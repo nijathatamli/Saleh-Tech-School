@@ -25,7 +25,7 @@ export default async function TeacherClassDetailPage({ params }: { params: { id:
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-electric-600">{classGroup.course.name}</p>
-              <h2 className="mt-1 font-app text-xl font-extrabold text-navy-900">{classGroup.name}</h2>
+              <h2 className="mt-1 font-display text-xl text-navy-900">{classGroup.name}</h2>
               <p className="mt-1 text-sm text-navy-400">{classGroup.schedule}</p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-navy-50 px-4 py-2 text-sm font-bold text-navy-900">
@@ -36,7 +36,7 @@ export default async function TeacherClassDetailPage({ params }: { params: { id:
         </div>
 
         <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="border-b border-navy-100 p-6 font-app text-base font-bold text-navy-900">Tələbələr</h3>
+          <h3 className="border-b border-navy-100 p-6 font-display text-base text-navy-900">Tələbələr</h3>
           {classGroup.enrollments.length === 0 ? (
             <div className="p-6">
               <EmptyState icon={Users} title="Bu sinifdə tələbə yoxdur" />
@@ -76,7 +76,7 @@ export default async function TeacherClassDetailPage({ params }: { params: { id:
         </div>
 
         <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="border-b border-navy-100 p-6 font-app text-base font-bold text-navy-900">Dərslər</h3>
+          <h3 className="border-b border-navy-100 p-6 font-display text-base text-navy-900">Dərslər</h3>
           {classGroup.lessons.length === 0 ? (
             <div className="p-6">
               <EmptyState icon={CalendarCheck} title="Hələ dərs yoxdur" />

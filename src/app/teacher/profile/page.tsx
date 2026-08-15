@@ -23,7 +23,7 @@ export default async function TeacherProfilePage() {
         </div>
 
         <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="mb-3 font-app text-base font-bold text-navy-900">Bio</h3>
+          <h3 className="mb-3 font-display text-base text-navy-900">Bio</h3>
           <p className="text-sm leading-relaxed text-navy-600">{teacher.bio}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {teacher.specializations.map((s) => (

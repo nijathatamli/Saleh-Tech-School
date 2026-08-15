@@ -40,7 +40,7 @@ export default async function PaymentsPage() {
         </div>
 
         <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="border-b border-navy-100 p-6 font-app text-base font-bold text-navy-900">Ödəniş tarixçəsi</h3>
+          <h3 className="border-b border-navy-100 p-6 font-display text-base text-navy-900">Ödəniş tarixçəsi</h3>
           {payments.length === 0 ? (
             <div className="p-6">
               <EmptyState icon={CreditCard} title="Hələ ödəniş qeydi yoxdur" />

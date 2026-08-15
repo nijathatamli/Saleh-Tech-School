@@ -33,7 +33,7 @@ export default async function TeacherDashboardPage() {
 
       <div className="space-y-8 p-6 md:p-10">
         <div>
-          <h2 className="font-app text-2xl font-extrabold text-navy-900">Salam, {teacher.user.name.split(" ")[0]} 👋</h2>
+          <h2 className="font-display text-2xl text-navy-900">Salam, {teacher.user.name.split(" ")[0]} 👋</h2>
           <p className="mt-1 text-sm text-navy-400">Bugünkü xülasəniz budur.</p>
         </div>
 
@@ -46,7 +46,7 @@ export default async function TeacherDashboardPage() {
 
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-app text-base font-bold text-navy-900">Siniflərim</h3>
+            <h3 className="font-display text-base text-navy-900">Siniflərim</h3>
             <Link href="/teacher/classes" className="flex items-center gap-1 text-xs font-bold text-electric-600">
               Hamısına bax <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
@@ -75,7 +75,7 @@ export default async function TeacherDashboardPage() {
         </div>
 
         <div>
-          <h3 className="mb-4 font-app text-base font-bold text-navy-900">Son fəaliyyət</h3>
+          <h3 className="mb-4 font-display text-base text-navy-900">Son fəaliyyət</h3>
           <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
             {recentLessons.length === 0 ? (
               <div className="p-6">

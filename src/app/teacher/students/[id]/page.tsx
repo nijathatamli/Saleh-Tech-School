@@ -45,7 +45,7 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
         <div className="flex flex-col items-center gap-6 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm shadow-navy-900/[0.03] sm:flex-row">
           <Avatar name={`${student.firstName} ${student.lastName}`} src={student.avatarUrl} size={72} />
           <div className="text-center sm:text-left">
-            <h2 className="font-app text-xl font-extrabold text-navy-900">
+            <h2 className="font-display text-xl text-navy-900">
               {student.firstName} {student.lastName}
             </h2>
             <p className="mt-1 text-sm text-navy-400">
@@ -59,15 +59,15 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
           </div>
           <div className="ml-0 grid grid-cols-3 gap-6 sm:ml-auto">
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{student.points.toLocaleString("az-AZ")}</p>
+              <p className="font-display text-xl text-navy-900">{student.points.toLocaleString("az-AZ")}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Xal</p>
             </div>
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{rate}%</p>
+              <p className="font-display text-xl text-navy-900">{rate}%</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Davamiyyət</p>
             </div>
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{student.grades.length}</p>
+              <p className="font-display text-xl text-navy-900">{student.grades.length}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Qiymət</p>
             </div>
           </div>
@@ -76,7 +76,7 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 font-app text-base font-bold text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
+              <h3 className="mb-6 font-display text-base text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
               {student.progress.length === 0 ? (
                 <p className="text-sm text-navy-400">Hələ tərəqqi qeydi yoxdur.</p>
               ) : (
@@ -95,7 +95,7 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
             </section>
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 font-app text-base font-bold text-navy-900">Qiymətlər</h3>
+              <h3 className="mb-6 font-display text-base text-navy-900">Qiymətlər</h3>
               {student.grades.length === 0 ? (
                 <p className="text-sm text-navy-400">Hələ qiymət qeydi yoxdur.</p>
               ) : (
@@ -111,7 +111,7 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
             </section>
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
                 <FolderGit2 className="h-4 w-4 text-electric-500" /> Layihələr
               </h3>
               {student.projects.length === 0 ? (
@@ -131,7 +131,7 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
 
           <div className="space-y-8">
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
                 <Trophy className="h-4 w-4 text-amber-500" /> Nailiyyətlər
               </h3>
               {student.studentBadges.length === 0 ? (

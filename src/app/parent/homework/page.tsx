@@ -78,7 +78,7 @@ export default async function HomeworkPage({ searchParams }: { searchParams: { c
             (section) =>
               section.items.length > 0 && (
                 <div key={section.title}>
-                  <h3 className="mb-4 font-app text-base font-bold text-navy-900">{section.title}</h3>
+                  <h3 className="mb-4 font-display text-base text-navy-900">{section.title}</h3>
                   <div className="grid gap-4 md:grid-cols-2">
                     {section.items.map((s) => {
                       const meta = statusVariant[s.status];

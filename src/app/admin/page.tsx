@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="mb-6 font-app text-base font-bold text-navy-900">CRM Pipeline üzrə müraciətlər</h3>
+          <h3 className="mb-6 font-display text-base text-navy-900">CRM Pipeline üzrə müraciətlər</h3>
           <AdminBarChart data={chartData} />
         </section>
       </div>

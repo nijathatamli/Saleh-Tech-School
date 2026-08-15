@@ -12,11 +12,10 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-white hover:bg-black",
         outline: "border border-grey-200 text-secondary hover:bg-secondary hover:text-white",
         ghost: "text-secondary hover:bg-grey-100",
-        app: "bg-electric-500 text-white hover:bg-electric-600 shadow-lg shadow-electric-500/20 normal-case tracking-normal font-semibold text-sm",
-        "app-outline":
-          "border border-navy-100 text-navy-900 hover:bg-navy-50 normal-case tracking-normal font-semibold text-sm",
-        "app-ghost": "text-navy-400 hover:bg-navy-50 normal-case tracking-normal font-semibold text-sm",
-        destructive: "bg-red-500 text-white hover:bg-red-600 normal-case tracking-normal font-semibold text-sm",
+        app: "bg-electric-500 text-white hover:bg-electric-600 shadow-lg shadow-electric-500/20",
+        "app-outline": "border border-navy-100 text-navy-900 hover:bg-navy-50",
+        "app-ghost": "text-navy-400 hover:bg-navy-50",
+        destructive: "bg-red-500 text-white hover:bg-red-600",
       },
       size: {
         sm: "px-4 py-2",

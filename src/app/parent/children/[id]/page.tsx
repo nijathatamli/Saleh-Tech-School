@@ -29,7 +29,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
         <div className="flex flex-col items-center gap-6 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm shadow-navy-900/[0.03] sm:flex-row">
           <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={80} />
           <div className="text-center sm:text-left">
-            <h2 className="font-app text-xl font-extrabold text-navy-900">
+            <h2 className="font-display text-xl text-navy-900">
               {child.firstName} {child.lastName}
             </h2>
             <p className="mt-1 text-sm text-navy-400">{age} yaş · Səviyyə {child.level}</p>
@@ -43,15 +43,15 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
           </div>
           <div className="ml-0 grid grid-cols-3 gap-6 sm:ml-auto">
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{child.xp.toLocaleString("az-AZ")}</p>
+              <p className="font-display text-xl text-navy-900">{child.xp.toLocaleString("az-AZ")}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">XP</p>
             </div>
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{child.points.toLocaleString("az-AZ")}</p>
+              <p className="font-display text-xl text-navy-900">{child.points.toLocaleString("az-AZ")}</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Xal</p>
             </div>
             <div className="text-center">
-              <p className="font-app text-xl font-extrabold text-navy-900">{rate}%</p>
+              <p className="font-display text-xl text-navy-900">{rate}%</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Davamiyyət</p>
             </div>
           </div>
@@ -60,7 +60,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 font-app text-base font-bold text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
+              <h3 className="mb-6 font-display text-base text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
               {child.progress.length === 0 ? (
                 <p className="text-sm text-navy-400">Hələ tərəqqi qeydi yoxdur.</p>
               ) : (
@@ -79,7 +79,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
             </section>
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
                 <FolderGit2 className="h-4 w-4 text-electric-500" /> Layihələr
               </h3>
               {child.projects.length === 0 ? (
@@ -104,7 +104,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
 
           <div className="space-y-8">
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
                 <Trophy className="h-4 w-4 text-amber-500" /> Nailiyyətlər
               </h3>
               {child.studentBadges.length === 0 ? (
@@ -126,14 +126,14 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
             </section>
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
                 <Award className="h-4 w-4 text-amber-500" /> Sertifikatlar
               </h3>
               <EmptyState icon={Award} title="Hələ sertifikat qazanılmayıb" description="Kurs tamamlandıqda burada görünəcək." />
             </section>
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-4 font-app text-base font-bold text-navy-900">Müəllim rəyləri</h3>
+              <h3 className="mb-4 font-display text-base text-navy-900">Müəllim rəyləri</h3>
               {child.grades.length === 0 ? (
                 <p className="text-sm text-navy-400">Hələ qiymət qeydi yoxdur.</p>
               ) : (

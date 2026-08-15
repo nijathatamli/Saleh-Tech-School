@@ -37,7 +37,7 @@ export default async function HomeworkGradingPage({ params }: { params: { id: st
       <div className="space-y-6 p-6 md:p-10">
         <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
           <p className="text-xs font-bold uppercase tracking-widest text-electric-600">{homework.lesson.class.course.name}</p>
-          <h2 className="mt-1 font-app text-lg font-extrabold text-navy-900">{homework.title}</h2>
+          <h2 className="mt-1 font-display text-lg text-navy-900">{homework.title}</h2>
           <p className="mt-2 text-sm text-navy-400">{homework.description}</p>
           <p className="mt-2 text-xs text-navy-400">Son tarix: {formatDate(homework.dueDate)}</p>
         </div>

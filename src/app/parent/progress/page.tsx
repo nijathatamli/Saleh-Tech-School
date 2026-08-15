@@ -60,7 +60,7 @@ export default async function ProgressPage({ searchParams }: { searchParams: { c
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-            <h3 className="mb-6 font-app text-base font-bold text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
+            <h3 className="mb-6 font-display text-base text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
             {child.progress.length === 0 ? (
               <p className="text-sm text-navy-400">Hələ tərəqqi qeydi yoxdur.</p>
             ) : (
@@ -79,7 +79,7 @@ export default async function ProgressPage({ searchParams }: { searchParams: { c
           </div>
 
           <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-            <h3 className="mb-6 font-app text-base font-bold text-navy-900">Zaman üzrə tərəqqi</h3>
+            <h3 className="mb-6 font-display text-base text-navy-900">Zaman üzrə tərəqqi</h3>
             {chartData.length === 0 ? (
               <p className="text-sm text-navy-400">Hələ kifayət qədər məlumat yoxdur.</p>
             ) : (

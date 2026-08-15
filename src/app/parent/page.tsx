@@ -26,7 +26,7 @@ export default async function ParentDashboardPage() {
 
       <div className="space-y-8 p-6 md:p-10">
         <div>
-          <h2 className="font-app text-2xl font-extrabold text-navy-900">Salam, {parent.user.name.split(" ")[0]} 👋</h2>
+          <h2 className="font-display text-2xl text-navy-900">Salam, {parent.user.name.split(" ")[0]} 👋</h2>
           <p className="mt-1 text-sm text-navy-400">Övladlarınızın bugünkü xülasəsi budur.</p>
         </div>
 
@@ -39,7 +39,7 @@ export default async function ParentDashboardPage() {
 
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-app text-base font-bold text-navy-900">Uşaqlarım</h3>
+            <h3 className="font-display text-base text-navy-900">Uşaqlarım</h3>
             <Link href="/parent/children" className="flex items-center gap-1 text-xs font-bold text-electric-600">
               Hamısına bax <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>

@@ -25,11 +25,11 @@ export function StatCard({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]", className)}>
+    <div className={cn("rounded-3xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]", className)}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-navy-400">{label}</p>
-          <p className="mt-2 font-app text-3xl font-extrabold text-navy-900">{value}</p>
+          <p className="mt-2 font-display text-3xl text-navy-900">{value}</p>
           {trend && <p className="mt-1 text-xs font-semibold text-emerald-600">{trend}</p>}
         </div>
         <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", colorMap[color])}>

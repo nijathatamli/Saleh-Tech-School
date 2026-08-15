@@ -67,11 +67,11 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
             <p className="text-xs font-bold uppercase tracking-widest text-navy-400">Bu ay davamiyyət</p>
-            <p className="mt-2 font-app text-3xl font-extrabold text-navy-900">{monthRate}%</p>
+            <p className="mt-2 font-display text-3xl text-navy-900">{monthRate}%</p>
           </div>
           <div className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
             <p className="text-xs font-bold uppercase tracking-widest text-navy-400">Ümumi davamiyyət</p>
-            <p className="mt-2 font-app text-3xl font-extrabold text-navy-900">{rate}%</p>
+            <p className="mt-2 font-display text-3xl text-navy-900">{rate}%</p>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
         </div>
 
         <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="border-b border-navy-100 p-6 font-app text-base font-bold text-navy-900">Davamiyyət tarixçəsi</h3>
+          <h3 className="border-b border-navy-100 p-6 font-display text-base text-navy-900">Davamiyyət tarixçəsi</h3>
           {records.length === 0 ? (
             <div className="p-6">
               <EmptyState icon={CalendarCheck} title="Hələ davamiyyət qeydi yoxdur" />

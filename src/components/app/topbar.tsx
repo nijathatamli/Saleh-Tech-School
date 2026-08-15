@@ -24,7 +24,7 @@ export function AppTopbar({
 }) {
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-navy-100 bg-white/80 px-6 py-4 backdrop-blur-md md:px-10">
-      <h1 className="font-app text-lg font-extrabold text-navy-900 md:text-xl">{title}</h1>
+      <h1 className="font-display text-lg text-navy-900 md:text-xl">{title}</h1>
 
       <div className="flex items-center gap-4">
         <button className="relative flex h-10 w-10 items-center justify-center rounded-full text-navy-400 transition-colors hover:bg-navy-50 hover:text-navy-900">

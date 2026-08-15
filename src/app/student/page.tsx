@@ -36,7 +36,7 @@ export default async function StudentDashboardPage() {
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
             <div>
               <p className="text-sm text-white/70">Salam, {student.firstName} 👋</p>
-              <h2 className="mt-1 font-app text-2xl font-extrabold">Səviyyə {student.level}</h2>
+              <h2 className="mt-1 font-display text-2xl">Səviyyə {student.level}</h2>
               <div className="mt-4 w-56">
                 <div className="mb-1 flex justify-between text-xs text-white/70">
                   <span>{student.xp.toLocaleString("az-AZ")} XP</span>
@@ -73,7 +73,7 @@ export default async function StudentDashboardPage() {
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
             <section>
-              <h3 className="mb-4 font-app text-base font-bold text-navy-900">Kurslarım</h3>
+              <h3 className="mb-4 font-display text-base text-navy-900">Kurslarım</h3>
               {student.enrollments.length === 0 ? (
                 <EmptyState icon={BookOpen} title="Hələ kursa yazılmamısınız" />
               ) : (
@@ -90,7 +90,7 @@ export default async function StudentDashboardPage() {
 
             <section>
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-app text-base font-bold text-navy-900">Ev tapşırıqları</h3>
+                <h3 className="font-display text-base text-navy-900">Ev tapşırıqları</h3>
                 <Link href="/student/homework" className="flex items-center gap-1 text-xs font-bold text-electric-600">
                   Hamısına bax <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
@@ -114,7 +114,7 @@ export default async function StudentDashboardPage() {
           </div>
 
           <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-            <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
+            <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
               <Trophy className="h-4 w-4 text-amber-500" /> Nişanlarım
             </h3>
             {student.studentBadges.length === 0 ? (

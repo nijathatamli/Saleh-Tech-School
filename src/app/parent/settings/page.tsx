@@ -26,7 +26,7 @@ export default async function SettingsPage() {
         </div>
 
         <form action={updateProfile} className="space-y-5 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="font-app text-base font-bold text-navy-900">Şəxsi məlumatlar</h3>
+          <h3 className="font-display text-base text-navy-900">Şəxsi məlumatlar</h3>
           <div>
             <Label htmlFor="name">Ad Soyad</Label>
             <Input id="name" name="name" defaultValue={parent.user.name} />
