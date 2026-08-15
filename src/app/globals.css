@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-grey-200;
+  }
+  body {
+    @apply antialiased;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-offset-2 ring-electric-500 rounded-md;
+  }
+}
+
+@layer utilities {
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .app-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .app-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .app-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-navy-400/40 rounded-full;
+  }
+}
