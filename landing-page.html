@@ -2,6 +2,16 @@
 <html lang="az">
 <head>
     <script>
+        // Set theme before first paint to avoid a light/dark flash
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored ? stored === 'dark' : prefersDark) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+    <script>
         window.FontAwesomeConfig = {
           autoReplaceSvg: 'nest'
         };
@@ -17,6 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -45,11 +56,21 @@
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-20px)' },
-                        }
+                        },
+                        tagScroll: {
+                            from: { transform: 'translateX(0)' },
+                            to: { transform: 'translateX(-50%)' },
+                        },
+                        popIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
                     },
                     animation: {
                         scroll: 'scroll 20s linear infinite',
                         float: 'float 6s ease-in-out infinite',
+                        'tag-scroll': 'tagScroll 10s linear infinite',
+                        'pop-in': 'popIn 0.25s ease-out',
                     },
                 },
             },
@@ -72,26 +93,52 @@
         }
         .nav-link-hover:hover::after { transform: translateX(0); }
         .course-card:hover { transform: translateY(-5px); }
+
+        /* Smooth dark/light theme crossfade instead of an instant snap */
+        *, *::before, *::after {
+            transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease, fill 0.45s ease, stroke 0.45s ease;
+        }
+
+        .hero-mascot { transition: transform 0.4s ease; }
+        .hero-mascot:hover { transform: translateY(-6px) scale(1.04) rotate(-2deg); }
+
+        .highlight-card { transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.45s ease, border-color 0.45s ease; cursor: pointer; }
+        .highlight-card:hover { transform: translateY(-8px) scale(1.015); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        .highlight-card:active { transform: translateY(-4px) scale(0.99); }
+
+        .tag-track-mask { -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent); mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent); }
+
+        .teacher-card { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease, background-color 0.45s ease; position: relative; }
+        .teacher-card:hover { z-index: 10; }
+        .teacher-card:hover { transform: scale(1.06); box-shadow: 0 25px 45px -15px rgba(0,0,0,0.35); }
+        .teacher-name { transition: color 0.35s ease, letter-spacing 0.35s ease; }
+        .teacher-card:hover .teacher-name { color: #FF6B00; letter-spacing: 0.5px; }
+
+        #course-modal-backdrop { backdrop-filter: blur(4px); }
     </style>
 </head>
-<body class="bg-white text-secondary antialiased overflow-x-hidden">
+<body class="bg-white text-secondary dark:text-white dark:bg-black antialiased overflow-x-hidden">
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-white/90 backdrop-blur-md border-b border-grey-100">
+    <header class="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-white/90 dark:bg-black/80 backdrop-blur-md border-b border-grey-100 dark:border-zinc-800">
         <div class="flex items-center space-x-8">
             <a href="#" class="font-display text-xl tracking-tight flex items-center">
                 <span class="text-primary mr-2"><i class="fa-solid fa-fox"></i></span>
                 Saleh<span class="text-primary">.</span>Tech
             </a>
-            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-grey-500">
-                <a href="#" class="nav-link-hover text-secondary">Ana Səhifə</a>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-grey-500 dark:text-zinc-400">
+                <a href="#" class="nav-link-hover text-secondary dark:text-white">Ana Səhifə</a>
                 <a href="#courses" class="nav-link-hover">Kurslar</a>
                 <a href="#parents" class="nav-link-hover">Valideyn Paneli</a>
                 <a href="#testimonials" class="nav-link-hover">Rəylər</a>
             </nav>
         </div>
         <div class="flex items-center space-x-6">
-            <a href="ParentDashboard__desktop.html" class="hidden md:inline-block text-sm font-bold text-secondary hover:text-primary transition-colors">Giriş</a>
+            <button onclick="toggleTheme()" aria-label="Tema dəyiş" class="w-10 h-10 rounded-full border border-grey-100 dark:border-zinc-800 flex items-center justify-center text-grey-500 dark:text-zinc-400 hover:bg-secondary hover:text-white dark:hover:bg-white dark:hover:text-secondary transition-all">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:inline-block"></i>
+            </button>
+            <a href="ParentDashboard__desktop.html" class="hidden md:inline-block text-sm font-bold text-secondary dark:text-white hover:text-primary transition-colors">Giriş</a>
             <a href="#contact" class="px-8 py-3 bg-primary text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">Qeydiyyat</a>
             <button class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
         </div>
@@ -112,7 +159,7 @@
                 <h1 class="font-display text-4xl md:text-6xl leading-tight">
                     Uşağınız gələcəyin <span class="text-primary">texnologiyalarını</span> bu gündən öyrənsin.
                 </h1>
-                <p class="text-grey-500 text-lg max-w-md leading-relaxed">
+                <p class="text-grey-500 dark:text-zinc-400 text-lg max-w-md leading-relaxed">
                     Saleh Tech School ilə 6-18 yaş arası uşaqlar üçün ən müasir texnologiya yollarını kəşf edin. Bizim sevimli tülkü maskotumuzla öyrənmək daha əyləncəlidir!
                 </p>
 
@@ -124,7 +171,7 @@
                             <img class="w-10 h-10 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="">
                             <img class="w-10 h-10 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="">
                         </div>
-                        <p class="text-xs text-grey-500 font-medium">500+ aktiv tələbə</p>
+                        <p class="text-xs text-grey-500 dark:text-zinc-400 font-medium">500+ aktiv tələbə</p>
                     </div>
                 </div>
             </div>
@@ -132,7 +179,7 @@
             <div class="w-full md:w-1/2 relative flex justify-center items-center">
                 <!-- Mascot Image -->
                 <div class="relative z-10 animate-float">
-                    <img class="w-full max-w-md h-auto" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_fd0da67a02_b5ce6de0f892224b.png" alt="friendly orange fox mascot wearing a blue hoodie and tech glasses, sitting with a laptop, 3D charact" />
+                    <img class="hero-mascot w-full max-w-md h-auto" src="assets/fox-mascot-hero.png" alt="friendly orange fox mascot wearing a blue hoodie and tech glasses, sitting with a laptop, 3D charact" />
                 </div>
                 <!-- Abstract blobs -->
                 <div class="absolute inset-0 flex items-center justify-center -z-10">
@@ -142,141 +189,269 @@
         </section>
 
         <!-- Marquee Section -->
-        <section class="border-y border-grey-100 py-6 overflow-hidden bg-white">
+        <section class="border-y border-grey-100 dark:border-zinc-800 py-6 overflow-hidden bg-white dark:bg-black">
             <div class="animate-scroll whitespace-nowrap inline-block">
-                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">ROBOTOTEXNİKA</span>
+                <span class="font-display text-2xl md:text-3xl text-grey-200 dark:text-zinc-800 mx-12">ROBOTOTEXNİKA</span>
                 <span class="font-display text-2xl md:text-3xl text-primary mx-12">KİBER TƏHLÜKƏSİZLİK</span>
-                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">PROQRAMLAŞDIRMA</span>
+                <span class="font-display text-2xl md:text-3xl text-grey-200 dark:text-zinc-800 mx-12">PROQRAMLAŞDIRMA</span>
                 <span class="font-display text-2xl md:text-3xl text-primary mx-12">SÜNİ İNTELLEKT</span>
-                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">OYUN YARADILMASI</span>
+                <span class="font-display text-2xl md:text-3xl text-grey-200 dark:text-zinc-800 mx-12">OYUN YARADILMASI</span>
             </div>
         </section>
 
         <!-- Stats Band -->
-        <section class="bg-grey-50 px-6 md:px-20 py-24 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <section class="bg-grey-50 dark:bg-zinc-900 px-6 md:px-20 py-24 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             <div class="space-y-3">
-                <div class="font-display text-4xl md:text-5xl text-secondary">500+</div>
+                <div class="font-display text-4xl md:text-5xl text-secondary dark:text-white">500+</div>
                 <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Aktiv Tələbə</div>
             </div>
             <div class="space-y-3">
-                <div class="font-display text-4xl md:text-5xl text-secondary">20+</div>
+                <div class="font-display text-4xl md:text-5xl text-secondary dark:text-white">20+</div>
                 <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Ekspert Müəllim</div>
             </div>
             <div class="space-y-3">
-                <div class="font-display text-4xl md:text-5xl text-secondary">15+</div>
+                <div class="font-display text-4xl md:text-5xl text-secondary dark:text-white">15+</div>
                 <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Tədris Proqramı</div>
             </div>
             <div class="space-y-3">
-                <div class="font-display text-4xl md:text-5xl text-secondary">98%</div>
+                <div class="font-display text-4xl md:text-5xl text-secondary dark:text-white">98%</div>
                 <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Məmnuniyyət</div>
             </div>
         </section>
 
-        <!-- Age Groups -->
+        <!-- Age Groups / Course Highlights -->
         <section class="px-6 md:px-20 py-32">
             <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
-                <h2 class="font-display text-3xl md:text-4xl leading-tight">Hər yaşa uyğun texnoloji macəra</h2>
-                <p class="text-grey-500">Uşağınızın yaş qrupuna uyğun olaraq hazırlanmış xüsusi dərslərimizlə tanış olun.</p>
+                <h2 class="font-display text-3xl md:text-4xl leading-tight">Uşaqlar üçün IT və Proqramlaşdırma kursları!</h2>
+                <p class="text-grey-500 dark:text-zinc-400">Kurslarımızda müxtəlif növ və istiqamət üçün texnologiyalar tədris olunur</p>
             </div>
 
-            <div class="grid md:grid-cols-4 gap-6">
-                <!-- Age Card 1 -->
-                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
-                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-cubes text-2xl"></i>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Course Card 1 -->
+                <div class="highlight-card relative bg-yellow-50 dark:bg-yellow-950/40 border-2 border-yellow-300 dark:border-yellow-800 rounded-3xl p-8 overflow-hidden"
+                     data-title="IT və Kompüter Mühəndisliyi kursu" data-instructor="Emin Qasımov" data-price="180 AZN/ay"
+                     data-start="16 Sentyabr 2026" data-seats="4 yer qalıb" data-format="Həftədə 2 dərs, offline">
+                    <img src="assets/course-it.png" alt="IT və Kompüter Mühəndisliyi kursu personajı" class="absolute -bottom-3 -right-3 w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">IT və Kompüter Mühəndisliyi kursu</h3>
+                        <p class="text-grey-600 text-sm">Texnologiya dünyasına ilk addımını at!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 10-15</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Başlanğıc</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 15 ay</span></li>
+                        </ul>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg mb-2">6-8 yaş</h3>
-                        <p class="text-xs text-grey-500 leading-relaxed">Vizual proqramlaşdırma və məntiq əsasları.</p>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">figma</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">javascript</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">html</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">css</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">cybersecurity</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">figma</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">javascript</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">html</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">css</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">cybersecurity</span>
+                        </div>
                     </div>
-                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
                 </div>
-                <!-- Age Card 2 -->
-                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
-                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-gamepad text-2xl"></i>
+                <!-- Course Card 2 -->
+                <div class="highlight-card relative bg-red-50 dark:bg-red-950/40 border-2 border-red-400 dark:border-red-800 rounded-3xl p-8 overflow-hidden"
+                     data-title="Kibertəhlükəsizlik Kursu" data-instructor="Tural Zeynalov" data-price="220 AZN/ay"
+                     data-start="23 Sentyabr 2026" data-seats="2 yer qalıb" data-format="Həftədə 3 dərs, offline">
+                    <img src="assets/course-cyber.png" alt="Kibertəhlükəsizlik Kursu personajı" class="absolute -bottom-3 -right-3 w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">Kibertəhlükəsizlik Kursu</h3>
+                        <p class="text-grey-600 text-sm">Rəqəmsal dünyanı təhlükəsiz et!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 11-17</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Qabaqcıl</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 12 ay</span></li>
+                        </ul>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg mb-2">9-11 yaş</h3>
-                        <p class="text-xs text-grey-500 leading-relaxed">Oyun yaradılması və robototexnikaya giriş.</p>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">şəbəkə</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">linux</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">blue team</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">red team</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">pentest</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">şəbəkə</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">linux</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">blue team</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">red team</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">pentest</span>
+                        </div>
                     </div>
-                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
                 </div>
-                <!-- Age Card 3 -->
-                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
-                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-code text-2xl"></i>
+                <!-- Course Card 3 -->
+                <div class="highlight-card relative bg-green-50 dark:bg-green-950/40 border-2 border-green-300 dark:border-green-800 rounded-3xl p-8 overflow-hidden"
+                     data-title="Robotexnika kursu" data-instructor="Nigar Əliyeva" data-price="160 AZN/ay"
+                     data-start="30 Sentyabr 2026" data-seats="6 yer qalıb" data-format="Həftədə 2 dərs, offline">
+                    <img src="assets/course-robotics.webp" alt="Robotexnika kursu personajı" class="absolute -bottom-3 -right-3 w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">Robotexnika kursu</h3>
+                        <p class="text-grey-600 text-sm">Öz robotunu yarat, proqramla və idarə et!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 8-12</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Başlanğıc</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 6 ay</span></li>
+                        </ul>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg mb-2">12-14 yaş</h3>
-                        <p class="text-xs text-grey-500 leading-relaxed">Python proqramlaşdırma və kiber təhlükəsizlik.</p>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">arduino</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">lego</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">vex</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">sensor</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">led</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">steam</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">arduino</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">lego</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">vex</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">sensor</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">led</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">steam</span>
+                        </div>
                     </div>
-                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
                 </div>
-                <!-- Age Card 4 -->
-                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
-                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-brain text-2xl"></i>
+                <!-- Course Card 4 -->
+                <div class="highlight-card relative bg-lime-50 dark:bg-lime-950/40 border-2 border-blue-800 dark:border-blue-700 rounded-3xl p-8 overflow-hidden"
+                     data-title="Liderlik Təlimləri" data-instructor="Emin Qasımov" data-price="140 AZN/ay"
+                     data-start="7 Oktyabr 2026" data-seats="8 yer qalıb" data-format="Həftədə 1 dərs, offline">
+                    <img src="assets/course-leadership.webp" alt="Liderlik Təlimləri personajı" class="absolute -bottom-3 -right-3 w-28 h-32 md:w-32 md:h-36 object-contain object-bottom drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">Liderlik Təlimləri</h3>
+                        <p class="text-grey-600 text-sm">Texnologiya dünyasına ilk addımını at!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 10-16</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Başlanğıc</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 1 ay</span></li>
+                        </ul>
                     </div>
-                    <div>
-                        <h3 class="font-display text-lg mb-2">15-18 yaş</h3>
-                        <p class="text-xs text-grey-500 leading-relaxed">Süni intellekt və professional inkişaf.</p>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">nitq</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">liderlik</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">inkişaf</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">soft skills</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">komanda idarəetməsi</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">nitq</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">liderlik</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">inkişaf</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">soft skills</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">komanda idarəetməsi</span>
+                        </div>
                     </div>
-                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
+                </div>
+                <!-- Course Card 5 -->
+                <div class="highlight-card relative bg-green-100 dark:bg-green-950/40 border-2 border-transparent dark:border-green-800 rounded-3xl p-8 overflow-hidden"
+                     data-title="Yay Məktəbi: IT və Proqramlaşdırma" data-instructor="Nigar Əliyeva" data-price="120 AZN/ay"
+                     data-start="14 Oktyabr 2026" data-seats="10 yer qalıb" data-format="Həftədə 2 dərs, offline">
+                    <img src="assets/course-summer.webp" alt="Yay Məktəbi: IT və Proqramlaşdırma personajları" class="absolute -bottom-3 -right-3 w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">Yay Məktəbi: IT və Proqramlaşdırma</h3>
+                        <p class="text-grey-600 text-sm">Texnologiya dünyasına ilk addımını at!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 10-15</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Başlanğıc</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 3 ay</span></li>
+                        </ul>
+                    </div>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">html</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">css</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">figma</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">IT</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">html</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">css</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">figma</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">IT</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course Card 6 -->
+                <div class="highlight-card relative bg-blue-50 dark:bg-blue-950/40 border-2 border-blue-300 dark:border-blue-800 rounded-3xl p-8 overflow-hidden"
+                     data-title="Süni İntellekt Mühəndisliyi kursu" data-instructor="Tural Zeynalov" data-price="240 AZN/ay"
+                     data-start="21 Oktyabr 2026" data-seats="3 yer qalıb" data-format="Həftədə 3 dərs, online">
+                    <img src="assets/course-ai.png" alt="Süni İntellekt Mühəndisliyi kursu personajı" class="absolute -bottom-3 -right-3 w-28 h-28 md:w-32 md:h-32 object-contain drop-shadow-lg pointer-events-none" />
+                    <div class="relative z-10 space-y-4 max-w-[80%]">
+                        <h3 class="font-display text-lg leading-snug">Süni İntellekt Mühəndisliyi kursu</h3>
+                        <p class="text-grey-600 text-sm">Gələcəyin texnologiyasını öyrən!</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Yaş:</b> 12-17</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Səviyyə:</b> Qabaqcıl</span></li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-secondary dark:text-white text-xs"></i><span><b>Müddət:</b> 8 ay</span></li>
+                        </ul>
+                    </div>
+                    <div class="relative z-10 mt-6 overflow-hidden tag-track-mask">
+                        <div class="tag-track flex gap-2 w-max animate-tag-scroll">
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">artificial intelligence</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">AI</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">machine learning</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap">computer vision</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">artificial intelligence</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">AI</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">machine learning</span>
+                            <span class="bg-white/70 dark:bg-white/10 dark:text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap" aria-hidden="true">computer vision</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Courses -->
-        <section id="courses" class="px-6 md:px-20 py-32 bg-grey-50">
+        <section id="courses" class="px-6 md:px-20 py-32 bg-grey-50 dark:bg-zinc-900">
             <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
                 <div class="space-y-4 max-w-xl">
                     <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Ən çox seçilənlər</span>
                     <h2 class="font-display text-3xl md:text-5xl leading-tight">Populyar kurslarımız</h2>
                 </div>
-                <button class="px-8 py-3 border border-grey-200 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">Hamısına bax</button>
+                <button class="px-8 py-3 border border-grey-200 dark:border-zinc-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-secondary hover:text-white dark:hover:bg-white dark:hover:text-secondary transition-all">Hamısına bax</button>
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Course 1 -->
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                <div class="course-card bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-grey-100 dark:border-zinc-800 transition-all cursor-pointer group">
                     <div class="h-64 relative overflow-hidden">
                         <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_4d78f13579_72fa6a1d65880b79.png" alt="modern cybersecurity visualization with shields and locks, neon orange and white theme, digital tech" />
                         <div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Yeni</div>
                     </div>
                     <div class="p-8 space-y-4">
                         <h3 class="font-display text-xl group-hover:text-primary transition-colors">Kiber Təhlükəsizlik Əsasları</h3>
-                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Uşaqlar rəqəmsal dünyanı necə qorumağı və etik hakerlik prinsiplərini öyrənirlər.</p>
+                        <p class="text-grey-500 dark:text-zinc-400 text-sm leading-relaxed line-clamp-3">Uşaqlar rəqəmsal dünyanı necə qorumağı və etik hakerlik prinsiplərini öyrənirlər.</p>
                         <div class="pt-4 flex items-center justify-between border-t border-grey-50">
-                            <span class="text-xs font-bold text-secondary">8 Ay</span>
+                            <span class="text-xs font-bold text-secondary dark:text-white">8 Ay</span>
                             <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
                         </div>
                     </div>
                 </div>
                 <!-- Course 2 -->
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                <div class="course-card bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-grey-100 dark:border-zinc-800 transition-all cursor-pointer group">
                     <div class="h-64 relative overflow-hidden">
                         <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_96dae3585e_7e155be2988d8706.png" alt="child hands coding python on a laptop, friendly bright workspace, orange accents, educational photog" />
                     </div>
                     <div class="p-8 space-y-4">
                         <h3 class="font-display text-xl group-hover:text-primary transition-colors">Python ilə Proqramlaşdırma</h3>
-                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Dünyanın ən populyar proqramlaşdırma dilini əyləncəli layihələrlə mənimsəyin.</p>
+                        <p class="text-grey-500 dark:text-zinc-400 text-sm leading-relaxed line-clamp-3">Dünyanın ən populyar proqramlaşdırma dilini əyləncəli layihələrlə mənimsəyin.</p>
                         <div class="pt-4 flex items-center justify-between border-t border-grey-50">
-                            <span class="text-xs font-bold text-secondary">6 Ay</span>
+                            <span class="text-xs font-bold text-secondary dark:text-white">6 Ay</span>
                             <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
                         </div>
                     </div>
                 </div>
                 <!-- Course 3 -->
-                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                <div class="course-card bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-grey-100 dark:border-zinc-800 transition-all cursor-pointer group">
                     <div class="h-64 relative overflow-hidden">
                         <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_55f76a70f6_e6f3256ef5c6b526.png" alt="robotics workshop for teenagers, assembling futuristic robot arm, bright clean laboratory, orange li" />
                     </div>
                     <div class="p-8 space-y-4">
                         <h3 class="font-display text-xl group-hover:text-primary transition-colors">Robototexnika və IoT</h3>
-                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Öz robotlarınızı yaradın və onları kod vasitəsilə canlandırın.</p>
+                        <p class="text-grey-500 dark:text-zinc-400 text-sm leading-relaxed line-clamp-3">Öz robotlarınızı yaradın və onları kod vasitəsilə canlandırın.</p>
                         <div class="pt-4 flex items-center justify-between border-t border-grey-50">
-                            <span class="text-xs font-bold text-secondary">9 Ay</span>
+                            <span class="text-xs font-bold text-secondary dark:text-white">9 Ay</span>
                             <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
                         </div>
                     </div>
@@ -285,50 +460,63 @@
         </section>
 
         <!-- Teachers Section -->
-        <section id="teachers" class="px-6 md:px-20 py-32 border-t border-grey-100">
-            <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
-                <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Bizim Komandamız</span>
-                <h2 class="font-display text-3xl md:text-4xl">Peşəkar Müəllimlərimiz</h2>
-                <p class="text-grey-500">Uşaqlarınıza texnologiyanı sevdirən və onlara real təcrübə qazandıran mütəxəssislər.</p>
+        <section id="teachers" class="relative px-6 md:px-20 py-32 bg-grey-50 dark:bg-zinc-900 overflow-hidden">
+            <!-- Decorative glows -->
+            <div class="absolute top-0 right-0 w-[32rem] h-[32rem] bg-blue-400/10 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-0 left-0 w-[24rem] h-[24rem] bg-primary/5 rounded-full blur-[120px]"></div>
+            <!-- Decorative dots -->
+            <div class="absolute top-16 right-24 w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+            <div class="absolute top-40 right-10 w-1 h-1 bg-blue-300 rounded-full"></div>
+            <div class="absolute bottom-24 left-16 w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
+            <div class="absolute bottom-40 right-1/3 w-1 h-1 bg-blue-300 rounded-full"></div>
+
+            <div class="relative z-10 flex items-center gap-4 mb-16">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-primary flex items-center justify-center text-white text-xl shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h2 class="font-display text-2xl md:text-4xl text-secondary dark:text-white">Peşəkar Müəllimlərimiz</h2>
+                    <div class="w-16 h-1 bg-gradient-to-r from-teal-500 to-transparent rounded-full mt-3"></div>
+                </div>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-12">
+            <div class="relative z-10 grid md:grid-cols-3 gap-8">
                 <!-- Teacher 1 -->
-                <div class="group text-center space-y-6">
-                    <div class="relative inline-block">
-                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
-                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Tural Zeynalov">
-                    </div>
-                    <div class="space-y-2 relative z-10">
-                        <h3 class="font-display text-xl">Tural Zeynalov</h3>
-                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Kiber Təhlükəsizlik üzrə Baş Mütəxəssis</p>
-                        <p class="text-grey-500 text-sm max-w-xs mx-auto">10 illik beynəlxalq təcrübəyə malik mütəxəssis, tələbələrə rəqəmsal dünyanın sirlərini öyrədir.</p>
+                <div class="teacher-card group relative rounded-2xl overflow-hidden aspect-[4/5]">
+                    <img class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Tural Zeynalov">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 space-y-1">
+                        <h3 class="teacher-name font-display text-lg text-white">Tural Zeynalov</h3>
+                        <p class="text-teal-400 text-[10px] font-bold uppercase tracking-widest">Kiber Təhlükəsizlik üzrə Baş Mütəxəssis</p>
+                        <p class="text-grey-200/70 text-xs">10 illik beynəlxalq təcrübə</p>
                     </div>
                 </div>
                 <!-- Teacher 2 -->
-                <div class="group text-center space-y-6">
-                    <div class="relative inline-block">
-                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
-                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-9.jpg" alt="Emin Qasımov">
-                    </div>
-                    <div class="space-y-2 relative z-10">
-                        <h3 class="font-display text-xl">Emin Qasımov</h3>
-                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Full-Stack Proqramçı</p>
-                        <p class="text-grey-500 text-sm max-w-xs mx-auto">Python və Web texnologiyaları sahəsində 8 illik təcrübə ilə uşaqlara kodlaşdırmanı sevdirir.</p>
+                <div class="teacher-card group relative rounded-2xl overflow-hidden aspect-[4/5]">
+                    <img class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-9.jpg" alt="Emin Qasımov">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 space-y-1">
+                        <h3 class="teacher-name font-display text-lg text-white">Emin Qasımov</h3>
+                        <p class="text-teal-400 text-[10px] font-bold uppercase tracking-widest">Full-Stack Proqramçı</p>
+                        <p class="text-grey-200/70 text-xs">Texniki Təlim Direktoru</p>
                     </div>
                 </div>
                 <!-- Teacher 3 -->
-                <div class="group text-center space-y-6">
-                    <div class="relative inline-block">
-                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
-                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Nigar Əliyeva">
-                    </div>
-                    <div class="space-y-2 relative z-10">
-                        <h3 class="font-display text-xl">Nigar Əliyeva</h3>
-                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Robototexnika Mühəndisi</p>
-                        <p class="text-grey-500 text-sm max-w-xs mx-auto">Süni intellekt və robototexnika üzrə tədqiqatçı, gənc ixtiraçılar üçün mentor.</p>
+                <div class="teacher-card group relative rounded-2xl overflow-hidden aspect-[4/5]">
+                    <img class="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Nigar Əliyeva">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 space-y-1">
+                        <h3 class="teacher-name font-display text-lg text-white">Nigar Əliyeva</h3>
+                        <p class="text-teal-400 text-[10px] font-bold uppercase tracking-widest">Robototexnika Mühəndisi</p>
+                        <p class="text-grey-200/70 text-xs">Süni İntellekt üzrə Tədqiqatçı</p>
                     </div>
                 </div>
+            </div>
+
+            <div class="relative z-10 flex justify-center mt-16">
+                <a href="#" class="inline-flex items-center gap-2 px-8 py-4 bg-secondary border border-secondary text-white rounded-full text-sm font-semibold hover:bg-primary hover:border-primary transition-all">
+                    Bütün Müəllimlər <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
             </div>
         </section>
 
@@ -343,7 +531,7 @@
                 <div class="w-full md:w-1/2 space-y-8 relative z-10">
                     <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Valideynlər Üçün</span>
                     <h2 class="font-display text-3xl md:text-5xl leading-tight">Uşağınızın hər addımını izləyin</h2>
-                    <p class="text-grey-500 text-lg">Xüsusi Valideyn Paneli vasitəsilə tələbənin davamiyyətini, dərslərdəki aktivliyini və qazandığı uğurları real vaxtda izləyə bilərsiniz.</p>
+                    <p class="text-grey-500 dark:text-zinc-400 text-lg">Xüsusi Valideyn Paneli vasitəsilə tələbənin davamiyyətini, dərslərdəki aktivliyini və qazandığı uğurları real vaxtda izləyə bilərsiniz.</p>
                     <ul class="space-y-4">
                         <li class="flex items-center space-x-3">
                             <i class="fa-solid fa-circle-check text-primary"></i>
@@ -358,7 +546,7 @@
                             <span class="text-sm">Sertifikat və nailiyyət izləmə</span>
                         </li>
                     </ul>
-                    <a href="ParentDashboard__desktop.html" class="inline-block px-10 py-4 bg-white text-secondary rounded-full font-bold uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">Paneli Sınaqdan Keçir</a>
+                    <a href="ParentDashboard__desktop.html" class="inline-block px-10 py-4 bg-white text-secondary dark:text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">Paneli Sınaqdan Keçir</a>
                 </div>
 
                 <div class="w-full md:w-1/2 relative">
@@ -376,36 +564,36 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                <div class="bg-grey-50 dark:bg-zinc-900 p-10 rounded-3xl space-y-6 relative">
                     <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
-                    <p class="text-grey-500 italic relative z-10">"Oğlum hər dərsə böyük həvəslə gedir. Saleh Tech School-da öyrəndiyi proqramlaşdırma bilikləri onun məntiqi düşünməsini çox inkişaf etdirib."</p>
-                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                    <p class="text-grey-500 dark:text-zinc-400 italic relative z-10">"Oğlum hər dərsə böyük həvəslə gedir. Saleh Tech School-da öyrəndiyi proqramlaşdırma bilikləri onun məntiqi düşünməsini çox inkişaf etdirib."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 dark:border-zinc-700 pt-6">
                         <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="">
                         <div>
-                            <p class="font-bold text-sm text-secondary">Vüqar Məmmədov</p>
-                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                            <p class="font-bold text-sm text-secondary dark:text-white">Vüqar Məmmədov</p>
+                            <p class="text-[10px] text-grey-500 dark:text-zinc-400 uppercase tracking-widest font-bold">Valideyn</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                <div class="bg-grey-50 dark:bg-zinc-900 p-10 rounded-3xl space-y-6 relative">
                     <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
-                    <p class="text-grey-500 italic relative z-10">"Qızımın texnologiyaya olan marağı burada peşəkar şəkildə yönləndirilir. Valideyn paneli isə hər şeyi şəffaf edir."</p>
-                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                    <p class="text-grey-500 dark:text-zinc-400 italic relative z-10">"Qızımın texnologiyaya olan marağı burada peşəkar şəkildə yönləndirilir. Valideyn paneli isə hər şeyi şəffaf edir."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 dark:border-zinc-700 pt-6">
                         <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg" alt="">
                         <div>
-                            <p class="font-bold text-sm text-secondary">Leyla Əliyeva</p>
-                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                            <p class="font-bold text-sm text-secondary dark:text-white">Leyla Əliyeva</p>
+                            <p class="text-[10px] text-grey-500 dark:text-zinc-400 uppercase tracking-widest font-bold">Valideyn</p>
                         </div>
                     </div>
                 </div>
-                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                <div class="bg-grey-50 dark:bg-zinc-900 p-10 rounded-3xl space-y-6 relative">
                     <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
-                    <p class="text-grey-500 italic relative z-10">"Müasir dünyada uşaqların texnologiyanı öyrənməsi şərtdir. Bu məktəb bizə keyfiyyətli təhsil və əyləncəni bir arada təqdim edir."</p>
-                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                    <p class="text-grey-500 dark:text-zinc-400 italic relative z-10">"Müasir dünyada uşaqların texnologiyanı öyrənməsi şərtdir. Bu məktəb bizə keyfiyyətli təhsil və əyləncəni bir arada təqdim edir."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 dark:border-zinc-700 pt-6">
                         <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="">
                         <div>
-                            <p class="font-bold text-sm text-secondary">Samir Quliyev</p>
-                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                            <p class="font-bold text-sm text-secondary dark:text-white">Samir Quliyev</p>
+                            <p class="text-[10px] text-grey-500 dark:text-zinc-400 uppercase tracking-widest font-bold">Valideyn</p>
                         </div>
                     </div>
                 </div>
@@ -423,25 +611,25 @@
                 <h2 class="font-display text-4xl md:text-6xl text-white leading-tight">Uşağınızın gələcəyi bu gündən başlasın!</h2>
                 <p class="text-white/80 text-lg">Ödənişsiz sınaq dərsi üçün qeydiyyatdan keçin və bizimlə tanış olun.</p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-                    <input type="text" placeholder="Telefon nömrəniz" class="px-8 py-5 rounded-full text-sm bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:bg-white focus:text-secondary transition-all w-full sm:w-64">
+                    <input type="text" placeholder="Telefon nömrəniz" class="px-8 py-5 rounded-full text-sm bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:bg-white focus:text-secondary dark:text-white transition-all w-full sm:w-64">
                     <button class="px-12 py-5 bg-white text-primary rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl">Zəng Sifariş Et</button>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
-        <footer class="bg-white border-t border-grey-100 px-6 md:px-20 py-20">
+        <footer class="bg-white dark:bg-black border-t border-grey-100 dark:border-zinc-800 px-6 md:px-20 py-20">
             <div class="grid md:grid-cols-4 gap-12 mb-20">
                 <div class="space-y-6">
                     <a href="#" class="font-display text-xl flex items-center">
                         <span class="text-primary mr-2"><i class="fa-solid fa-fox"></i></span>
                         Saleh<span class="text-primary">.</span>Tech
                     </a>
-                    <p class="text-grey-500 text-sm leading-relaxed">6-18 yaş arası uşaqlar üçün texnologiya və proqramlaşdırma məktəbi.</p>
+                    <p class="text-grey-500 dark:text-zinc-400 text-sm leading-relaxed">6-18 yaş arası uşaqlar üçün texnologiya və proqramlaşdırma məktəbi.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Kurslar</h4>
-                    <ul class="space-y-4 text-sm text-grey-500">
+                    <ul class="space-y-4 text-sm text-grey-500 dark:text-zinc-400">
                         <li><a href="#" class="hover:text-primary transition-colors">Kiber Təhlükəsizlik</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Proqramlaşdırma</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Robototexnika</a></li>
@@ -449,7 +637,7 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Şirkət</h4>
-                    <ul class="space-y-4 text-sm text-grey-500">
+                    <ul class="space-y-4 text-sm text-grey-500 dark:text-zinc-400">
                         <li><a href="#" class="hover:text-primary transition-colors">Haqqımızda</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Vakansiyalar</a></li>
                         <li><a href="#" class="hover:text-primary transition-colors">Əlaqə</a></li>
@@ -458,13 +646,13 @@
                 <div>
                     <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Bizi İzləyin</h4>
                     <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 dark:border-zinc-800 flex items-center justify-center text-grey-500 dark:text-zinc-400 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 dark:border-zinc-800 flex items-center justify-center text-grey-500 dark:text-zinc-400 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 dark:border-zinc-800 flex items-center justify-center text-grey-500 dark:text-zinc-400 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
             </div>
-            <div class="border-t border-grey-100 pt-10 flex flex-col md:flex-row justify-between items-center text-xs text-grey-500 gap-4">
+            <div class="border-t border-grey-100 dark:border-zinc-800 pt-10 flex flex-col md:flex-row justify-between items-center text-xs text-grey-500 dark:text-zinc-400 gap-4">
                 <p>© 2026 Saleh Tech School. Bütün hüquqlar qorunur.</p>
                 <div class="flex space-x-6 font-bold uppercase tracking-widest">
                     <a href="#" class="hover:text-primary transition-colors">Məxfilik</a>
@@ -474,6 +662,78 @@
         </footer>
 
     </main>
+
+    <!-- Course Details Modal (mock data preview) -->
+    <div id="course-modal-backdrop" class="fixed inset-0 bg-black/50 z-[100] hidden items-center justify-center px-6" onclick="if(event.target===this) closeCourseModal()">
+        <div class="animate-pop-in bg-white dark:bg-zinc-900 rounded-3xl max-w-md w-full p-8 relative shadow-2xl">
+            <button onclick="closeCourseModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-grey-100 dark:bg-zinc-800 hover:bg-grey-200 dark:hover:bg-zinc-700 flex items-center justify-center text-secondary dark:text-white transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <span class="inline-block text-primary text-[10px] font-bold uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full mb-4">Kurs məlumatı (demo)</span>
+            <h3 id="modal-title" class="font-display text-2xl leading-snug mb-6"></h3>
+            <ul class="space-y-4 text-sm">
+                <li class="flex items-center justify-between border-b border-grey-100 dark:border-zinc-800 pb-3">
+                    <span class="text-grey-500 dark:text-zinc-400"><i class="fa-solid fa-chalkboard-user mr-2 text-primary"></i>Müəllim</span>
+                    <span id="modal-instructor" class="font-bold text-secondary dark:text-white"></span>
+                </li>
+                <li class="flex items-center justify-between border-b border-grey-100 dark:border-zinc-800 pb-3">
+                    <span class="text-grey-500 dark:text-zinc-400"><i class="fa-solid fa-sack-dollar mr-2 text-primary"></i>Qiymət</span>
+                    <span id="modal-price" class="font-bold text-secondary dark:text-white"></span>
+                </li>
+                <li class="flex items-center justify-between border-b border-grey-100 dark:border-zinc-800 pb-3">
+                    <span class="text-grey-500 dark:text-zinc-400"><i class="fa-solid fa-calendar-days mr-2 text-primary"></i>Növbəti başlanğıc</span>
+                    <span id="modal-start" class="font-bold text-secondary dark:text-white"></span>
+                </li>
+                <li class="flex items-center justify-between border-b border-grey-100 dark:border-zinc-800 pb-3">
+                    <span class="text-grey-500 dark:text-zinc-400"><i class="fa-solid fa-users mr-2 text-primary"></i>Qalan yerlər</span>
+                    <span id="modal-seats" class="font-bold text-secondary dark:text-white"></span>
+                </li>
+                <li class="flex items-center justify-between">
+                    <span class="text-grey-500 dark:text-zinc-400"><i class="fa-solid fa-clock mr-2 text-primary"></i>Format</span>
+                    <span id="modal-format" class="font-bold text-secondary dark:text-white"></span>
+                </li>
+            </ul>
+            <a href="#contact" onclick="closeCourseModal()" class="mt-8 block text-center px-8 py-4 bg-primary text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-primary-dark transition-all">Sınaq dərsinə yazıl</a>
+            <p class="text-center text-[10px] text-grey-500 dark:text-zinc-400 mt-4">*Nümunə məlumatdır, dəqiq detallar üçün bizimlə əlaqə saxlayın.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            var isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+    </script>
+    <script>
+        (function () {
+            var backdrop = document.getElementById('course-modal-backdrop');
+            var cards = document.querySelectorAll('.highlight-card');
+
+            cards.forEach(function (card) {
+                card.addEventListener('click', function () {
+                    document.getElementById('modal-title').textContent = card.dataset.title || '';
+                    document.getElementById('modal-instructor').textContent = card.dataset.instructor || '';
+                    document.getElementById('modal-price').textContent = card.dataset.price || '';
+                    document.getElementById('modal-start').textContent = card.dataset.start || '';
+                    document.getElementById('modal-seats').textContent = card.dataset.seats || '';
+                    document.getElementById('modal-format').textContent = card.dataset.format || '';
+                    backdrop.classList.remove('hidden');
+                    backdrop.classList.add('flex');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            window.closeCourseModal = function () {
+                backdrop.classList.add('hidden');
+                backdrop.classList.remove('flex');
+                document.body.style.overflow = '';
+            };
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') window.closeCourseModal();
+            });
+        })();
+    </script>
 
 </body>
 </html>
