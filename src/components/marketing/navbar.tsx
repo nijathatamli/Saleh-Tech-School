@@ -7,10 +7,10 @@ import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 
 const links = [
-  { href: "/", label: "Ana Səhifə" },
-  { href: "/kurslar", label: "Kurslar" },
-  { href: "/#parents", label: "Valideyn Paneli" },
-  { href: "/#testimonials", label: "Rəylər" },
+  { href: "/", label: "Ana Səhifə", active: true },
+  { href: "/#courses", label: "Kurslar", active: false },
+  { href: "/#parents", label: "Valideyn Paneli", active: false },
+  { href: "/#testimonials", label: "Rəylər", active: false },
 ];
 
 export function Navbar() {
@@ -24,9 +24,13 @@ export function Navbar() {
             <span className="mr-2 text-primary">🦊</span>
             Saleh<span className="text-primary">.</span>Tech
           </Link>
-          <nav className="hidden space-x-8 text-sm font-semibold text-grey-500 md:flex">
+          <nav className="hidden space-x-8 text-sm font-semibold text-grey-500 dark:text-zinc-400 md:flex">
             {links.map((l) => (
-              <Link key={l.label} href={l.href} className="relative transition-colors hover:text-secondary dark:hover:text-white">
+              <Link
+                key={l.label}
+                href={l.href}
+                className={`nav-link-hover ${l.active ? "text-secondary dark:text-white" : ""}`}
+              >
                 {l.label}
               </Link>
             ))}

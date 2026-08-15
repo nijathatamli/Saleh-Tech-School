@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Quote, Star } from "lucide-react";
+import { Quote } from "lucide-react";
 import { getTestimonials } from "@/lib/data";
 
 export async function TestimonialsSection() {
@@ -15,21 +15,13 @@ export async function TestimonialsSection() {
         {testimonials.map((t) => (
           <div key={t.id} className="relative space-y-6 rounded-3xl bg-grey-50 p-10 dark:bg-zinc-900">
             <Quote className="absolute left-8 top-8 h-10 w-10 text-primary opacity-20" />
-            <div className="relative z-10 flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-3.5 w-3.5 ${i < t.rating ? "fill-primary text-primary" : "text-grey-200"}`}
-                />
-              ))}
-            </div>
             <p className="relative z-10 italic text-grey-500 dark:text-zinc-400">&quot;{t.quote}&quot;</p>
             <div className="flex items-center space-x-4 border-t border-grey-200 pt-6 dark:border-zinc-700">
               <Image src={t.avatarUrl} alt={t.name} width={48} height={48} className="rounded-full" />
               <div>
                 <p className="text-sm font-bold text-secondary dark:text-white">{t.name}</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-500">
-                  {t.role} · {t.courseTag}
+                  {t.role}
                 </p>
               </div>
             </div>

@@ -1,7 +1,17 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function CtaSection() {
+  const router = useRouter();
+  const [phone, setPhone] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    router.push(`/sinaq-dersi${phone ? `?phone=${encodeURIComponent(phone)}` : ""}`);
+  }
+
   return (
     <section id="contact" className="relative overflow-hidden bg-primary px-6 py-32 text-center md:px-20">
       <div className="absolute -left-10 bottom-0 rotate-12 text-[16rem] opacity-20">🦊</div>
@@ -10,11 +20,21 @@ export function CtaSection() {
           Uşağınızın gələcəyi bu gündən başlasın!
         </h2>
         <p className="text-lg text-white/80">Ödənişsiz sınaq dərsi üçün qeydiyyatdan keçin və bizimlə tanış olun.</p>
-        <div className="flex justify-center pt-4">
-          <Button asChild size="lg" className="bg-white text-primary hover:scale-105 hover:bg-white">
-            <Link href="/sinaq-dersi">Ödənişsiz sınaq dərsinə yazıl</Link>
-          </Button>
-        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col justify-center gap-4 pt-4 sm:flex-row">
+          <input
+            type="text"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Telefon nömrəniz"
+            className="w-full rounded-full border border-white/20 bg-white/10 px-8 py-5 text-sm text-white placeholder-white/60 transition-all focus:bg-white focus:text-secondary focus:outline-none sm:w-64"
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-white px-12 py-5 text-xs font-bold uppercase tracking-widest text-primary shadow-2xl transition-all hover:scale-105"
+          >
+            Zəng Sifariş Et
+          </button>
+        </form>
       </div>
     </section>
   );

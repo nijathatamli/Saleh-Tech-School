@@ -14,6 +14,42 @@
   }
 }
 
+/* Ported verbatim from landing-page.html so the marketing site behaves identically */
+*, *::before, *::after {
+  transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease, fill 0.45s ease, stroke 0.45s ease;
+}
+
+.nav-link-hover { position: relative; overflow: hidden; }
+.nav-link-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #FF6B00;
+  transform: translateX(-101%);
+  transition: transform 0.3s ease;
+}
+.nav-link-hover:hover::after { transform: translateX(0); }
+.course-card:hover { transform: translateY(-5px); }
+
+.hero-mascot { transition: transform 0.4s ease; }
+.hero-mascot:hover { transform: translateY(-6px) scale(1.04) rotate(-2deg); }
+
+.highlight-card { transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.45s ease, border-color 0.45s ease; cursor: pointer; }
+.highlight-card:hover { transform: translateY(-8px) scale(1.015); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+.highlight-card:active { transform: translateY(-4px) scale(0.99); }
+
+.tag-track-mask { -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent); mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent); }
+
+.teacher-card { transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s ease, background-color 0.45s ease; position: relative; }
+.teacher-card:hover { z-index: 10; transform: scale(1.06); box-shadow: 0 25px 45px -15px rgba(0,0,0,0.35); }
+.teacher-name { transition: color 0.35s ease, letter-spacing 0.35s ease; }
+.teacher-card:hover .teacher-name { color: #FF6B00; letter-spacing: 0.5px; }
+
+#course-modal-backdrop { backdrop-filter: blur(4px); }
+
 @layer utilities {
   .marquee-mask {
     -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);

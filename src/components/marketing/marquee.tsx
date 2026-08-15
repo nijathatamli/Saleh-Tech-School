@@ -3,8 +3,7 @@ const words = [
   { text: "KİBER TƏHLÜKƏSİZLİK", accent: true },
   { text: "PROQRAMLAŞDIRMA", accent: false },
   { text: "SÜNİ İNTELLEKT", accent: true },
-  { text: "PYTHON", accent: false },
-  { text: "IoT", accent: true },
+  { text: "OYUN YARADILMASI", accent: false },
 ];
 
 export function Marquee() {

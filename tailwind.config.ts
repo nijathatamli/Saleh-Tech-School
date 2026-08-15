@@ -73,6 +73,14 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        tagScroll: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        popIn: {
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
         scroll: "scroll 20s linear infinite",
@@ -80,6 +88,8 @@ const config: Config = {
         "count-up": "count-up 0.5s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "tag-scroll": "tagScroll 10s linear infinite",
+        "pop-in": "popIn 0.25s ease-out",
       },
     },
   },
