@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+      </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saleh Tech School | Gələcəyin Texnologiyaları</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Unbounded:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B00', // Vibrant Orange
+                        'primary-dark': '#E66000',
+                        secondary: '#1A1A1A',
+                        light: '#FFFFFF',
+                        grey: {
+                            50: '#F9FAFB',
+                            100: '#F3F4F6',
+                            200: '#E5E7EB',
+                            500: '#6B7280',
+                            800: '#1F2937',
+                        },
+                        border: '#E5E7EB',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Unbounded', 'sans-serif'],
+                    },
+                    keyframes: {
+                        scroll: {
+                            from: { transform: 'translateX(0)' },
+                            to: { transform: 'translateX(-50%)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    },
+                    animation: {
+                        scroll: 'scroll 20s linear infinite',
+                        float: 'float 6s ease-in-out infinite',
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-display { font-family: 'Unbounded', sans-serif; }
+        .nav-link-hover { position: relative; overflow: hidden; }
+        .nav-link-hover::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #FF6B00;
+            transform: translateX(-101%);
+            transition: transform 0.3s ease;
+        }
+        .nav-link-hover:hover::after { transform: translateX(0); }
+        .course-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="bg-white text-secondary antialiased overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full z-50 px-6 py-4 flex justify-between items-center bg-white/90 backdrop-blur-md border-b border-grey-100">
+        <div class="flex items-center space-x-8">
+            <a href="#" class="font-display text-xl tracking-tight flex items-center">
+                <span class="text-primary mr-2"><i class="fa-solid fa-fox"></i></span>
+                Saleh<span class="text-primary">.</span>Tech
+            </a>
+            <nav class="hidden md:flex space-x-8 text-sm font-semibold text-grey-500">
+                <a href="#" class="nav-link-hover text-secondary">Ana Səhifə</a>
+                <a href="#courses" class="nav-link-hover">Kurslar</a>
+                <a href="#parents" class="nav-link-hover">Valideyn Paneli</a>
+                <a href="#testimonials" class="nav-link-hover">Rəylər</a>
+            </nav>
+        </div>
+        <div class="flex items-center space-x-6">
+            <a href="ParentDashboard__desktop.html" class="hidden md:inline-block text-sm font-bold text-secondary hover:text-primary transition-colors">Giriş</a>
+            <a href="#contact" class="px-8 py-3 bg-primary text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">Qeydiyyat</a>
+            <button class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+        </div>
+    </header>
+
+    <main class="pt-20">
+
+        <!-- Hero Section -->
+        <section class="relative min-h-[90vh] flex flex-col md:flex-row items-center px-6 md:px-20 py-20 gap-12 overflow-hidden">
+            <!-- Background Decorative Elements -->
+            <div class="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+
+            <div class="w-full md:w-1/2 space-y-8 z-10">
+                <div class="inline-flex items-center space-x-2 bg-primary/10 px-4 py-2 rounded-full">
+                    <span class="text-primary text-[10px] font-bold tracking-widest uppercase">Gələcəyi kodla 🦊</span>
+                </div>
+                <h1 class="font-display text-4xl md:text-6xl leading-tight">
+                    Uşağınız gələcəyin <span class="text-primary">texnologiyalarını</span> bu gündən öyrənsin.
+                </h1>
+                <p class="text-grey-500 text-lg max-w-md leading-relaxed">
+                    Saleh Tech School ilə 6-18 yaş arası uşaqlar üçün ən müasir texnologiya yollarını kəşf edin. Bizim sevimli tülkü maskotumuzla öyrənmək daha əyləncəlidir!
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center gap-6 pt-4">
+                    <a href="#contact" class="w-full sm:w-auto text-center px-10 py-5 bg-primary text-white rounded-full font-bold uppercase tracking-widest text-xs hover:bg-primary-dark transition-all shadow-xl shadow-primary/20">Sınaq dərsinə yazıl</a>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex -space-x-3">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg" alt="">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" alt="">
+                            <img class="w-10 h-10 rounded-full border-2 border-white" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="">
+                        </div>
+                        <p class="text-xs text-grey-500 font-medium">500+ aktiv tələbə</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 relative flex justify-center items-center">
+                <!-- Mascot Image -->
+                <div class="relative z-10 animate-float">
+                    <img class="w-full max-w-md h-auto" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_fd0da67a02_b5ce6de0f892224b.png" alt="friendly orange fox mascot wearing a blue hoodie and tech glasses, sitting with a laptop, 3D charact" />
+                </div>
+                <!-- Abstract blobs -->
+                <div class="absolute inset-0 flex items-center justify-center -z-10">
+                    <div class="w-full aspect-square max-w-lg bg-primary/10 rounded-full opacity-50 blur-2xl"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marquee Section -->
+        <section class="border-y border-grey-100 py-6 overflow-hidden bg-white">
+            <div class="animate-scroll whitespace-nowrap inline-block">
+                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">ROBOTOTEXNİKA</span>
+                <span class="font-display text-2xl md:text-3xl text-primary mx-12">KİBER TƏHLÜKƏSİZLİK</span>
+                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">PROQRAMLAŞDIRMA</span>
+                <span class="font-display text-2xl md:text-3xl text-primary mx-12">SÜNİ İNTELLEKT</span>
+                <span class="font-display text-2xl md:text-3xl text-grey-200 mx-12">OYUN YARADILMASI</span>
+            </div>
+        </section>
+
+        <!-- Stats Band -->
+        <section class="bg-grey-50 px-6 md:px-20 py-24 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+            <div class="space-y-3">
+                <div class="font-display text-4xl md:text-5xl text-secondary">500+</div>
+                <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Aktiv Tələbə</div>
+            </div>
+            <div class="space-y-3">
+                <div class="font-display text-4xl md:text-5xl text-secondary">20+</div>
+                <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Ekspert Müəllim</div>
+            </div>
+            <div class="space-y-3">
+                <div class="font-display text-4xl md:text-5xl text-secondary">15+</div>
+                <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Tədris Proqramı</div>
+            </div>
+            <div class="space-y-3">
+                <div class="font-display text-4xl md:text-5xl text-secondary">98%</div>
+                <div class="text-primary text-[10px] font-bold uppercase tracking-widest">Məmnuniyyət</div>
+            </div>
+        </section>
+
+        <!-- Age Groups -->
+        <section class="px-6 md:px-20 py-32">
+            <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
+                <h2 class="font-display text-3xl md:text-4xl leading-tight">Hər yaşa uyğun texnoloji macəra</h2>
+                <p class="text-grey-500">Uşağınızın yaş qrupuna uyğun olaraq hazırlanmış xüsusi dərslərimizlə tanış olun.</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6">
+                <!-- Age Card 1 -->
+                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
+                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-cubes text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg mb-2">6-8 yaş</h3>
+                        <p class="text-xs text-grey-500 leading-relaxed">Vizual proqramlaşdırma və məntiq əsasları.</p>
+                    </div>
+                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
+                </div>
+                <!-- Age Card 2 -->
+                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
+                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-gamepad text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg mb-2">9-11 yaş</h3>
+                        <p class="text-xs text-grey-500 leading-relaxed">Oyun yaradılması və robototexnikaya giriş.</p>
+                    </div>
+                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
+                </div>
+                <!-- Age Card 3 -->
+                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
+                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-code text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg mb-2">12-14 yaş</h3>
+                        <p class="text-xs text-grey-500 leading-relaxed">Python proqramlaşdırma və kiber təhlükəsizlik.</p>
+                    </div>
+                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
+                </div>
+                <!-- Age Card 4 -->
+                <div class="bg-white border border-grey-100 p-8 rounded-3xl hover:border-primary transition-all group cursor-pointer text-center space-y-6">
+                    <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-brain text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg mb-2">15-18 yaş</h3>
+                        <p class="text-xs text-grey-500 leading-relaxed">Süni intellekt və professional inkişaf.</p>
+                    </div>
+                    <a href="#" class="inline-block text-[10px] font-bold uppercase tracking-widest text-primary border-b border-primary/20 pb-1 hover:border-primary">Kəşf et</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Courses -->
+        <section id="courses" class="px-6 md:px-20 py-32 bg-grey-50">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+                <div class="space-y-4 max-w-xl">
+                    <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Ən çox seçilənlər</span>
+                    <h2 class="font-display text-3xl md:text-5xl leading-tight">Populyar kurslarımız</h2>
+                </div>
+                <button class="px-8 py-3 border border-grey-200 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-all">Hamısına bax</button>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Course 1 -->
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                    <div class="h-64 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_4d78f13579_72fa6a1d65880b79.png" alt="modern cybersecurity visualization with shields and locks, neon orange and white theme, digital tech" />
+                        <div class="absolute top-4 left-4 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">Yeni</div>
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <h3 class="font-display text-xl group-hover:text-primary transition-colors">Kiber Təhlükəsizlik Əsasları</h3>
+                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Uşaqlar rəqəmsal dünyanı necə qorumağı və etik hakerlik prinsiplərini öyrənirlər.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-grey-50">
+                            <span class="text-xs font-bold text-secondary">8 Ay</span>
+                            <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course 2 -->
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                    <div class="h-64 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_96dae3585e_7e155be2988d8706.png" alt="child hands coding python on a laptop, friendly bright workspace, orange accents, educational photog" />
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <h3 class="font-display text-xl group-hover:text-primary transition-colors">Python ilə Proqramlaşdırma</h3>
+                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Dünyanın ən populyar proqramlaşdırma dilini əyləncəli layihələrlə mənimsəyin.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-grey-50">
+                            <span class="text-xs font-bold text-secondary">6 Ay</span>
+                            <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course 3 -->
+                <div class="course-card bg-white rounded-3xl overflow-hidden border border-grey-100 transition-all cursor-pointer group">
+                    <div class="h-64 relative overflow-hidden">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_55f76a70f6_e6f3256ef5c6b526.png" alt="robotics workshop for teenagers, assembling futuristic robot arm, bright clean laboratory, orange li" />
+                    </div>
+                    <div class="p-8 space-y-4">
+                        <h3 class="font-display text-xl group-hover:text-primary transition-colors">Robototexnika və IoT</h3>
+                        <p class="text-grey-500 text-sm leading-relaxed line-clamp-3">Öz robotlarınızı yaradın və onları kod vasitəsilə canlandırın.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-grey-50">
+                            <span class="text-xs font-bold text-secondary">9 Ay</span>
+                            <span class="text-primary"><i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teachers Section -->
+        <section id="teachers" class="px-6 md:px-20 py-32 border-t border-grey-100">
+            <div class="text-center max-w-2xl mx-auto mb-20 space-y-4">
+                <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Bizim Komandamız</span>
+                <h2 class="font-display text-3xl md:text-4xl">Peşəkar Müəllimlərimiz</h2>
+                <p class="text-grey-500">Uşaqlarınıza texnologiyanı sevdirən və onlara real təcrübə qazandıran mütəxəssislər.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Teacher 1 -->
+                <div class="group text-center space-y-6">
+                    <div class="relative inline-block">
+                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="Tural Zeynalov">
+                    </div>
+                    <div class="space-y-2 relative z-10">
+                        <h3 class="font-display text-xl">Tural Zeynalov</h3>
+                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Kiber Təhlükəsizlik üzrə Baş Mütəxəssis</p>
+                        <p class="text-grey-500 text-sm max-w-xs mx-auto">10 illik beynəlxalq təcrübəyə malik mütəxəssis, tələbələrə rəqəmsal dünyanın sirlərini öyrədir.</p>
+                    </div>
+                </div>
+                <!-- Teacher 2 -->
+                <div class="group text-center space-y-6">
+                    <div class="relative inline-block">
+                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-9.jpg" alt="Emin Qasımov">
+                    </div>
+                    <div class="space-y-2 relative z-10">
+                        <h3 class="font-display text-xl">Emin Qasımov</h3>
+                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Full-Stack Proqramçı</p>
+                        <p class="text-grey-500 text-sm max-w-xs mx-auto">Python və Web texnologiyaları sahəsində 8 illik təcrübə ilə uşaqlara kodlaşdırmanı sevdirir.</p>
+                    </div>
+                </div>
+                <!-- Teacher 3 -->
+                <div class="group text-center space-y-6">
+                    <div class="relative inline-block">
+                        <div class="absolute -inset-4 bg-primary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500"></div>
+                        <img class="w-48 h-48 rounded-full object-cover border-4 border-white shadow-xl relative z-10" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Nigar Əliyeva">
+                    </div>
+                    <div class="space-y-2 relative z-10">
+                        <h3 class="font-display text-xl">Nigar Əliyeva</h3>
+                        <p class="text-primary text-[10px] font-bold uppercase tracking-widest">Robototexnika Mühəndisi</p>
+                        <p class="text-grey-500 text-sm max-w-xs mx-auto">Süni intellekt və robototexnika üzrə tədqiqatçı, gənc ixtiraçılar üçün mentor.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Parent Panel Preview -->
+        <section id="parents" class="px-6 md:px-20 py-32 overflow-hidden">
+            <div class="bg-secondary rounded-[3rem] p-12 md:p-20 text-white flex flex-col md:flex-row items-center gap-16 relative overflow-hidden">
+                <!-- Fox in the background -->
+                <div class="absolute -right-20 -bottom-20 opacity-10 rotate-12">
+                    <i class="fa-solid fa-fox text-[25rem]"></i>
+                </div>
+
+                <div class="w-full md:w-1/2 space-y-8 relative z-10">
+                    <span class="text-primary text-[10px] font-bold uppercase tracking-widest">Valideynlər Üçün</span>
+                    <h2 class="font-display text-3xl md:text-5xl leading-tight">Uşağınızın hər addımını izləyin</h2>
+                    <p class="text-grey-500 text-lg">Xüsusi Valideyn Paneli vasitəsilə tələbənin davamiyyətini, dərslərdəki aktivliyini və qazandığı uğurları real vaxtda izləyə bilərsiniz.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-check text-primary"></i>
+                            <span class="text-sm">Həftəlik tərəqqi hesabatları</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-check text-primary"></i>
+                            <span class="text-sm">Müəllim rəyləri və tövsiyələr</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-check text-primary"></i>
+                            <span class="text-sm">Sertifikat və nailiyyət izləmə</span>
+                        </li>
+                    </ul>
+                    <a href="ParentDashboard__desktop.html" class="inline-block px-10 py-4 bg-white text-secondary rounded-full font-bold uppercase tracking-widest text-xs hover:bg-primary hover:text-white transition-all">Paneli Sınaqdan Keçir</a>
+                </div>
+
+                <div class="w-full md:w-1/2 relative">
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 shadow-2xl rotate-2">
+                        <img class="w-full rounded-xl shadow-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_90e64f8db3_29b9a6071ab67562.png" alt="modern mobile app dashboard UI for tracking student grades and progress, clean white theme with oran" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section id="testimonials" class="px-6 md:px-20 py-32">
+            <div class="text-center mb-20 space-y-4">
+                <h2 class="font-display text-3xl md:text-4xl">Valideynlərimiz nə deyir?</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                    <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-grey-500 italic relative z-10">"Oğlum hər dərsə böyük həvəslə gedir. Saleh Tech School-da öyrəndiyi proqramlaşdırma bilikləri onun məntiqi düşünməsini çox inkişaf etdirib."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                        <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" alt="">
+                        <div>
+                            <p class="font-bold text-sm text-secondary">Vüqar Məmmədov</p>
+                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                    <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-grey-500 italic relative z-10">"Qızımın texnologiyaya olan marağı burada peşəkar şəkildə yönləndirilir. Valideyn paneli isə hər şeyi şəffaf edir."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                        <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg" alt="">
+                        <div>
+                            <p class="font-bold text-sm text-secondary">Leyla Əliyeva</p>
+                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-grey-50 p-10 rounded-3xl space-y-6 relative">
+                    <div class="text-primary text-4xl opacity-20 absolute top-8 left-8"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-grey-500 italic relative z-10">"Müasir dünyada uşaqların texnologiyanı öyrənməsi şərtdir. Bu məktəb bizə keyfiyyətli təhsil və əyləncəni bir arada təqdim edir."</p>
+                    <div class="flex items-center space-x-4 border-t border-grey-200 pt-6">
+                        <img class="w-12 h-12 rounded-full" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg" alt="">
+                        <div>
+                            <p class="font-bold text-sm text-secondary">Samir Quliyev</p>
+                            <p class="text-[10px] text-grey-500 uppercase tracking-widest font-bold">Valideyn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="contact" class="px-6 md:px-20 py-32 text-center bg-primary overflow-hidden relative">
+            <!-- Decorative Mascot -->
+            <div class="absolute -left-10 bottom-0 w-64 h-64 opacity-20 rotate-12">
+                 <img class="w-full h-full object-contain" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_b3ed9494c3_e052d231935592b2.png" alt="orange fox mascot waving, cartoon style, white background" />
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-8 relative z-10">
+                <h2 class="font-display text-4xl md:text-6xl text-white leading-tight">Uşağınızın gələcəyi bu gündən başlasın!</h2>
+                <p class="text-white/80 text-lg">Ödənişsiz sınaq dərsi üçün qeydiyyatdan keçin və bizimlə tanış olun.</p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                    <input type="text" placeholder="Telefon nömrəniz" class="px-8 py-5 rounded-full text-sm bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:bg-white focus:text-secondary transition-all w-full sm:w-64">
+                    <button class="px-12 py-5 bg-white text-primary rounded-full font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-2xl">Zəng Sifariş Et</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-grey-100 px-6 md:px-20 py-20">
+            <div class="grid md:grid-cols-4 gap-12 mb-20">
+                <div class="space-y-6">
+                    <a href="#" class="font-display text-xl flex items-center">
+                        <span class="text-primary mr-2"><i class="fa-solid fa-fox"></i></span>
+                        Saleh<span class="text-primary">.</span>Tech
+                    </a>
+                    <p class="text-grey-500 text-sm leading-relaxed">6-18 yaş arası uşaqlar üçün texnologiya və proqramlaşdırma məktəbi.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Kurslar</h4>
+                    <ul class="space-y-4 text-sm text-grey-500">
+                        <li><a href="#" class="hover:text-primary transition-colors">Kiber Təhlükəsizlik</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Proqramlaşdırma</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Robototexnika</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Şirkət</h4>
+                    <ul class="space-y-4 text-sm text-grey-500">
+                        <li><a href="#" class="hover:text-primary transition-colors">Haqqımızda</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Vakansiyalar</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Əlaqə</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm mb-6 uppercase tracking-widest">Bizi İzləyin</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full border border-grey-100 flex items-center justify-center text-grey-500 hover:bg-primary hover:text-white hover:border-primary transition-all"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-grey-100 pt-10 flex flex-col md:flex-row justify-between items-center text-xs text-grey-500 gap-4">
+                <p>© 2026 Saleh Tech School. Bütün hüquqlar qorunur.</p>
+                <div class="flex space-x-6 font-bold uppercase tracking-widest">
+                    <a href="#" class="hover:text-primary transition-colors">Məxfilik</a>
+                    <a href="#" class="hover:text-primary transition-colors">Şərtlər</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+</body>
+</html>
