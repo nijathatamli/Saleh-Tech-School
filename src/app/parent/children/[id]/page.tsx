@@ -127,7 +127,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
 
             <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
               <h3 className="mb-6 flex items-center gap-2 font-app text-base font-bold text-navy-900">
-                <Award className="h-4 w-4 text-violet-500" /> Sertifikatlar
+                <Award className="h-4 w-4 text-amber-500" /> Sertifikatlar
               </h3>
               <EmptyState icon={Award} title="Hələ sertifikat qazanılmayıb" description="Kurs tamamlandıqda burada görünəcək." />
             </section>

@@ -31,8 +31,8 @@ export default async function StudentDashboardPage() {
       <div className="space-y-8 p-6 md:p-10">
         {/* Gamified hero band */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-electric-600 p-8 text-white">
-          <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-violet-500/20 blur-3xl" />
-          <div className="absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-cyan-500/20 blur-3xl" />
+          <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-amber-500/20 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-teal-500/20 blur-3xl" />
           <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
             <div>
               <p className="text-sm text-white/70">Salam, {student.firstName} 👋</p>
@@ -43,7 +43,7 @@ export default async function StudentDashboardPage() {
                   <span>Növbəti səviyyə</span>
                 </div>
                 <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/15">
-                  <div className="h-full rounded-full bg-cyan-400" style={{ width: `${levelProgress}%` }} />
+                  <div className="h-full rounded-full bg-teal-400" style={{ width: `${levelProgress}%` }} />
                 </div>
               </div>
             </div>
@@ -62,7 +62,7 @@ export default async function StudentDashboardPage() {
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 text-2xl font-extrabold">
-                  <Trophy className="h-6 w-6 text-violet-300" /> {student.studentBadges.length}
+                  <Trophy className="h-6 w-6 text-amber-300" /> {student.studentBadges.length}
                 </div>
                 <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-white/60">Nişan</p>
               </div>

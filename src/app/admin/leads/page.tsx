@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 
 const columns = [
   { stage: "NEW", label: "Yeni", color: "bg-electric-500" },
-  { stage: "CONTACTED", label: "Əlaqə saxlanılıb", color: "bg-cyan-500" },
-  { stage: "TRIAL_LESSON", label: "Sınaq dərsi", color: "bg-violet-500" },
+  { stage: "CONTACTED", label: "Əlaqə saxlanılıb", color: "bg-teal-500" },
+  { stage: "TRIAL_LESSON", label: "Sınaq dərsi", color: "bg-amber-500" },
   { stage: "TRIAL_COMPLETED", label: "Sınaq bitib", color: "bg-amber-500" },
   { stage: "INTERESTED", label: "Maraqlıdır", color: "bg-orange-500" },
   { stage: "REGISTERED", label: "Qeydiyyatdan keçib", color: "bg-emerald-500" },

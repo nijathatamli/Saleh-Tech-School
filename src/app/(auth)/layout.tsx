@@ -4,7 +4,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy-950 px-6 py-16 font-app">
       <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-electric-500/20 blur-[120px]" />
-      <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-violet-500/20 blur-[120px]" />
+      <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-amber-500/20 blur-[120px]" />
 
       <div className="relative z-10 w-full max-w-md">
         <Link href="/" className="mb-8 flex items-center justify-center font-display text-xl text-white">

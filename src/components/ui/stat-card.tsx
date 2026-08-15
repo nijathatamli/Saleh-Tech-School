@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 
 const colorMap = {
   electric: "bg-electric-500/10 text-electric-600",
-  violet: "bg-violet-500/10 text-violet-600",
-  cyan: "bg-cyan-500/10 text-cyan-600",
+  violet: "bg-amber-500/10 text-amber-600",
+  cyan: "bg-teal-500/10 text-teal-600",
   emerald: "bg-emerald-500/10 text-emerald-600",
   amber: "bg-amber-500/10 text-amber-600",
 };

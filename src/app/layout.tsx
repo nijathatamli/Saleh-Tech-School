@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Unbounded, Manrope } from "next/font/google";
+import { Inter, Unbounded } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/providers";
 import "./globals.css";
@@ -11,8 +11,6 @@ const unbounded = Unbounded({
   variable: "--font-unbounded",
   display: "swap",
 });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
-
 export const metadata: Metadata = {
   title: {
     default: "Saleh Tech School | Gələcəyin Texnologiyaları",
@@ -26,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="az"
-      className={`${inter.variable} ${unbounded.variable} ${manrope.variable}`}
+      className={`${inter.variable} ${unbounded.variable}`}
       suppressHydrationWarning
     >
       <head>

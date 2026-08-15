@@ -18,7 +18,7 @@ export default async function StudentPortfolioPage() {
       <AppTopbar title="Portfolio" userName={student.user?.name ?? student.firstName} userEmail={student.user?.email ?? ""} />
 
       <div className="space-y-8 p-6 md:p-10">
-        <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-navy-900 to-electric-700 p-8 text-white sm:flex-row">
+        <div className="flex flex-col items-center gap-6 rounded-3xl bg-gradient-to-br from-navy-900 to-electric-600 p-8 text-white sm:flex-row">
           <Avatar name={`${student.firstName} ${student.lastName}`} src={student.avatarUrl} size={80} className="ring-4 ring-white/20" />
           <div className="text-center sm:text-left">
             <h2 className="font-app text-2xl font-extrabold">{student.firstName} {student.lastName}</h2>
@@ -75,7 +75,7 @@ export default async function StudentPortfolioPage() {
 
             <div className="mt-8">
               <h3 className="mb-4 flex items-center gap-2 font-app text-base font-bold text-navy-900">
-                <Award className="h-4 w-4 text-violet-500" /> Sertifikatlar
+                <Award className="h-4 w-4 text-amber-500" /> Sertifikatlar
               </h3>
               <EmptyState icon={Award} title="Hələ sertifikat qazanılmayıb" description="Kurs tamamlandıqda burada görünəcək." />
             </div>

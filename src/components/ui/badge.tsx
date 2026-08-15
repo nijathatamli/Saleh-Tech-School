@@ -11,8 +11,8 @@ const badgeVariants = cva("inline-flex items-center gap-1 rounded-full font-bold
       warning: "bg-amber-100 text-amber-700",
       danger: "bg-red-100 text-red-700",
       "app-electric": "bg-electric-500/10 text-electric-600",
-      "app-violet": "bg-violet-500/10 text-violet-600",
-      "app-cyan": "bg-cyan-500/10 text-cyan-600",
+      "app-violet": "bg-amber-500/10 text-amber-600",
+      "app-cyan": "bg-teal-500/10 text-teal-600",
       "app-navy": "bg-navy-900/5 text-navy-900",
     },
     size: {

@@ -19,20 +19,22 @@ const config: Config = {
           500: "#6B7280",
           800: "#1F2937",
         },
-        // App brand (parent / teacher / student / admin dashboards)
+        // App brand (parent / teacher / student / admin dashboards) — same
+        // black/orange identity as the public site, just given more shades
+        // for UI surfaces (borders, muted text, dark sidebar).
         navy: {
-          50: "#EEF2FA",
-          100: "#DCE4F4",
-          400: "#3D537C",
-          600: "#1E2E4F",
-          800: "#101A30",
-          900: "#0A1224",
-          950: "#060B16",
+          50: "#F9FAFB",
+          100: "#E5E7EB",
+          400: "#6B7280",
+          600: "#4B5563",
+          800: "#1F2937",
+          900: "#1A1A1A",
+          950: "#0A0A0A",
         },
         electric: {
-          400: "#5B8CFF",
-          500: "#3366FF",
-          600: "#254DDB",
+          400: "#FF9142",
+          500: "#FF6B00",
+          600: "#E66000",
         },
         violet: {
           400: "#A78BFA",
@@ -48,7 +50,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
         display: ["var(--font-unbounded)", "sans-serif"],
-        app: ["var(--font-manrope)", "sans-serif"],
+        app: ["var(--font-inter)", "sans-serif"],
       },
       keyframes: {
         scroll: {
