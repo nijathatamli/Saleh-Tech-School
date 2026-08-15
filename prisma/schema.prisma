@@ -1,0 +1,348 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Auth / Users ----------
+
+enum Role {
+  PARENT
+  TEACHER
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role
+  phone         String?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  parentProfile  ParentProfile?
+  teacherProfile TeacherProfile?
+  studentProfile StudentProfile?
+
+  notifications Notification[]
+}
+
+model ParentProfile {
+  id       String  @id @default(cuid())
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children StudentProfile[]
+  payments Payment[]
+}
+
+model TeacherProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  position        String
+  bio             String   @db.Text
+  experienceYears Int
+  specializations String[]
+  photoUrl        String?
+
+  classes  ClassGroup[]
+  courses  Course[]
+}
+
+model StudentProfile {
+  id         String   @id @default(cuid())
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId   String
+  parent     ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  firstName  String
+  lastName   String
+  birthDate  DateTime
+  avatarUrl  String?
+  level      Int      @default(1)
+  xp         Int      @default(0)
+  points     Int      @default(0)
+  streakDays Int      @default(0)
+
+  enrollments Enrollment[]
+  attendance  Attendance[]
+  submissions Submission[]
+  progress    SkillProgress[]
+  studentBadges StudentBadge[]
+  projects    Project[]
+  grades      Grade[]
+}
+
+// ---------- Courses / Curriculum ----------
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model Course {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  shortDesc     String
+  longDesc      String   @db.Text
+  category      String // lookup key for the icon/color in the UI (e.g. "cybersecurity", "python")
+  coverImageUrl String?
+  minAge        Int
+  maxAge        Int
+  level         Level
+  durationMonths Int
+  lessonsPerWeek Int
+  lessonMinutes  Int
+  price         Int // AZN / month
+  tags          String[]
+  featured      Boolean  @default(false)
+  teacherId     String?
+  teacher       TeacherProfile? @relation(fields: [teacherId], references: [id])
+  createdAt     DateTime @default(now())
+
+  modules     CourseModule[]
+  skills      String[]
+  enrollments Enrollment[]
+  classes     ClassGroup[]
+  trialBookings TrialBooking[]
+}
+
+model CourseModule {
+  id       String @id @default(cuid())
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order    Int
+  title    String
+  summary  String
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  classId   String?
+  class     ClassGroup? @relation(fields: [classId], references: [id])
+  startedAt DateTime @default(now())
+  status    String   @default("active") // active | completed | paused
+}
+
+model ClassGroup {
+  id         String   @id @default(cuid())
+  name       String
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacherId  String
+  teacher    TeacherProfile @relation(fields: [teacherId], references: [id])
+  schedule   String   // e.g. "Ç.a - Cümə, 18:00"
+
+  enrollments Enrollment[]
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  classId     String
+  class       ClassGroup @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @db.Text
+  date        DateTime
+  materialsUrl String?
+  videoUrl     String?
+
+  attendance Attendance[]
+  homeworks  Homework[]
+}
+
+// ---------- Attendance / Homework / Progress ----------
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model Attendance {
+  id        String @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status    AttendanceStatus
+  note      String?
+  date      DateTime
+}
+
+model Homework {
+  id          String   @id @default(cuid())
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @db.Text
+  dueDate     DateTime
+
+  submissions Submission[]
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  GRADED
+  OVERDUE
+}
+
+model Submission {
+  id         String   @id @default(cuid())
+  homeworkId String
+  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status     SubmissionStatus @default(PENDING)
+  score      Int?
+  feedback   String?
+  submittedAt DateTime?
+
+  grade Grade?
+}
+
+model Grade {
+  id           String   @id @default(cuid())
+  studentId    String
+  student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  submissionId String?  @unique
+  submission   Submission? @relation(fields: [submissionId], references: [id])
+  subject      String
+  score        Int
+  maxScore     Int      @default(100)
+  createdAt    DateTime @default(now())
+}
+
+model SkillProgress {
+  id        String @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skill     String
+  percent   Int
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Gamification ----------
+
+model Badge {
+  id          String @id @default(cuid())
+  code        String @unique
+  name        String
+  emoji       String
+  description String
+
+  studentBadges StudentBadge[]
+}
+
+model StudentBadge {
+  id        String   @id @default(cuid())
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @db.Text
+  imageUrl    String
+  technologies String[]
+  courseTag   String
+  createdAt   DateTime @default(now())
+}
+
+// ---------- Payments ----------
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  OVERDUE
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  parentId    String
+  parent      ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  title       String
+  amount      Int
+  status      PaymentStatus
+  dueDate     DateTime
+  paidAt      DateTime?
+  invoiceNo   String   @unique
+}
+
+// ---------- Marketing / CRM ----------
+
+model Testimonial {
+  id        String  @id @default(cuid())
+  name      String
+  role      String // "Valideyn" | "Tələbə"
+  courseTag String
+  rating    Int
+  quote     String  @db.Text
+  avatarUrl String
+  featured  Boolean @default(true)
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  TRIAL_LESSON
+  TRIAL_COMPLETED
+  INTERESTED
+  REGISTERED
+}
+
+model TrialBooking {
+  id           String    @id @default(cuid())
+  parentName   String
+  parentPhone  String
+  studentName  String
+  studentAge   Int
+  courseId     String?
+  course       Course?   @relation(fields: [courseId], references: [id])
+  preferredDate DateTime
+  preferredTime String
+  stage        LeadStage @default(NEW)
+  createdAt    DateTime  @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      String   @default("info") // info | success | warning | error
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
