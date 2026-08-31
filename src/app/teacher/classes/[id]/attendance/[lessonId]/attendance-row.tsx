@@ -53,10 +53,10 @@ export function AttendanceRow({
   }
 
   return (
-    <div className="flex flex-col gap-3 border-b border-navy-50 p-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-dash-rule/70 p-4 last:border-0 dark:border-dash-dark-rule/70 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
         <Avatar name={name} src={avatarUrl} size={36} />
-        <span className="font-bold text-navy-900">{name}</span>
+        <span className="font-bold text-dash-ink dark:text-white">{name}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -66,8 +66,10 @@ export function AttendanceRow({
             disabled={isPending}
             onClick={() => handleSet(o.status)}
             className={cn(
-              "flex items-center gap-1.5 rounded-full border border-navy-100 px-3 py-1.5 text-xs font-bold transition-all disabled:opacity-60",
-              status === o.status ? o.activeClass : "bg-white text-navy-400 hover:bg-navy-50"
+              "flex items-center gap-1.5 rounded-full border border-dash-rule px-3 py-1.5 text-xs font-bold transition-all disabled:opacity-60 dark:border-dash-dark-rule",
+              status === o.status
+                ? o.activeClass
+                : "bg-white text-dash-ink/45 hover:bg-dash-paper-2 dark:bg-dash-dark-surface dark:text-white/40 dark:hover:bg-white/5"
             )}
           >
             <o.icon className="h-3.5 w-3.5" />
@@ -88,7 +90,7 @@ export function AttendanceRow({
           onChange={(e) => setNote(e.target.value)}
           onBlur={handleNoteBlur}
           placeholder="Qeyd əlavə et..."
-          className="w-full rounded-lg border border-navy-100 px-3 py-1.5 text-xs sm:w-56"
+          className="w-full rounded-lg border border-dash-rule bg-white px-3 py-1.5 text-xs text-dash-ink focus:border-electric-500 dark:border-dash-dark-rule dark:bg-dash-dark-surface dark:text-white sm:w-56"
         />
       )}
     </div>

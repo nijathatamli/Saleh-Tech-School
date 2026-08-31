@@ -1,10 +1,14 @@
 import { getCurrentParent } from "@/lib/data";
-import { AppTopbar } from "@/components/app/topbar";
+import { DashTopbar } from "@/components/dash/topbar";
+import { DashCard } from "@/components/dash/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
+import { LanguageSwitcher } from "@/components/dash/language-switcher";
+import { DashThemeToggle } from "@/components/dash/theme-toggle";
+import { getServerDictionary, topbarLabels } from "@/i18n/server";
 import { updateProfile } from "./actions";
+import { AvatarUpload } from "./avatar-upload";
 
 export const dynamic = "force-dynamic";
 
@@ -12,34 +16,59 @@ export default async function SettingsPage() {
   const parent = await getCurrentParent();
   if (!parent) return null;
 
+  const { locale, dict } = getServerDictionary();
+
   return (
     <div>
-      <AppTopbar title="Ayarlar" userName={parent.user.name} userEmail={parent.user.email} />
+      <DashTopbar
+        title={dict.settings.title}
+        userName={parent.user.name}
+        userEmail={parent.user.email}
+        locale={locale}
+        labels={topbarLabels(dict)}
+        settingsHref="/parent/settings"
+        showMobileMenuTrigger={false}
+      />
 
-      <div className="max-w-2xl space-y-8 p-6 md:p-10">
-        <div className="flex items-center gap-4 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-          <Avatar name={parent.user.name} size={64} />
-          <div>
-            <p className="font-bold text-navy-900">{parent.user.name}</p>
-            <p className="text-sm text-navy-400">{parent.user.email}</p>
-          </div>
-        </div>
+      <div className="max-w-2xl space-y-6 p-6 md:p-10">
+        <DashCard>
+          <h3 className="mb-4 font-display text-base text-dash-ink dark:text-white">{dict.settings.avatarTitle}</h3>
+          <AvatarUpload name={parent.user.name} initialUrl={parent.user.avatarUrl} label={dict.settings.avatarChange} />
+        </DashCard>
 
-        <form action={updateProfile} className="space-y-5 rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-          <h3 className="font-display text-base text-navy-900">Şəxsi məlumatlar</h3>
+        <DashCard className="flex items-center justify-between">
           <div>
-            <Label htmlFor="name">Ad Soyad</Label>
-            <Input id="name" name="name" defaultValue={parent.user.name} />
+            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.appearanceTitle}</h3>
+            <p className="mt-1 text-sm text-dash-ink/50 dark:text-white/45">{dict.settings.appearanceDesc}</p>
           </div>
+          <DashThemeToggle light={dict.common.light} dark={dict.common.dark} />
+        </DashCard>
+
+        <DashCard className="flex items-center justify-between">
           <div>
-            <Label>Email</Label>
-            <Input defaultValue={parent.user.email} disabled />
+            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.languageTitle}</h3>
+            <p className="mt-1 text-sm text-dash-ink/50 dark:text-white/45">{dict.settings.languageDesc}</p>
           </div>
-          <div>
-            <Label htmlFor="phone">Telefon</Label>
-            <Input id="phone" name="phone" defaultValue={parent.user.phone ?? ""} />
-          </div>
-          <Button type="submit" variant="app">Yadda saxla</Button>
+          <LanguageSwitcher locale={locale} label={dict.languageSwitcher.label} />
+        </DashCard>
+
+        <form action={updateProfile}>
+          <DashCard className="space-y-5">
+            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.personalInfoTitle}</h3>
+            <div>
+              <Label htmlFor="name">{dict.settings.fullName}</Label>
+              <Input id="name" name="name" defaultValue={parent.user.name} />
+            </div>
+            <div>
+              <Label>{dict.settings.email}</Label>
+              <Input defaultValue={parent.user.email} disabled />
+            </div>
+            <div>
+              <Label htmlFor="phone">{dict.settings.phone}</Label>
+              <Input id="phone" name="phone" defaultValue={parent.user.phone ?? ""} />
+            </div>
+            <Button type="submit" variant="app">{dict.settings.save}</Button>
+          </DashCard>
         </form>
       </div>
     </div>

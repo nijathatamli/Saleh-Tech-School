@@ -146,6 +146,10 @@ model ClassGroup {
   teacherId  String
   teacher    TeacherProfile @relation(fields: [teacherId], references: [id])
   schedule   String   // e.g. "Ç.a - Cümə, 18:00"
+  // Expected session count for a full month of this recurring weekly class,
+  // set by the teacher (e.g. 2 lessons/week ≈ 8/month). Used as the "y" in
+  // the parent-facing "x/y classes attended this month" figure.
+  monthlyExpectedClasses Int @default(8)
 
   enrollments Enrollment[]
   lessons     Lesson[]
@@ -289,6 +293,10 @@ model Payment {
   dueDate     DateTime
   paidAt      DateTime?
   invoiceNo   String   @unique
+  // Set when a parent uploads a cheque/receipt photo; moves status to PENDING
+  // pending admin confirmation.
+  receiptUrl  String?
+  receiptSubmittedAt DateTime?
 }
 
 // ---------- Marketing / CRM ----------

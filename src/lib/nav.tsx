@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   Users,
   CalendarCheck,
-  TrendingUp,
   BookOpen,
   CreditCard,
   Bell,
@@ -17,17 +16,30 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import type { NavItem } from "@/components/app/sidebar";
+import type { DashNavItem } from "@/components/dash/sidebar";
+import type { Dictionary } from "@/i18n";
 
-export const parentNav: NavItem[] = [
-  { href: "/parent", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/children", label: "Uşaqlarım", icon: <Users className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/attendance", label: "Davamiyyət", icon: <CalendarCheck className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/progress", label: "Tərəqqi", icon: <TrendingUp className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/homework", label: "Ev tapşırığı", icon: <BookOpen className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/payments", label: "Ödənişlər", icon: <CreditCard className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/notifications", label: "Bildirişlər", icon: <Bell className="h-4 w-4 shrink-0" /> },
-  { href: "/parent/settings", label: "Ayarlar", icon: <Settings className="h-4 w-4 shrink-0" /> },
-];
+export function getParentNavItems(dict: Dictionary): DashNavItem[] {
+  return [
+    { href: "/parent", label: dict.nav.dashboard, icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/children", label: dict.nav.myChildren, icon: <Users className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/attendance", label: dict.nav.attendance, icon: <CalendarCheck className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/homework", label: dict.nav.homework, icon: <BookOpen className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/payments", label: dict.nav.payments, icon: <CreditCard className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/notifications", label: dict.nav.notifications, icon: <Bell className="h-4 w-4 shrink-0" /> },
+    { href: "/parent/settings", label: dict.nav.settings, icon: <Settings className="h-4 w-4 shrink-0" /> },
+  ];
+}
+
+export function getStudentNavItems(dict: Dictionary): DashNavItem[] {
+  return [
+    { href: "/student", label: dict.nav.dashboard, icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
+    { href: "/student/homework", label: dict.nav.homework, icon: <BookOpen className="h-4 w-4 shrink-0" /> },
+    { href: "/student/portfolio", label: dict.nav.portfolio, icon: <FolderGit2 className="h-4 w-4 shrink-0" /> },
+    { href: "/student/leaderboard", label: dict.nav.leaderboard, icon: <Trophy className="h-4 w-4 shrink-0" /> },
+    { href: "/student/settings", label: dict.nav.settings, icon: <Settings className="h-4 w-4 shrink-0" /> },
+  ];
+}
 
 export const teacherNav: NavItem[] = [
   { href: "/teacher", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
@@ -36,12 +48,14 @@ export const teacherNav: NavItem[] = [
   { href: "/teacher/profile", label: "Profil", icon: <User className="h-4 w-4 shrink-0" /> },
 ];
 
-export const studentNav: NavItem[] = [
-  { href: "/student", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
-  { href: "/student/homework", label: "Ev tapşırığı", icon: <BookOpen className="h-4 w-4 shrink-0" /> },
-  { href: "/student/portfolio", label: "Portfolio", icon: <FolderGit2 className="h-4 w-4 shrink-0" /> },
-  { href: "/student/leaderboard", label: "Liderlik Cədvəli", icon: <Trophy className="h-4 w-4 shrink-0" /> },
-];
+export function getTeacherNavItems(): DashNavItem[] {
+  return [
+    { href: "/teacher", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
+    { href: "/teacher/classes", label: "Siniflərim", icon: <School className="h-4 w-4 shrink-0" /> },
+    { href: "/teacher/homework", label: "Ev tapşırıqları", icon: <ClipboardList className="h-4 w-4 shrink-0" /> },
+    { href: "/teacher/profile", label: "Profil", icon: <User className="h-4 w-4 shrink-0" /> },
+  ];
+}
 
 export const adminNav: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },

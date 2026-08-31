@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTeacherById } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { CourseCard } from "@/components/marketing/course-card";
+import { TeacherPhoto } from "@/components/marketing/teacher-photo";
 
 export const dynamic = "force-dynamic";
 
@@ -20,12 +20,7 @@ export default async function TeacherDetailPage({ params }: { params: { id: stri
       <div className="mx-auto grid max-w-5xl gap-12 md:grid-cols-3">
         <div>
           <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
-            <Image
-              src={teacher.photoUrl || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg"}
-              alt={teacher.user.name}
-              fill
-              className="object-cover"
-            />
+            <TeacherPhoto src={teacher.photoUrl} name={teacher.user.name} fill />
           </div>
         </div>
         <div className="md:col-span-2">

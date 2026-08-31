@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 
 const colorMap: Record<string, string> = {
   electric: "bg-electric-500",
-  violet: "bg-amber-500",
-  cyan: "bg-teal-500",
+  violet: "bg-indigo-500",
+  cyan: "bg-sky-500",
   emerald: "bg-emerald-500",
   amber: "bg-amber-500",
   primary: "bg-primary",

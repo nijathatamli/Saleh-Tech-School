@@ -7,6 +7,8 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LearningJourney } from "@/components/marketing/learning-journey";
+import { TeacherPhoto } from "@/components/marketing/teacher-photo";
+import { Reveal } from "@/components/app/reveal";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const dynamic = "force-dynamic";
@@ -144,12 +146,11 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
       {course.teacher && (
         <section className="px-6 py-20 md:px-20">
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-8 rounded-3xl border border-grey-100 p-10 dark:border-zinc-800 md:flex-row">
-            <Image
-              src={course.teacher.photoUrl || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg"}
-              alt={course.teacher.user.name}
-              width={120}
-              height={120}
-              className="rounded-2xl object-cover"
+            <TeacherPhoto
+              src={course.teacher.photoUrl}
+              name={course.teacher.user.name}
+              size={120}
+              className="rounded-2xl"
             />
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Kursu tədris edir</p>

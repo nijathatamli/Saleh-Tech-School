@@ -1,13 +1,17 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Award, FolderGit2, Trophy } from "lucide-react";
+import { Award, FolderGit2 } from "lucide-react";
 import { getChildForParent, getCurrentParent } from "@/lib/data";
-import { AppTopbar } from "@/components/app/topbar";
+import { DashTopbar } from "@/components/dash/topbar";
+import { DashCard } from "@/components/dash/card";
+import { DashEmptyState } from "@/components/dash/empty-state";
+import { DashAttendanceStatusCard } from "@/components/dash/ledger";
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
-import { attendanceRate } from "@/lib/utils";
+import { attendanceRate, averageGrade, monthlyAttendanceByClass } from "@/lib/utils";
+import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { format } from "@/i18n/locales";
 
 export const dynamic = "force-dynamic";
 
@@ -18,21 +22,37 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
   const child = await getChildForParent(params.id);
   if (!child) notFound();
 
+  const { locale, dict } = getServerDictionary();
   const rate = attendanceRate(child.attendance);
+  const grade = averageGrade(child.grades);
+  const monthly = monthlyAttendanceByClass(child.attendance)[0];
   const age = Math.floor((Date.now() - new Date(child.birthDate).getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+  const absentCount = child.attendance.filter((a) => a.status === "ABSENT").length;
+  const lateCount = child.attendance.filter((a) => a.status === "LATE").length;
+  const excusedCount = child.attendance.filter((a) => a.status === "EXCUSED").length;
 
   return (
     <div>
-      <AppTopbar title={`${child.firstName} ${child.lastName}`} userName={parent.user.name} userEmail={parent.user.email} />
+      <DashTopbar
+        title={`${child.firstName} ${child.lastName}`}
+        userName={parent.user.name}
+        userEmail={parent.user.email}
+        locale={locale}
+        labels={topbarLabels(dict)}
+        settingsHref="/parent/settings"
+        showMobileMenuTrigger={false}
+      />
 
       <div className="space-y-8 p-6 md:p-10">
-        <div className="flex flex-col items-center gap-6 rounded-2xl border border-navy-100 bg-white p-8 shadow-sm shadow-navy-900/[0.03] sm:flex-row">
+        <DashCard className="flex flex-col items-center gap-6 p-8 sm:flex-row">
           <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={80} />
           <div className="text-center sm:text-left">
-            <h2 className="font-display text-xl text-navy-900">
+            <h2 className="font-display text-xl text-dash-ink dark:text-white">
               {child.firstName} {child.lastName}
             </h2>
-            <p className="mt-1 text-sm text-navy-400">{age} yaş · Səviyyə {child.level}</p>
+            <p className="mt-1 text-sm text-dash-ink/50 dark:text-white/45">
+              {age} {dict.childProfile.yearsOld} · {dict.childProfile.level} {child.level}
+            </p>
             <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
               {child.enrollments.map((e) => (
                 <Badge key={e.id} variant="app-electric">
@@ -43,112 +63,86 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
           </div>
           <div className="ml-0 grid grid-cols-3 gap-6 sm:ml-auto">
             <div className="text-center">
-              <p className="font-display text-xl text-navy-900">{child.xp.toLocaleString("az-AZ")}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">XP</p>
+              <p className="font-display text-xl text-dash-ink dark:text-white">{rate}%</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/35">{dict.childProfile.attendance}</p>
             </div>
             <div className="text-center">
-              <p className="font-display text-xl text-navy-900">{child.points.toLocaleString("az-AZ")}</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Xal</p>
+              <p className="font-display text-xl text-dash-ink dark:text-white">{grade}%</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/35">{dict.childProfile.teacherFeedbackTitle}</p>
             </div>
             <div className="text-center">
-              <p className="font-display text-xl text-navy-900">{rate}%</p>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-navy-400">Davamiyyət</p>
+              <p className="font-display text-xl text-dash-ink dark:text-white">
+                {monthly ? format(dict.attendance.classesThisMonth, { x: monthly.attended, y: monthly.expected }) : "—"}
+              </p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/35">{dict.attendance.classesThisMonthLabel}</p>
             </div>
           </div>
-        </div>
+        </DashCard>
+
+        <DashAttendanceStatusCard
+          rate={rate}
+          attended={monthly?.attended ?? 0}
+          total={monthly?.expected ?? 0}
+          breakdown={format(dict.attendance.breakdown, { absent: absentCount, late: lateCount, excused: excusedCount })}
+          warning={absentCount >= 3}
+          standingLabel={dict.attendance.standingGood}
+          warningLabel={dict.attendance.standingWarning}
+        />
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 font-display text-base text-navy-900">Bacarıqlar üzrə tərəqqi</h3>
-              {child.progress.length === 0 ? (
-                <p className="text-sm text-navy-400">Hələ tərəqqi qeydi yoxdur.</p>
+            <DashCard>
+              <h3 className="mb-6 font-display text-base text-dash-ink dark:text-white">{dict.childProfile.teacherFeedbackTitle}</h3>
+              {child.grades.length === 0 ? (
+                <p className="text-sm text-dash-ink/50 dark:text-white/45">{dict.childProfile.noGrades}</p>
               ) : (
-                <div className="space-y-5">
-                  {child.progress.map((p) => (
-                    <div key={p.id}>
-                      <div className="mb-1.5 flex justify-between text-xs text-navy-400">
-                        <span>{p.skill}</span>
-                        <span className="font-bold text-navy-900">{p.percent}%</span>
+                <div className="space-y-4">
+                  {child.grades.map((g) => (
+                    <div key={g.id}>
+                      <div className="mb-1.5 flex justify-between text-xs text-dash-ink/50 dark:text-white/40">
+                        <span>{g.subject}</span>
+                        <span className="font-bold text-dash-ink dark:text-white">
+                          {g.score}/{g.maxScore}
+                        </span>
                       </div>
-                      <Progress value={p.percent} color="electric" />
+                      <Progress value={Math.round((g.score / g.maxScore) * 100)} color="electric" />
                     </div>
                   ))}
                 </div>
               )}
-            </section>
+            </DashCard>
 
-            <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
-                <FolderGit2 className="h-4 w-4 text-electric-500" /> Layihələr
+            <DashCard>
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-dash-ink dark:text-white">
+                <FolderGit2 className="h-4 w-4 text-electric-500" /> {dict.childProfile.projectsTitle}
               </h3>
               {child.projects.length === 0 ? (
-                <EmptyState icon={FolderGit2} title="Hələ layihə yoxdur" />
+                <DashEmptyState icon={FolderGit2} title={dict.childProfile.noProjectsTitle} />
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {child.projects.map((p) => (
-                    <div key={p.id} className="overflow-hidden rounded-xl border border-navy-100">
+                    <div key={p.id} className="overflow-hidden rounded-lg border border-dash-rule dark:border-dash-dark-rule">
                       <div className="relative h-32">
                         <Image src={p.imageUrl} alt={p.title} fill className="object-cover" />
                       </div>
                       <div className="p-4">
-                        <p className="text-sm font-bold text-navy-900">{p.title}</p>
-                        <p className="mt-1 text-xs text-navy-400">{p.technologies.join(", ")}</p>
+                        <p className="text-sm font-bold text-dash-ink dark:text-white">{p.title}</p>
+                        <p className="mt-1 text-xs text-dash-ink/50 dark:text-white/40">{p.technologies.join(", ")}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </section>
+            </DashCard>
           </div>
 
           <div className="space-y-8">
-            <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
-                <Trophy className="h-4 w-4 text-amber-500" /> Nailiyyətlər
+            <DashCard>
+              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-dash-ink dark:text-white">
+                <Award className="h-4 w-4 text-amber-500" /> {dict.childProfile.certificatesTitle}
               </h3>
-              {child.studentBadges.length === 0 ? (
-                <p className="text-sm text-navy-400">Hələ nişan qazanılmayıb.</p>
-              ) : (
-                <div className="grid grid-cols-3 gap-3">
-                  {child.studentBadges.map((sb) => (
-                    <div
-                      key={sb.id}
-                      className="flex flex-col items-center gap-1 rounded-xl bg-navy-50 p-3 text-center"
-                      title={sb.badge.description}
-                    >
-                      <span className="text-2xl">{sb.badge.emoji}</span>
-                      <span className="text-[10px] font-bold leading-tight text-navy-900">{sb.badge.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-navy-900">
-                <Award className="h-4 w-4 text-amber-500" /> Sertifikatlar
-              </h3>
-              <EmptyState icon={Award} title="Hələ sertifikat qazanılmayıb" description="Kurs tamamlandıqda burada görünəcək." />
-            </section>
-
-            <section className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <h3 className="mb-4 font-display text-base text-navy-900">Müəllim rəyləri</h3>
-              {child.grades.length === 0 ? (
-                <p className="text-sm text-navy-400">Hələ qiymət qeydi yoxdur.</p>
-              ) : (
-                <div className="space-y-3">
-                  {child.grades.slice(0, 4).map((g) => (
-                    <div key={g.id} className="flex items-center justify-between text-sm">
-                      <span className="text-navy-600">{g.subject}</span>
-                      <span className="font-bold text-navy-900">
-                        {g.score}/{g.maxScore}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
+              <DashEmptyState icon={Award} title={dict.childProfile.noCertificatesTitle} description={dict.childProfile.noCertificatesDesc} />
+            </DashCard>
           </div>
         </div>
       </div>

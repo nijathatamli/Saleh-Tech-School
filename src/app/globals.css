@@ -50,6 +50,29 @@
 
 #course-modal-backdrop { backdrop-filter: blur(4px); }
 
+/* Custom themed cursor: hides the native pointer only once JS confirms a
+   fine-pointer, motion-safe device, so touch/reduced-motion users are unaffected. */
+@media (pointer: fine) {
+  .custom-cursor-active,
+  .custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+.cursor-fox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  font-size: 28px;
+  line-height: 1;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  will-change: transform;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+}
+
 @layer utilities {
   .marquee-mask {
     -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
@@ -70,5 +93,11 @@
   }
   .app-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-navy-400/40 rounded-full;
+  }
+  .dash-ledger {
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 39px, rgba(36, 31, 26, 0.04) 39px, rgba(36, 31, 26, 0.04) 40px);
+  }
+  .dark .dash-ledger {
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 39px, rgba(255, 255, 255, 0.035) 39px, rgba(255, 255, 255, 0.035) 40px);
   }
 }

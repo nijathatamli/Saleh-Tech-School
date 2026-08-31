@@ -1,5 +1,11 @@
 import type { Config } from "tailwindcss";
 
+/* Hallmark · genre: playful · scope: app-partial (parent + student dashboards only)
+ * macrostructure: Soft Workbench (persistent rail + warm card grid — adapted for an
+ * authenticated app shell, not a marketing macrostructure) · theme: brand-locked
+ * (existing electric-orange accent + teal secondary, new warm "dash" paper/ink pair)
+ * · enrichment: none · admin, teacher, and the marketing site are untouched. */
+
 const config: Config = {
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
@@ -46,6 +52,21 @@ const config: Config = {
           500: "#06B6D4",
           600: "#0891B2",
         },
+        // Dash — warm-tinted surface used only by the redesigned parent/student
+        // dashboards. Additive: doesn't touch navy/electric, so admin, teacher,
+        // and the marketing site are unaffected. Dark values keep the same warm
+        // anchor hue as light (never switch hue between modes); card surfaces are
+        // lighter than the page background, per standard dark-mode elevation.
+        dash: {
+          paper: "#FFFAF3",
+          "paper-2": "#FFF3E4",
+          ink: "#241F1A",
+          rule: "#F0E4D3",
+          // Dark mode
+          "dark-bg": "#1B1712",
+          "dark-surface": "#26211B",
+          "dark-rule": "#3A332B",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
@@ -81,6 +102,15 @@ const config: Config = {
           "0%": { transform: "scale(0.9)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        blob: {
+          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
+          "33%": { transform: "translate(4%, -6%) scale(1.1)" },
+          "66%": { transform: "translate(-3%, 4%) scale(0.95)" },
+        },
+        drift: {
+          "0%, 100%": { transform: "translateY(0) translateX(0)", opacity: "0.3" },
+          "50%": { transform: "translateY(-30px) translateX(10px)", opacity: "0.9" },
+        },
       },
       animation: {
         scroll: "scroll 20s linear infinite",
@@ -90,6 +120,8 @@ const config: Config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "tag-scroll": "tagScroll 10s linear infinite",
         "pop-in": "popIn 0.25s ease-out",
+        blob: "blob 12s ease-in-out infinite",
+        drift: "drift 7s ease-in-out infinite",
       },
     },
   },

@@ -1,54 +1,64 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
-import { attendanceRate, averageProgress } from "@/lib/utils";
-import type { Attendance, Course, Enrollment, SkillProgress, StudentProfile } from "@prisma/client";
+import { DashCard } from "@/components/dash/card";
+import { attendanceRate, averageGrade, monthlyAttendanceByClass } from "@/lib/utils";
+import { getServerDictionary } from "@/i18n/server";
+import { format } from "@/i18n/locales";
+import type { Attendance, Course, Enrollment, Grade, Lesson, ClassGroup, StudentProfile } from "@prisma/client";
+
+type AttendanceWithLesson = Attendance & { lesson: Lesson & { class: ClassGroup } };
 
 type ChildWithRelations = StudentProfile & {
-  attendance: Attendance[];
-  progress: SkillProgress[];
+  attendance: AttendanceWithLesson[];
+  grades: Grade[];
   enrollments: (Enrollment & { course: Course })[];
 };
 
 export function ChildCard({ child }: { child: ChildWithRelations }) {
+  const { dict } = getServerDictionary();
   const rate = attendanceRate(child.attendance);
-  const progress = averageProgress(child.progress);
+  const grade = averageGrade(child.grades);
   const course = child.enrollments[0]?.course;
+  const monthly = monthlyAttendanceByClass(child.attendance)[0];
 
   return (
-    <Link
-      href={`/parent/children/${child.id}`}
-      className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03] transition-all hover:-translate-y-1 hover:shadow-lg"
-    >
-      <div className="flex items-center gap-4">
-        <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={52} />
-        <div>
-          <p className="font-bold text-navy-900">
-            {child.firstName} {child.lastName}
-          </p>
-          <p className="text-xs text-navy-400">{course?.name ?? "Kurs təyin edilməyib"} · Səviyyə {child.level}</p>
+    <Link href={`/parent/children/${child.id}`} className="block">
+      <DashCard interactive>
+        <div className="flex items-center gap-4">
+          <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={52} />
+          <div>
+            <p className="font-bold text-dash-ink dark:text-white">
+              {child.firstName} {child.lastName}
+            </p>
+            <p className="text-xs text-dash-ink/50 dark:text-white/40">
+              {course?.name ?? dict.studentLeaderboard.courseNotAssigned} · {dict.childProfile.level} {child.level}
+            </p>
+          </div>
+          <span className="ml-auto text-xs font-bold text-dash-ink/50 dark:text-white/40">
+            {child.points.toLocaleString("az-AZ")} {dict.childProfile.points}
+          </span>
         </div>
-        <span className="ml-auto flex items-center gap-1 rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600">
-          {child.points.toLocaleString("az-AZ")} ⭐
-        </span>
-      </div>
 
-      <div className="mt-6 space-y-4">
-        <div>
-          <div className="mb-1.5 flex justify-between text-xs text-navy-400">
-            <span>Davamiyyət</span>
-            <span className="font-bold text-navy-900">{rate}%</span>
+        <div className="mt-6 space-y-4">
+          <div>
+            <div className="mb-1.5 flex justify-between text-xs text-dash-ink/50 dark:text-white/40">
+              <span>{dict.childProfile.attendance}</span>
+              <span className="font-bold text-dash-ink dark:text-white">
+                {monthly ? format(dict.attendance.classesThisMonth, { x: monthly.attended, y: monthly.expected }) : `${rate}%`}
+              </span>
+            </div>
+            <Progress value={rate} color="emerald" />
           </div>
-          <Progress value={rate} color="emerald" />
-        </div>
-        <div>
-          <div className="mb-1.5 flex justify-between text-xs text-navy-400">
-            <span>Tərəqqi</span>
-            <span className="font-bold text-navy-900">{progress}%</span>
+          <div>
+            <div className="mb-1.5 flex justify-between text-xs text-dash-ink/50 dark:text-white/40">
+              <span>{dict.childProfile.teacherFeedbackTitle}</span>
+              <span className="font-bold text-dash-ink dark:text-white">{grade}%</span>
+            </div>
+            <Progress value={grade} color="electric" />
           </div>
-          <Progress value={progress} color="electric" />
         </div>
-      </div>
+      </DashCard>
     </Link>
   );
 }

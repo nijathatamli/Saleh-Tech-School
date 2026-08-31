@@ -18,3 +18,12 @@ export async function updateProfile(formData: FormData) {
   await prisma.user.update({ where: { id: session.user.id }, data: parsed.data });
   revalidatePath("/parent/settings");
 }
+
+export async function updateAvatar(avatarUrl: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return;
+
+  await prisma.user.update({ where: { id: session.user.id }, data: { avatarUrl } });
+  revalidatePath("/parent/settings");
+  revalidatePath("/parent", "layout");
+}

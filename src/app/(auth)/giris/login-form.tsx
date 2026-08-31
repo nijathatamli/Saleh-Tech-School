@@ -80,11 +80,6 @@ export function LoginForm() {
           Qeydiyyatdan keçin
         </Link>
       </p>
-
-      <div className="rounded-xl bg-navy-50 p-4 text-xs text-navy-400">
-        <p className="font-bold text-navy-900">Demo giriş:</p>
-        <p>elvin.memmedov@example.com / parent123</p>
-      </div>
     </form>
   );
 }

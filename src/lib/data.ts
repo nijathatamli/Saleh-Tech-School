@@ -14,7 +14,8 @@ export async function getCurrentParent() {
         include: {
           enrollments: { include: { course: true } },
           progress: true,
-          attendance: true,
+          grades: true,
+          attendance: { include: { lesson: { include: { class: true } } } },
         },
       },
     },
@@ -32,7 +33,7 @@ export async function getChildForParent(childId: string) {
       studentBadges: { include: { badge: true } },
       projects: true,
       grades: true,
-      attendance: { include: { lesson: true }, orderBy: { date: "desc" } },
+      attendance: { include: { lesson: { include: { class: true } } }, orderBy: { date: "desc" } },
     },
   });
 }
@@ -65,7 +66,7 @@ export async function getClassForTeacher(classId: string) {
       teacher: { include: { user: true } },
       enrollments: {
         include: {
-          student: { include: { attendance: true, progress: true } },
+          student: { include: { attendance: true, progress: true, grades: true } },
         },
       },
       lessons: { orderBy: { date: "desc" }, include: { homeworks: true } },
@@ -85,7 +86,8 @@ export async function getCurrentStudent() {
       progress: true,
       studentBadges: { include: { badge: true } },
       projects: true,
-      attendance: true,
+      grades: true,
+      attendance: { include: { lesson: { include: { class: true } } } },
     },
   });
 }
@@ -200,4 +202,19 @@ export function getStudentProjects() {
     orderBy: { createdAt: "desc" },
     take: 6,
   });
+}
+
+export async function getPublicStats() {
+  const [totalStudents, totalTeachers, totalCourses, testimonials] = await Promise.all([
+    prisma.studentProfile.count(),
+    prisma.teacherProfile.count(),
+    prisma.course.count(),
+    prisma.testimonial.findMany({ select: { rating: true } }),
+  ]);
+
+  const avgRating = testimonials.length
+    ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
+    : 0;
+
+  return { totalStudents, totalTeachers, totalCourses, avgRating };
 }

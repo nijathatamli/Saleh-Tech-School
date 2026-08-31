@@ -11,3 +11,13 @@ export async function markAllAsRead() {
   await prisma.notification.updateMany({ where: { userId: session.user.id, read: false }, data: { read: true } });
   revalidatePath("/parent/notifications");
 }
+
+export async function markOneAsRead(notificationId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return;
+  await prisma.notification.updateMany({
+    where: { id: notificationId, userId: session.user.id },
+    data: { read: true },
+  });
+  revalidatePath("/parent/notifications");
+}

@@ -26,3 +26,10 @@ next-env.d.ts
 
 # local dev database (PGlite)
 /.pgdata
+
+# user-uploaded files (avatars, payment receipts)
+/public/uploads
+
+# local tooling state
+/.claude
+/.hallmark

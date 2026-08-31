@@ -2,12 +2,17 @@ import Link from "next/link";
 import { School, Users, ClipboardList, CalendarCheck, ArrowUpRight } from "lucide-react";
 import { getCurrentTeacher } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
-import { AppTopbar } from "@/components/app/topbar";
-import { StatCard } from "@/components/ui/stat-card";
-import { EmptyState } from "@/components/ui/empty-state";
+import { DashTopbar } from "@/components/dash/topbar";
+import { DashGreetingBanner } from "@/components/dash/greeting-banner";
+import { DashStatCard } from "@/components/dash/stat-card";
+import { DashCard } from "@/components/dash/card";
+import { DashEmptyState } from "@/components/dash/empty-state";
+import { DashLedgerCard, DashLedgerRow, DashSectionLabel } from "@/components/dash/ledger";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+const topbarLabels = { language: "Dil", profile: "Profil", settings: "Tənzimləmələr", logout: "Çıxış", light: "İşıqlı", dark: "Qaranlıq" };
 
 export default async function TeacherDashboardPage() {
   const teacher = await getCurrentTeacher();
@@ -29,45 +34,50 @@ export default async function TeacherDashboardPage() {
 
   return (
     <div>
-      <AppTopbar title="Dashboard" userName={teacher.user.name} userEmail={teacher.user.email} />
+      <DashTopbar
+        title="Dashboard"
+        subtitle="Bugünkü xülasə"
+        userName={teacher.user.name}
+        userEmail={teacher.user.email}
+        locale="az"
+        labels={topbarLabels}
+        settingsHref="/teacher/profile"
+        showLanguageSwitcher={false}
+        showMobileMenuTrigger={false}
+      />
 
       <div className="space-y-8 p-6 md:p-10">
-        <div>
-          <h2 className="font-display text-2xl text-navy-900">Salam, {teacher.user.name.split(" ")[0]} 👋</h2>
-          <p className="mt-1 text-sm text-navy-400">Bugünkü xülasəniz budur.</p>
-        </div>
+        <DashGreetingBanner greeting={`Salam, ${teacher.user.name.split(" ")[0]}`} subtitle="Bugünkü xülasəniz budur." />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Siniflərim" value={String(teacher.classes.length)} icon={School} color="electric" />
-          <StatCard label="Tələbələr" value={String(studentCount)} icon={Users} color="violet" />
-          <StatCard label="Qiymətləndirmə gözləyir" value={String(pendingSubmissions)} icon={ClipboardList} color="amber" />
-          <StatCard label="Dərslər" value={String(recentLessons.length)} icon={CalendarCheck} color="emerald" />
+          <DashStatCard label="Siniflərim" value={String(teacher.classes.length)} icon={School} color="electric" />
+          <DashStatCard label="Tələbələr" value={String(studentCount)} icon={Users} color="violet" />
+          <DashStatCard label="Qiymətləndirmə gözləyir" value={String(pendingSubmissions)} icon={ClipboardList} color="amber" />
+          <DashStatCard label="Dərslər" value={String(recentLessons.length)} icon={CalendarCheck} color="teal" />
         </div>
 
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-display text-base text-navy-900">Siniflərim</h3>
+            <DashSectionLabel>Siniflərim</DashSectionLabel>
             <Link href="/teacher/classes" className="flex items-center gap-1 text-xs font-bold text-electric-600">
               Hamısına bax <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           {teacher.classes.length === 0 ? (
-            <EmptyState icon={School} title="Hələ sinif təyin edilməyib" />
+            <DashEmptyState icon={School} title="Hələ sinif təyin edilməyib" />
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {teacher.classes.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/teacher/classes/${c.id}`}
-                  className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03] transition-all hover:-translate-y-1 hover:shadow-lg"
-                >
-                  <p className="font-bold text-navy-900">{c.name}</p>
-                  <p className="mt-1 text-xs text-navy-400">{c.course.name}</p>
-                  <div className="mt-4 flex items-center justify-between text-xs text-navy-400">
-                    <span>{c.schedule}</span>
-                    <span className="font-bold text-navy-900">{c.enrollments.length} tələbə</span>
-                  </div>
+                <Link key={c.id} href={`/teacher/classes/${c.id}`}>
+                  <DashCard interactive>
+                    <p className="font-bold text-dash-ink dark:text-white">{c.name}</p>
+                    <p className="mt-1 text-xs text-dash-ink/50 dark:text-white/40">{c.course.name}</p>
+                    <div className="mt-4 flex items-center justify-between text-xs">
+                      <span className="text-dash-ink/50 dark:text-white/40">{c.schedule}</span>
+                      <span className="font-bold text-dash-ink dark:text-white">{c.enrollments.length} tələbə</span>
+                    </div>
+                  </DashCard>
                 </Link>
               ))}
             </div>
@@ -75,26 +85,22 @@ export default async function TeacherDashboardPage() {
         </div>
 
         <div>
-          <h3 className="mb-4 font-display text-base text-navy-900">Son fəaliyyət</h3>
-          <div className="rounded-2xl border border-navy-100 bg-white shadow-sm shadow-navy-900/[0.03]">
-            {recentLessons.length === 0 ? (
-              <div className="p-6">
-                <EmptyState icon={CalendarCheck} title="Hələ dərs qeydi yoxdur" />
-              </div>
-            ) : (
-              <div className="divide-y divide-navy-100">
-                {recentLessons.map((l) => (
-                  <div key={l.id} className="flex items-center gap-4 p-5">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-navy-900">{l.title}</p>
-                      <p className="text-xs text-navy-400">{l.class.course.name} · {formatDate(l.date)}</p>
-                    </div>
-                    <span className="text-xs font-bold text-navy-400">{l.attendance.length} qeyd</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <DashSectionLabel className="mb-4">Son fəaliyyət</DashSectionLabel>
+          {recentLessons.length === 0 ? (
+            <DashEmptyState icon={CalendarCheck} title="Hələ dərs qeydi yoxdur" />
+          ) : (
+            <DashLedgerCard>
+              {recentLessons.map((l) => (
+                <DashLedgerRow
+                  key={l.id}
+                  icon={CalendarCheck}
+                  title={l.title}
+                  meta={`${l.class.course.name} · ${formatDate(l.date)}`}
+                  trailing={<span className="text-xs font-bold text-dash-ink/45 dark:text-white/40">{l.attendance.length} qeyd</span>}
+                />
+              ))}
+            </DashLedgerCard>
+          )}
         </div>
       </div>
     </div>
