@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-08-23",
+    "macrostructure": "Chalkboard Ledger (Blackboard-LMS-inspired: dark chalk sidebar, flat ledger rows, status pills)",
+    "theme": "brand-locked warm dash system, extended to teacher (was untouched before) + LMS content areas on student",
+    "enrichment": "ledger paper-line texture behind list rows, chalk-bullet section labels",
+    "scope": "app-partial",
+    "brief": "Saleh Tech School · brought teacher off the shared admin AppSidebar onto the dash system (dashboard, homework list, new-homework form, grading page) · restyled student homework (dashboard + /student/homework) as ledger rows with status pills instead of card/badge; admin + marketing untouched"
+  },
+  {
+    "date": "2026-08-22",
+    "macrostructure": "Swiss-minimal app shell (strict pivot from Soft Workbench)",
+    "theme": "brand-locked, de-gamified (electric-orange accent, warm dash paper/ink, light+dark)",
+    "enrichment": "none",
+    "scope": "app-partial",
+    "brief": "Saleh Tech School · strict/utilitarian rework of student+parent dashboards per ui-ux-pro-max Minimalism & Swiss Style guidance: removed gamification, added dark mode, cheque/avatar upload, per-notification read, x/y monthly attendance"
+  },
+  {
+    "date": "2026-08-22",
+    "macrostructure": "Soft Workbench (app-shell adaptation)",
+    "theme": "brand-locked warm (electric-orange accent, teal secondary, new dash paper/ink pair)",
+    "enrichment": "none",
+    "scope": "app-partial",
+    "brief": "Saleh Tech School · redesign the student + parent dashboards only (admin, teacher, marketing untouched) · added az/en/ru/tr i18n"
+  }
+]
