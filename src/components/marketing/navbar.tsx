@@ -34,6 +34,9 @@ export function Navbar() {
                 {l.label}
               </Link>
             ))}
+            <Link href="/scholarship_main_donttouch.html" className="nav-link-hover text-primary">
+              Təqaüd Proqramı
+            </Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">
@@ -59,6 +62,9 @@ export function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link href="/scholarship_main_donttouch.html" className="text-primary" onClick={() => setOpen(false)}>
+            Təqaüd Proqramı
+          </Link>
           <Link href="/giris" onClick={() => setOpen(false)}>
             Giriş
           </Link>

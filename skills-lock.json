@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/figma-use/SKILL.md",
       "computedHash": "9ad6263e09bd94a500b5481f7fa1c25f19c745a6d90d5a8ecb446c6a581300c1"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "be1e5177bdfd6707abe2caf6c499b4afe6991140078affa8ac1e915d8806a59d"
     }
   }
 }

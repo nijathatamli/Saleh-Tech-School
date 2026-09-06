@@ -305,6 +305,27 @@ CREATE TABLE "Notification" (
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ScholarshipApplication" (
+    "id" TEXT NOT NULL,
+    "applicationCode" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "age" INTEGER NOT NULL,
+    "courseInterest" TEXT NOT NULL DEFAULT 'cybersecurity',
+    "score" INTEGER NOT NULL,
+    "totalQuestions" INTEGER NOT NULL,
+    "passed" BOOLEAN NOT NULL,
+    "answers" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ScholarshipApplication_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipApplication_applicationCode_key" ON "ScholarshipApplication"("applicationCode");
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 

@@ -354,3 +354,18 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+model ScholarshipApplication {
+  id              String   @id @default(cuid())
+  applicationCode String   @unique
+  fullName        String
+  email           String
+  phone           String
+  age             Int
+  courseInterest  String   @default("cybersecurity")
+  score           Int
+  totalQuestions  Int
+  passed          Boolean
+  answers         Json
+  createdAt       DateTime @default(now())
+}

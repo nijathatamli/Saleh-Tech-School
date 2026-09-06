@@ -1,7 +1,5 @@
 {
-  "/teacher/page": "app/teacher/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/(auth)/giris/page": "app/(auth)/giris/page.js",
   "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/(marketing)/page": "app/(marketing)/page.js"
 }

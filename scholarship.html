@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <script>
+        (function () {
+            var stored = localStorage.getItem('theme');
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (stored ? stored === 'dark' : prefersDark) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Təqaüd Proqramı | Saleh Tech School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B00',
+                        'primary-dark': '#E66000',
+                        secondary: '#1A1A1A',
+                        grey: { 50: '#F9FAFB', 100: '#F3F4F6', 200: '#E5E7EB', 500: '#6B7280', 800: '#1F2937' },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Unbounded', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-display { font-family: 'Unbounded', sans-serif; }
+        .option-card { transition: transform .15s ease, border-color .15s ease, background-color .15s ease; cursor: pointer; }
+        .option-card:hover { transform: translateY(-2px); }
+        .option-card.selected { border-color: #FF6B00; background-color: rgba(255,107,0,0.08); }
+        .progress-fill { transition: width .3s ease; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+<body class="bg-white text-secondary dark:text-white dark:bg-black antialiased min-h-screen">
+
+    <header class="w-full px-6 py-4 flex justify-between items-center border-b border-grey-100 dark:border-zinc-800">
+        <a href="landing-page.html" data-home-link class="font-display text-xl tracking-tight flex items-center">
+            <span class="text-primary mr-2"><i class="fa-solid fa-fox"></i></span>
+            Saleh<span class="text-primary">.</span>Tech
+        </a>
+        <a href="landing-page.html" data-home-link class="text-sm font-bold text-grey-500 dark:text-zinc-400 hover:text-primary transition-colors">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Ana səhifə
+        </a>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-16">
+
+        <!-- INTRO SCREEN -->
+        <section id="screen-intro">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-6">2026 Təqaüd İmtahanı · Açıqdır</span>
+            <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-4">Gələcəyini qur.<br>Təqaüdünü qazan.</h1>
+            <p class="text-grey-500 dark:text-zinc-400 text-lg mb-8">Saleh Tech School-un təqaüd proqramına müraciət et və texnologiya sahəsində bacarıqlarını nümayiş etdir.</p>
+
+            <div class="grid grid-cols-3 gap-4 mb-10">
+                <div class="p-4 rounded-2xl border border-grey-100 dark:border-zinc-800 text-center">
+                    <div class="font-display text-xl text-primary">30 dəq</div>
+                    <div class="text-xs text-grey-500 dark:text-zinc-400 mt-1">İmtahan müddəti</div>
+                </div>
+                <div class="p-4 rounded-2xl border border-grey-100 dark:border-zinc-800 text-center">
+                    <div class="font-display text-xl text-primary">15–18</div>
+                    <div class="text-xs text-grey-500 dark:text-zinc-400 mt-1">Yaş aralığı</div>
+                </div>
+                <div class="p-4 rounded-2xl border border-grey-100 dark:border-zinc-800 text-center">
+                    <div class="font-display text-xl text-primary" id="question-count-chip">10</div>
+                    <div class="text-xs text-grey-500 dark:text-zinc-400 mt-1">Sual sayı</div>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold mb-3">Təqaüd imtahanı nədir?</h2>
+            <p class="text-grey-500 dark:text-zinc-400 mb-6">Bu imtahan sənin məntiqi düşüncəni, proqramlaşdırma və texnologiya biliklərini, problem həll etmə bacarığını və yaradıcılığını qiymətləndirir.</p>
+
+            <h3 class="text-sm font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400 mb-3">Qarşılaşacağın mövzular</h3>
+            <div class="flex flex-wrap gap-2 mb-12">
+                <span class="px-4 py-2 rounded-full bg-grey-50 dark:bg-zinc-900 text-sm font-semibold">Məntiqi düşüncə</span>
+                <span class="px-4 py-2 rounded-full bg-grey-50 dark:bg-zinc-900 text-sm font-semibold">Proqramlaşdırma</span>
+                <span class="px-4 py-2 rounded-full bg-grey-50 dark:bg-zinc-900 text-sm font-semibold">Kibertəhlükəsizlik</span>
+                <span class="px-4 py-2 rounded-full bg-grey-50 dark:bg-zinc-900 text-sm font-semibold">Problem həlli</span>
+                <span class="px-4 py-2 rounded-full bg-grey-50 dark:bg-zinc-900 text-sm font-semibold">Yaradıcılıq</span>
+            </div>
+
+            <div class="p-6 md:p-8 rounded-3xl border border-grey-100 dark:border-zinc-800 bg-grey-50/60 dark:bg-zinc-900/60">
+                <h3 class="text-xl font-bold mb-1">Hazırsan?</h3>
+                <p class="text-sm text-grey-500 dark:text-zinc-400 mb-6">Başlamazdan əvvəl əlaqə məlumatlarını daxil et.</p>
+
+                <form id="applicant-form" class="grid sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400 mb-1.5">Ad Soyad</label>
+                        <input required name="fullName" type="text" class="w-full px-4 py-3 rounded-xl border border-grey-200 dark:border-zinc-700 bg-white dark:bg-black focus:outline-none focus:border-primary" placeholder="Ali Vəliyev">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400 mb-1.5">E-poçt</label>
+                        <input required name="email" type="email" class="w-full px-4 py-3 rounded-xl border border-grey-200 dark:border-zinc-700 bg-white dark:bg-black focus:outline-none focus:border-primary" placeholder="ali@nümunə.az">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400 mb-1.5">Telefon</label>
+                        <input required name="phone" type="tel" class="w-full px-4 py-3 rounded-xl border border-grey-200 dark:border-zinc-700 bg-white dark:bg-black focus:outline-none focus:border-primary" placeholder="+994 50 000 00 00">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400 mb-1.5">Yaş</label>
+                        <input required name="age" type="number" min="10" max="25" class="w-full px-4 py-3 rounded-xl border border-grey-200 dark:border-zinc-700 bg-white dark:bg-black focus:outline-none focus:border-primary" placeholder="16">
+                    </div>
+                    <p id="intro-error" hidden class="sm:col-span-2 text-sm text-red-500"></p>
+                    <button type="submit" class="sm:col-span-2 mt-2 px-8 py-4 bg-primary text-white rounded-full text-sm font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                        İmtahana başla <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- EXAM SCREEN -->
+        <section id="screen-exam" hidden>
+            <div class="flex items-center justify-between mb-3 text-sm font-semibold text-grey-500 dark:text-zinc-400">
+                <span id="question-position">Sual 1 / 10</span>
+                <span id="timer" class="font-display text-primary">30:00</span>
+            </div>
+            <div class="w-full h-2 rounded-full bg-grey-100 dark:bg-zinc-800 mb-8">
+                <div id="progress-bar" class="progress-fill h-2 rounded-full bg-primary" style="width:10%"></div>
+            </div>
+
+            <span id="question-section" class="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-4"></span>
+            <h2 id="question-text" class="text-2xl font-bold mb-8"></h2>
+
+            <div id="options-container" class="space-y-3 mb-10"></div>
+
+            <div class="flex justify-between">
+                <button id="btn-prev" type="button" class="px-6 py-3 rounded-full text-sm font-bold border border-grey-200 dark:border-zinc-700 hover:border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Əvvəlki
+                </button>
+                <button id="btn-next" type="button" class="px-8 py-3 rounded-full text-sm font-bold bg-primary text-white hover:bg-primary-dark transition-all">
+                    Növbəti <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SUBMITTING SCREEN -->
+        <section id="screen-loading" hidden class="text-center py-24">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-grey-500 dark:text-zinc-400">Nəticə hazırlanır...</p>
+        </section>
+
+        <!-- RESULT SCREEN -->
+        <section id="screen-result" hidden class="text-center py-8">
+            <div id="result-pass" hidden>
+                <div class="text-6xl mb-4">🎉</div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3">Təbriklər, <span id="result-name"></span>!</h1>
+                <p class="text-grey-500 dark:text-zinc-400 mb-8">Saleh Tech School təqaüd proqramını qazandın. Nəticən aşağıdadır.</p>
+            </div>
+            <div id="result-fail" hidden>
+                <div class="text-6xl mb-4">💪</div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-3">Bu dəfə alınmadı</h1>
+                <p class="text-grey-500 dark:text-zinc-400 mb-8">İnkişaf etməyə davam et. Saleh Tech School-da sənin üçün uyğun başqa imkanlar da var.</p>
+            </div>
+
+            <div class="inline-flex items-center gap-8 p-6 rounded-3xl border border-grey-100 dark:border-zinc-800 mb-8">
+                <div>
+                    <div class="font-display text-3xl text-primary" id="result-score"></div>
+                    <div class="text-xs text-grey-500 dark:text-zinc-400 mt-1">Ümumi bal</div>
+                </div>
+                <div id="result-code-wrap" hidden>
+                    <div class="font-display text-lg" id="result-code"></div>
+                    <div class="text-xs text-grey-500 dark:text-zinc-400 mt-1">Müraciət ID</div>
+                </div>
+            </div>
+            <div>
+                <a href="landing-page.html" data-home-link class="inline-block px-8 py-4 bg-primary text-white rounded-full text-sm font-bold uppercase tracking-widest hover:bg-primary-dark transition-all shadow-lg shadow-primary/20">
+                    Kursları kəşf et
+                </a>
+            </div>
+        </section>
+
+        <section id="screen-error" hidden class="text-center py-24">
+            <i class="fa-solid fa-triangle-exclamation text-4xl text-red-500 mb-4"></i>
+            <p class="text-grey-500 dark:text-zinc-400" id="error-message">Xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.</p>
+        </section>
+
+    </main>
+
+    <div id="confirm-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50">
+        <div class="w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-grey-100 dark:border-zinc-800">
+            <h3 class="text-lg font-bold mb-2">İmtahanı tamamlayırsınız?</h3>
+            <p class="text-sm text-grey-500 dark:text-zinc-400 mb-6">Bu addımdan sonra geri qayıtmaq mümkün olmayacaq.</p>
+            <div class="flex gap-3">
+                <button id="confirm-cancel" type="button" class="flex-1 px-4 py-3 rounded-full text-sm font-bold border border-grey-200 dark:border-zinc-700">Suallara qayıt</button>
+                <button id="confirm-ok" type="button" class="flex-1 px-4 py-3 rounded-full text-sm font-bold bg-primary text-white">İmtahanı tamamla</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = location.protocol === 'file:' ? 'http://localhost:3000' : '';
+
+        // Served from the real site (/scholarship.html) the homepage is "/";
+        // opened straight from disk it's the sibling landing-page.html file.
+        if (location.protocol !== 'file:') {
+            document.querySelectorAll('[data-home-link]').forEach((el) => { el.href = '/'; });
+        }
+
+        const screens = {
+            intro: document.getElementById('screen-intro'),
+            exam: document.getElementById('screen-exam'),
+            loading: document.getElementById('screen-loading'),
+            result: document.getElementById('screen-result'),
+            error: document.getElementById('screen-error'),
+        };
+        function showScreen(name) {
+            Object.values(screens).forEach(el => el.hidden = true);
+            screens[name].hidden = false;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let questions = [];
+        let durationMinutes = 30;
+        let current = 0;
+        const answers = {};
+        let applicant = null;
+        let timerInterval = null;
+        let secondsLeft = 0;
+
+        async function loadQuestions() {
+            const res = await fetch(`${API_BASE}/api/scholarship`);
+            if (!res.ok) throw new Error('Suallar yüklənə bilmədi');
+            const data = await res.json();
+            questions = data.questions;
+            durationMinutes = data.durationMinutes;
+            document.getElementById('question-count-chip').textContent = questions.length;
+        }
+        loadQuestions().catch(() => {
+            document.getElementById('error-message').textContent = 'Suallar yüklənə bilmədi. Backend serverin işlədiyinə (npm run dev) əmin olun.';
+            showScreen('error');
+        });
+
+        document.getElementById('applicant-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('intro-error');
+            errorEl.hidden = true;
+            if (!questions.length) {
+                errorEl.textContent = 'Suallar hələ yüklənməyib. Bir az gözləyin.';
+                errorEl.hidden = false;
+                return;
+            }
+            const formData = new FormData(e.target);
+            applicant = {
+                fullName: formData.get('fullName').trim(),
+                email: formData.get('email').trim(),
+                phone: formData.get('phone').trim(),
+                age: Number(formData.get('age')),
+            };
+            startExam();
+        });
+
+        function startExam() {
+            current = 0;
+            secondsLeft = durationMinutes * 60;
+            showScreen('exam');
+            renderQuestion();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsLeft -= 1;
+                updateTimerDisplay();
+                if (secondsLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                }
+            }, 1000);
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.max(0, Math.floor(secondsLeft / 60));
+            const s = Math.max(0, secondsLeft % 60);
+            document.getElementById('timer').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function renderQuestion() {
+            const q = questions[current];
+            document.getElementById('question-position').textContent = `Sual ${current + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((current + 1) / questions.length) * 100}%`;
+            document.getElementById('question-section').textContent = q.section;
+            document.getElementById('question-text').textContent = q.text;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = 'option-card p-4 rounded-xl border border-grey-200 dark:border-zinc-700 flex items-center gap-3' + (answers[q.id] === idx ? ' selected' : '');
+                div.innerHTML = `<span class="w-6 h-6 flex items-center justify-center rounded-full border border-grey-300 dark:border-zinc-600 text-xs font-bold">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
+                div.addEventListener('click', () => {
+                    answers[q.id] = idx;
+                    renderQuestion();
+                });
+                container.appendChild(div);
+            });
+
+            document.getElementById('btn-prev').disabled = current === 0;
+            document.getElementById('btn-next').textContent = current === questions.length - 1 ? 'İmtahanı tamamla' : 'Növbəti';
+            document.getElementById('btn-next').innerHTML = current === questions.length - 1
+                ? 'İmtahanı tamamla <i class="fa-solid fa-check ml-1"></i>'
+                : 'Növbəti <i class="fa-solid fa-arrow-right ml-1"></i>';
+        }
+
+        document.getElementById('btn-prev').addEventListener('click', () => {
+            if (current > 0) { current -= 1; renderQuestion(); }
+        });
+        document.getElementById('btn-next').addEventListener('click', () => {
+            if (current < questions.length - 1) {
+                current += 1;
+                renderQuestion();
+            } else {
+                document.getElementById('confirm-modal').hidden = false;
+            }
+        });
+
+        document.getElementById('confirm-cancel').addEventListener('click', () => {
+            document.getElementById('confirm-modal').hidden = true;
+        });
+        document.getElementById('confirm-ok').addEventListener('click', () => {
+            document.getElementById('confirm-modal').hidden = true;
+            clearInterval(timerInterval);
+            submitExam();
+        });
+
+        async function submitExam() {
+            showScreen('loading');
+            try {
+                const res = await fetch(`${API_BASE}/api/scholarship`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...applicant, answers }),
+                });
+                if (!res.ok) throw new Error('Submission failed');
+                const data = await res.json();
+                renderResult(data);
+            } catch (err) {
+                document.getElementById('error-message').textContent = 'Nəticə göndərilə bilmədi. Backend serverin işlədiyinə (npm run dev) əmin olun.';
+                showScreen('error');
+            }
+        }
+
+        function renderResult(data) {
+            document.getElementById('result-score').textContent = `${data.score}/${data.totalQuestions}`;
+            document.getElementById('result-name').textContent = applicant.fullName.split(' ')[0];
+            document.getElementById('result-pass').hidden = !data.passed;
+            document.getElementById('result-fail').hidden = data.passed;
+            if (data.passed) {
+                document.getElementById('result-code-wrap').hidden = false;
+                document.getElementById('result-code').textContent = data.applicationCode;
+            }
+            showScreen('result');
+        }
+    </script>
+</body>
+</html>
