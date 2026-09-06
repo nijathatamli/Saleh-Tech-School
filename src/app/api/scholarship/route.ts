@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { SCHOLARSHIP_EXAM, SCHOLARSHIP_PASS_RATIO, generateApplicationCode } from "@/lib/scholarship-exam";
 
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       score,
       totalQuestions,
       passed,
-      answers: answerMap,
+      answers: answerMap as Prisma.InputJsonValue,
     },
   });
 
