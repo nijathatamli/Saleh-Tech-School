@@ -1,12 +1,12 @@
 import { getCurrentParent } from "@/lib/data";
-import { DashTopbar } from "@/components/dash/topbar";
+import { ParentPageHeader } from "@/components/dash/parent-page-header";
 import { DashCard } from "@/components/dash/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/dash/language-switcher";
 import { DashThemeToggle } from "@/components/dash/theme-toggle";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { getServerDictionary } from "@/i18n/server";
 import { updateProfile } from "./actions";
 import { AvatarUpload } from "./avatar-upload";
 
@@ -19,42 +19,34 @@ export default async function SettingsPage() {
   const { locale, dict } = getServerDictionary();
 
   return (
-    <div>
-      <DashTopbar
-        title={dict.settings.title}
-        userName={parent.user.name}
-        userEmail={parent.user.email}
-        locale={locale}
-        labels={topbarLabels(dict)}
-        settingsHref="/parent/settings"
-        showMobileMenuTrigger={false}
-      />
+    <div className="mx-auto max-w-[1240px]">
+      <ParentPageHeader title={dict.settings.title} />
 
-      <div className="max-w-2xl space-y-6 p-6 md:p-10">
-        <DashCard>
-          <h3 className="mb-4 font-display text-base text-dash-ink dark:text-white">{dict.settings.avatarTitle}</h3>
+      <div className="max-w-2xl space-y-6 px-6 pb-20 md:px-11">
+        <DashCard className="rounded-[22px] p-8">
+          <h3 className="mb-4 font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.avatarTitle}</h3>
           <AvatarUpload name={parent.user.name} initialUrl={parent.user.avatarUrl} label={dict.settings.avatarChange} />
         </DashCard>
 
-        <DashCard className="flex items-center justify-between">
+        <DashCard className="flex items-center justify-between rounded-[22px] p-8">
           <div>
-            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.appearanceTitle}</h3>
-            <p className="mt-1 text-sm text-dash-ink/50 dark:text-white/45">{dict.settings.appearanceDesc}</p>
+            <h3 className="font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.appearanceTitle}</h3>
+            <p className="mt-1 text-sm text-grey-500">{dict.settings.appearanceDesc}</p>
           </div>
           <DashThemeToggle light={dict.common.light} dark={dict.common.dark} />
         </DashCard>
 
-        <DashCard className="flex items-center justify-between">
+        <DashCard className="flex items-center justify-between rounded-[22px] p-8">
           <div>
-            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.languageTitle}</h3>
-            <p className="mt-1 text-sm text-dash-ink/50 dark:text-white/45">{dict.settings.languageDesc}</p>
+            <h3 className="font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.languageTitle}</h3>
+            <p className="mt-1 text-sm text-grey-500">{dict.settings.languageDesc}</p>
           </div>
           <LanguageSwitcher locale={locale} label={dict.languageSwitcher.label} />
         </DashCard>
 
         <form action={updateProfile}>
-          <DashCard className="space-y-5">
-            <h3 className="font-display text-base text-dash-ink dark:text-white">{dict.settings.personalInfoTitle}</h3>
+          <DashCard className="space-y-5 rounded-[22px] p-8">
+            <h3 className="font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.personalInfoTitle}</h3>
             <div>
               <Label htmlFor="name">{dict.settings.fullName}</Label>
               <Input id="name" name="name" defaultValue={parent.user.name} />

@@ -15,11 +15,17 @@ export async function getCurrentParent() {
           enrollments: { include: { course: true } },
           progress: true,
           grades: true,
+          submissions: true,
+          studentBadges: { include: { badge: true } },
           attendance: { include: { lesson: { include: { class: true } } } },
         },
       },
     },
   });
+}
+
+export function getUnreadNotificationCount(userId: string) {
+  return prisma.notification.count({ where: { userId, read: false } });
 }
 
 export async function getChildForParent(childId: string) {
@@ -182,6 +188,7 @@ export function getCourseBySlug(slug: string) {
 export function getTeachers() {
   return prisma.teacherProfile.findMany({
     include: { user: true, courses: true },
+    orderBy: { user: { createdAt: "asc" } },
   });
 }
 

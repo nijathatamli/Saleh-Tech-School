@@ -3,6 +3,19 @@ import Image from "next/image";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import { getTeachers } from "@/lib/data";
 
+// This card crops to a much shorter box than the dedicated teacher-profile
+// pages, so a headshot-style photo can end up with its lower half (logo,
+// crossed arms, etc.) hidden under the bottom gradient/text. Where that
+// happens, swap in a wider, purpose-cropped version for this card only —
+// the profile pages keep using the original photoUrl untouched.
+const CARD_PHOTO_OVERRIDES: Record<string, string> = {
+  "/uploads/nijat-hatamli.jpg": "/uploads/nijat-hatamli-torso.jpg",
+  "/uploads/eli-mustafayev.jpg": "/uploads/eli-mustafayev-torso.jpg",
+  "/uploads/nasib-ahmadov.jpg": "/uploads/nasib-ahmadov-torso.jpg",
+  "/uploads/rasul-sadigli.jpg": "/uploads/rasul-sadigli-torso.jpg",
+  "/uploads/nihat-durmusov.jpg": "/uploads/nihat-durmusov-torso.jpg",
+};
+
 export async function TeachersSection() {
   const teachers = await getTeachers();
 
@@ -33,7 +46,11 @@ export async function TeachersSection() {
             className="teacher-card group relative aspect-[4/5] overflow-hidden rounded-2xl"
           >
             <Image
-              src={t.photoUrl || `https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg`}
+              src={
+                (t.photoUrl && CARD_PHOTO_OVERRIDES[t.photoUrl]) ||
+                t.photoUrl ||
+                `https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg`
+              }
               alt={t.user.name}
               fill
               className="object-cover grayscale contrast-125 transition-all duration-500 group-hover:grayscale-0"

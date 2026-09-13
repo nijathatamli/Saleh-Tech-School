@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Award, FolderGit2 } from "lucide-react";
 import { getChildForParent, getCurrentParent } from "@/lib/data";
-import { DashTopbar } from "@/components/dash/topbar";
+import { ParentPageHeader } from "@/components/dash/parent-page-header";
 import { DashCard } from "@/components/dash/card";
 import { DashEmptyState } from "@/components/dash/empty-state";
 import { DashAttendanceStatusCard } from "@/components/dash/ledger";
@@ -10,7 +10,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { attendanceRate, averageGrade, monthlyAttendanceByClass } from "@/lib/utils";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { getServerDictionary } from "@/i18n/server";
 import { format } from "@/i18n/locales";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
   const child = await getChildForParent(params.id);
   if (!child) notFound();
 
-  const { locale, dict } = getServerDictionary();
+  const { dict } = getServerDictionary();
   const rate = attendanceRate(child.attendance);
   const grade = averageGrade(child.grades);
   const monthly = monthlyAttendanceByClass(child.attendance)[0];
@@ -32,19 +32,11 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
   const excusedCount = child.attendance.filter((a) => a.status === "EXCUSED").length;
 
   return (
-    <div>
-      <DashTopbar
-        title={`${child.firstName} ${child.lastName}`}
-        userName={parent.user.name}
-        userEmail={parent.user.email}
-        locale={locale}
-        labels={topbarLabels(dict)}
-        settingsHref="/parent/settings"
-        showMobileMenuTrigger={false}
-      />
+    <div className="mx-auto max-w-[1240px]">
+      <ParentPageHeader title={`${child.firstName} ${child.lastName}`} />
 
-      <div className="space-y-8 p-6 md:p-10">
-        <DashCard className="flex flex-col items-center gap-6 p-8 sm:flex-row">
+      <div className="space-y-6 px-6 pb-20 md:px-11">
+        <DashCard className="flex flex-col items-center gap-6 rounded-[22px] p-8 sm:flex-row">
           <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={80} />
           <div className="text-center sm:text-left">
             <h2 className="font-display text-xl text-dash-ink dark:text-white">
@@ -91,8 +83,8 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            <DashCard>
-              <h3 className="mb-6 font-display text-base text-dash-ink dark:text-white">{dict.childProfile.teacherFeedbackTitle}</h3>
+            <DashCard className="rounded-[22px] p-8">
+              <h3 className="mb-6 font-display text-[19px] font-semibold tracking-[-0.02em] text-dash-ink dark:text-white">{dict.childProfile.teacherFeedbackTitle}</h3>
               {child.grades.length === 0 ? (
                 <p className="text-sm text-dash-ink/50 dark:text-white/45">{dict.childProfile.noGrades}</p>
               ) : (
@@ -112,8 +104,8 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
               )}
             </DashCard>
 
-            <DashCard>
-              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-dash-ink dark:text-white">
+            <DashCard className="rounded-[22px] p-8">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-[19px] font-semibold tracking-[-0.02em] text-dash-ink dark:text-white">
                 <FolderGit2 className="h-4 w-4 text-electric-500" /> {dict.childProfile.projectsTitle}
               </h3>
               {child.projects.length === 0 ? (
@@ -137,8 +129,8 @@ export default async function ChildProfilePage({ params }: { params: { id: strin
           </div>
 
           <div className="space-y-8">
-            <DashCard>
-              <h3 className="mb-6 flex items-center gap-2 font-display text-base text-dash-ink dark:text-white">
+            <DashCard className="rounded-[22px] p-8">
+              <h3 className="mb-6 flex items-center gap-2 font-display text-[19px] font-semibold tracking-[-0.02em] text-dash-ink dark:text-white">
                 <Award className="h-4 w-4 text-amber-500" /> {dict.childProfile.certificatesTitle}
               </h3>
               <DashEmptyState icon={Award} title={dict.childProfile.noCertificatesTitle} description={dict.childProfile.noCertificatesDesc} />

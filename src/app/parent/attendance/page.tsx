@@ -1,11 +1,11 @@
 import { CalendarCheck } from "lucide-react";
 import { getCurrentParent } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
-import { DashTopbar } from "@/components/dash/topbar";
+import { ParentPageHeader } from "@/components/dash/parent-page-header";
 import { DashEmptyState } from "@/components/dash/empty-state";
 import { DashCard } from "@/components/dash/card";
 import { attendanceRate, formatDate, monthlyAttendanceByClass } from "@/lib/utils";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { getServerDictionary } from "@/i18n/server";
 import { format } from "@/i18n/locales";
 import type { Dictionary } from "@/i18n";
 
@@ -24,8 +24,7 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
   const parent = await getCurrentParent();
   if (!parent) return null;
 
-  const { locale, dict } = getServerDictionary();
-  const labels = topbarLabels(dict);
+  const { dict } = getServerDictionary();
   const meta = statusMeta(dict);
 
   const child = searchParams.child
@@ -34,9 +33,9 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
 
   if (!child) {
     return (
-      <div>
-        <DashTopbar title={dict.attendance.title} userName={parent.user.name} userEmail={parent.user.email} locale={locale} labels={labels} settingsHref="/parent/settings" showMobileMenuTrigger={false} />
-        <div className="p-6 md:p-10">
+      <div className="mx-auto max-w-[1240px]">
+        <ParentPageHeader title={dict.attendance.title} />
+        <div className="px-6 pb-20 md:px-11">
           <DashEmptyState icon={CalendarCheck} title={dict.attendance.childNotFound} />
         </div>
       </div>
@@ -53,10 +52,10 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
   const monthly = monthlyAttendanceByClass(records);
 
   return (
-    <div>
-      <DashTopbar title={dict.attendance.title} userName={parent.user.name} userEmail={parent.user.email} locale={locale} labels={labels} settingsHref="/parent/settings" showMobileMenuTrigger={false} />
+    <div className="mx-auto max-w-[1240px]">
+      <ParentPageHeader title={dict.attendance.title} />
 
-      <div className="space-y-8 p-6 md:p-10">
+      <div className="space-y-6 px-6 pb-20 md:px-11">
         {parent.children.length > 1 && (
           <div className="flex flex-wrap gap-2">
             {parent.children.map((c) => (
@@ -75,31 +74,31 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {monthly.length > 0 ? (
             monthly.map((m) => (
-              <DashCard key={m.className}>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/40">
+              <DashCard key={m.className} className="rounded-[22px] p-[26px]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">
                   {m.className} · {dict.attendance.classesThisMonthLabel}
                 </p>
-                <p className="mt-2 font-display text-3xl text-dash-ink dark:text-white">
+                <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">
                   {format(dict.attendance.classesThisMonth, { x: m.attended, y: m.expected })}
                 </p>
               </DashCard>
             ))
           ) : (
-            <DashCard>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/40">{dict.attendance.thisMonth}</p>
-              <p className="mt-2 font-display text-3xl text-dash-ink dark:text-white">—</p>
+            <DashCard className="rounded-[22px] p-[26px]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">{dict.attendance.thisMonth}</p>
+              <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">—</p>
             </DashCard>
           )}
-          <DashCard>
-            <p className="text-[11px] font-bold uppercase tracking-wide text-dash-ink/40 dark:text-white/40">{dict.attendance.overall}</p>
-            <p className="mt-2 font-display text-3xl text-dash-ink dark:text-white">{rate}%</p>
+          <DashCard className="rounded-[22px] p-[26px]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">{dict.attendance.overall}</p>
+            <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">{rate}%</p>
           </DashCard>
         </div>
 
-        <DashCard className="flex flex-wrap gap-4 p-4 text-xs font-semibold text-dash-ink/50 dark:text-white/45">
+        <DashCard className="flex flex-wrap gap-4 rounded-[22px] p-5 text-xs font-semibold text-grey-500">
           {(Object.keys(meta) as (keyof typeof meta)[]).map((key) => (
             <div key={key} className="flex items-center gap-2">
               <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${meta[key].className}`}>
@@ -110,8 +109,8 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
           ))}
         </DashCard>
 
-        <DashCard className="p-0">
-          <h3 className="border-b border-dash-rule p-6 font-display text-base text-dash-ink dark:border-dash-dark-rule dark:text-white">
+        <DashCard className="rounded-[22px] p-0">
+          <h3 className="border-b border-dash-ink/[0.06] p-6 font-display text-[19px] font-semibold tracking-[-0.02em] dark:border-white/10">
             {dict.attendance.historyTitle}
           </h3>
           {records.length === 0 ? (
@@ -119,20 +118,20 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
               <DashEmptyState icon={CalendarCheck} title={dict.attendance.noRecords} />
             </div>
           ) : (
-            <div className="divide-y divide-dash-rule dark:divide-dash-dark-rule">
+            <div className="divide-y divide-dash-ink/[0.06] dark:divide-white/10">
               {records.map((r) => {
                 const m = meta[r.status as keyof typeof meta];
                 return (
-                  <div key={r.id} className="flex items-center gap-4 p-5">
+                  <div key={r.id} className="flex items-center gap-4 p-6">
                     <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm ${m.className}`}>
                       {m.icon}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-bold text-dash-ink dark:text-white">{r.lesson.class.course.name}</p>
-                      <p className="text-xs text-dash-ink/50 dark:text-white/40">{formatDate(r.date)}</p>
-                      {r.note && <p className="mt-1 text-xs italic text-dash-ink/50 dark:text-white/40">&quot;{r.note}&quot;</p>}
+                      <p className="truncate text-[14.5px] font-semibold">{r.lesson.class.course.name}</p>
+                      <p className="mt-0.5 text-xs text-grey-500">{formatDate(r.date)}</p>
+                      {r.note && <p className="mt-1 text-xs italic text-grey-500">&quot;{r.note}&quot;</p>}
                     </div>
-                    <span className="text-xs font-bold text-dash-ink/50 dark:text-white/40">{m.label}</span>
+                    <span className="text-xs font-semibold text-grey-500">{m.label}</span>
                   </div>
                 );
               })}

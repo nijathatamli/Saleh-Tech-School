@@ -1,9 +1,9 @@
 import { Users } from "lucide-react";
 import { getCurrentParent } from "@/lib/data";
-import { DashTopbar } from "@/components/dash/topbar";
+import { ParentPageHeader } from "@/components/dash/parent-page-header";
 import { ChildCard } from "@/components/app/child-card";
 import { DashEmptyState } from "@/components/dash/empty-state";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { getServerDictionary } from "@/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -11,20 +11,12 @@ export default async function ChildrenPage() {
   const parent = await getCurrentParent();
   if (!parent) return null;
 
-  const { locale, dict } = getServerDictionary();
+  const { dict } = getServerDictionary();
 
   return (
-    <div>
-      <DashTopbar
-        title={dict.children.title}
-        userName={parent.user.name}
-        userEmail={parent.user.email}
-        locale={locale}
-        labels={topbarLabels(dict)}
-        settingsHref="/parent/settings"
-        showMobileMenuTrigger={false}
-      />
-      <div className="p-6 md:p-10">
+    <div className="mx-auto max-w-[1240px]">
+      <ParentPageHeader title={dict.children.title} />
+      <div className="px-6 pb-20 md:px-11">
         {parent.children.length === 0 ? (
           <DashEmptyState icon={Users} title={dict.children.noChildren} />
         ) : (

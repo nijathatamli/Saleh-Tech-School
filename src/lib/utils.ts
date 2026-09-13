@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Dictionary } from "@/i18n";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -54,6 +55,21 @@ export function monthlyAttendanceByClass<
     byClass.set(cls.id, entry);
   }
   return Array.from(byClass.values());
+}
+
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/** "Today" / "Yesterday" for recent dates, otherwise a short "day month" label — no year. */
+export function relativeDayLabel(date: Date | string, dict: Dictionary) {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const now = new Date();
+  if (isSameDay(d, now)) return dict.common.today;
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (isSameDay(d, yesterday)) return dict.common.yesterday;
+  return d.toLocaleDateString("az-AZ", { day: "2-digit", month: "long" });
 }
 
 export function initials(name: string) {

@@ -1,10 +1,10 @@
 import { Bell, Info, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { getCurrentParent } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
-import { DashTopbar } from "@/components/dash/topbar";
+import { ParentPageHeader } from "@/components/dash/parent-page-header";
 import { DashEmptyState } from "@/components/dash/empty-state";
 import { Button } from "@/components/ui/button";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import { getServerDictionary } from "@/i18n/server";
 import { format } from "@/i18n/locales";
 import { markAllAsRead, markOneAsRead } from "./actions";
 
@@ -30,7 +30,7 @@ export default async function NotificationsPage() {
   const parent = await getCurrentParent();
   if (!parent) return null;
 
-  const { locale, dict } = getServerDictionary();
+  const { dict } = getServerDictionary();
 
   const notifications = await prisma.notification.findMany({
     where: { userId: parent.userId },
@@ -38,18 +38,10 @@ export default async function NotificationsPage() {
   });
 
   return (
-    <div>
-      <DashTopbar
-        title={dict.notifications.title}
-        userName={parent.user.name}
-        userEmail={parent.user.email}
-        locale={locale}
-        labels={topbarLabels(dict)}
-        settingsHref="/parent/settings"
-        showMobileMenuTrigger={false}
-      />
+    <div className="mx-auto max-w-[1240px]">
+      <ParentPageHeader title={dict.notifications.title} />
 
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 px-6 pb-20 md:px-11">
         {notifications.some((n) => !n.read) && (
           <form action={markAllAsRead}>
             <Button type="submit" variant="app-outline" size="sm">
@@ -67,13 +59,13 @@ export default async function NotificationsPage() {
               return (
                 <div
                   key={n.id}
-                  className={`flex items-start gap-4 rounded-lg border p-5 dark:border-dash-dark-rule ${
+                  className={`flex items-start gap-4 rounded-[18px] border p-5 dark:border-dash-dark-rule ${
                     n.read
-                      ? "border-dash-rule bg-white dark:bg-dash-dark-surface"
+                      ? "border-dash-ink/[0.06] bg-white dark:bg-dash-dark-surface"
                       : "border-electric-200 bg-electric-50/40 dark:bg-electric-500/[0.06]"
                   }`}
                 >
-                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${meta.className}`}>
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${meta.className}`}>
                     <meta.icon className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">

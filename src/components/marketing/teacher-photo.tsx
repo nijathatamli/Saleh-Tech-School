@@ -7,8 +7,17 @@ type Props = {
   className?: string;
 } & ({ fill: true } | { fill?: false; size: number });
 
+// Some source photos aren't perfectly centered on the subject once cropped to
+// the card's 4:5 box. Rather than re-cropping the file, nudge the visible
+// crop window per-image via object-position. Keyed by src so this only
+// affects the specific photo that needs it.
+const OBJECT_POSITION_OVERRIDES: Record<string, string> = {
+  "/uploads/nijat-hatamli.jpg": "62% center",
+};
+
 export function TeacherPhoto(props: Props) {
   const { src, name, className } = props;
+  const objectPosition = src ? OBJECT_POSITION_OVERRIDES[src] : undefined;
 
   if (src) {
     return props.fill ? (
@@ -18,9 +27,17 @@ export function TeacherPhoto(props: Props) {
         fill
         sizes="(max-width: 768px) 100vw, 33vw"
         className={cn("object-cover", className)}
+        style={objectPosition ? { objectPosition } : undefined}
       />
     ) : (
-      <Image src={src} alt={name} width={props.size} height={props.size} className={cn("object-cover", className)} />
+      <Image
+        src={src}
+        alt={name}
+        width={props.size}
+        height={props.size}
+        className={cn("object-cover", className)}
+        style={objectPosition ? { objectPosition } : undefined}
+      />
     );
   }
 

@@ -24,7 +24,7 @@ export function ChildCard({ child }: { child: ChildWithRelations }) {
 
   return (
     <Link href={`/parent/children/${child.id}`} className="block">
-      <DashCard interactive>
+      <DashCard interactive className="rounded-[22px] p-[26px]">
         <div className="flex items-center gap-4">
           <Avatar name={`${child.firstName} ${child.lastName}`} src={child.avatarUrl} size={52} />
           <div>
