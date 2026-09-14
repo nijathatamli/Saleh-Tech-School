@@ -1,5 +1,5 @@
 const stats = [
-  { value: "500+", label: "Aktiv Tələbə" },
+  { value: "100+", label: "Aktiv Tələbə" },
   { value: "20+", label: "Ekspert Müəllim" },
   { value: "15+", label: "Tədris Proqramı" },
   { value: "98%", label: "Məmnuniyyət" },

@@ -39,7 +39,7 @@ export function Hero() {
                 />
               ))}
             </div>
-            <p className="text-xs font-medium text-grey-500 dark:text-zinc-400">500+ aktiv tələbə</p>
+            <p className="text-xs font-medium text-grey-500 dark:text-zinc-400">100+ aktiv tələbə</p>
           </div>
         </div>
       </div>
