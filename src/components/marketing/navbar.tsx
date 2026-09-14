@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LogoMark } from "@/components/app/logo-mark";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
@@ -21,7 +22,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center font-display text-xl tracking-tight">
-            <span className="mr-2 text-primary">🦊</span>
+            <LogoMark size={26} className="mr-2" />
             Saleh<span className="text-primary">.</span>Tech
           </Link>
           <nav className="hidden space-x-8 text-sm font-semibold text-grey-500 dark:text-zinc-400 md:flex">

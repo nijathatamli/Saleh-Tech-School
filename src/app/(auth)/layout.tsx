@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/app/logo-mark";
 import { AuthBackground } from "@/components/marketing/auth-background";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       <div className="animate-in fade-in zoom-in-95 duration-700 relative z-10 w-full max-w-md">
         <Link href="/" className="mb-8 flex items-center justify-center font-display text-xl text-white">
-          <span className="mr-2 text-primary">🦊</span>
+          <LogoMark size={28} className="mr-2" />
           Saleh<span className="text-primary">.</span>Tech
         </Link>
         <div className="rounded-3xl bg-white p-8 shadow-2xl transition-shadow duration-500 hover:shadow-electric-500/10 md:p-10">

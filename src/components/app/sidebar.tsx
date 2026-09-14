@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LogoMark } from "@/components/app/logo-mark";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { LogOut, Menu, X } from "lucide-react";
@@ -45,7 +46,7 @@ export function AppSidebar({
     <>
       <div className="mb-2 flex items-center justify-between px-2">
         <Link href={brandHref} className="flex items-center font-display text-lg text-white">
-          <span className="mr-2 text-primary">🦊</span>
+          <LogoMark size={24} className="mr-2" />
           Saleh<span className="text-primary">.</span>Tech
         </Link>
         <button

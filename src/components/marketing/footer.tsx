@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/app/logo-mark";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export function Footer() {
@@ -7,7 +8,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-12 pb-20 md:grid-cols-4">
         <div className="space-y-6">
           <Link href="/" className="flex items-center font-display text-xl">
-            <span className="mr-2 text-primary">🦊</span>
+            <LogoMark size={26} className="mr-2" />
             Saleh<span className="text-primary">.</span>Tech
           </Link>
           <p className="text-sm leading-relaxed text-grey-500 dark:text-zinc-400">
