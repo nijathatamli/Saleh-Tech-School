@@ -11,6 +11,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:sync-teachers": "tsx scripts/sync-teachers.ts",
     "db:studio": "prisma studio",
     "db:server": "node scripts/pg-dev-server.mjs"
   },

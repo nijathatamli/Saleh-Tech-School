@@ -3,6 +3,7 @@ import { PrismaClient, Level, AttendanceStatus, SubmissionStatus, PaymentStatus 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import bcrypt from "bcryptjs";
+import { teacherRoster } from "./teacher-roster";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
 const adapter = new PrismaPg(pool);
@@ -23,56 +24,10 @@ async function main() {
   console.log("Seeding...");
 
   // ---------- Teachers ----------
-  const teacherSeeds = [
-    {
-      name: "Nicat Hətəmli",
-      email: "tural.zeynalov@salehtech.az",
-      position: "Kiber Təhlükəsizlik üzrə Baş Mütəxəssis",
-      bio: "Respublika Kibertəhlükəsizlik olimpiadasına 4-cü yer. 5-dən çox hakaton qalibi (Metro Hakaton, Azcon Hakaton və s.).",
-      experienceYears: 10,
-      specializations: ["Linux", "Şəbəkə", "Kibertəhlükəsizlik", "CTF"],
-      photoUrl: "/uploads/nijat-hatamli.jpg",
-    },
-    {
-      name: "Əli Mustafayev",
-      email: "eli.mustafayev@salehtech.az",
-      position: "Elektrik-Elektronika Müəllimi",
-      bio: "Elektrik-elektronika fənni üzrə müəllim.",
-      experienceYears: 1,
-      specializations: ["Elektrik", "Elektronika"],
-      photoUrl: "/uploads/eli-mustafayev.jpg",
-    },
-    {
-      name: "Rasul Sadiqli",
-      email: "emin.qasimov@salehtech.az",
-      position: "Full-Stack Proqramçı",
-      bio: "Proqramlaşdırma fənni üzrə müəllim.",
-      experienceYears: 1,
-      specializations: ["JavaScript", "Python", "React", "Node.js"],
-      photoUrl: "/uploads/rasul-sadigli.jpg",
-    },
-    {
-      name: "Nasib Əhmədov",
-      email: "nigar.aliyeva@salehtech.az",
-      position: "Robototexnika Mühəndisi",
-      bio: "Robototexnika fənni üzrə müəllim.",
-      experienceYears: 1,
-      specializations: ["Arduino", "Robotexnika", "Süni İntellekt"],
-      photoUrl: "/uploads/nasib-ahmadov.jpg",
-    },
-    {
-      name: "Nihat Durmuşov",
-      email: "sebine.huseynova@salehtech.az",
-      position: "Elektronika və IoT Mütəxəssisi",
-      bio: "Elektronika və IoT fənni üzrə müəllim.",
-      experienceYears: 1,
-      specializations: ["Elektronika", "IoT", "Arduino", "Sensor sistemləri"],
-      photoUrl: "/uploads/nihat-durmusov.jpg",
-    },
-  ];
+  const teacherSeeds = teacherRoster;
 
   const teacherPasswordHash = await bcrypt.hash("teacher123", 10);
-  const teachers = [];
+  const teachersByEmail: Record<string, { id: string }> = {};
   for (const t of teacherSeeds) {
     const user = await prisma.user.create({
       data: {
@@ -93,9 +48,14 @@ async function main() {
       },
       include: { teacherProfile: true },
     });
-    teachers.push(user.teacherProfile!);
+    teachersByEmail[t.email] = user.teacherProfile!;
   }
-  const [tural, emin, nigar, sebine] = teachers;
+  // Looked up by email, not array position — inserting/reordering teacherSeeds
+  // must not silently reassign which teacher owns which course.
+  const tural = teachersByEmail["tural.zeynalov@salehtech.az"]; // Nicat Hətəmli — kibertəhlükəsizlik
+  const emin = teachersByEmail["emin.qasimov@salehtech.az"]; // Rasul Sadiqli — proqramlaşdırma
+  const nigar = teachersByEmail["nigar.aliyeva@salehtech.az"]; // Nasib Əhmədov — robotexnika
+  const sebine = teachersByEmail["sebine.huseynova@salehtech.az"]; // Nihat Durmuşov — elektronika
 
   // ---------- Courses ----------
   const courseSeeds = [

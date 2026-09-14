@@ -12,7 +12,7 @@ type Props = {
 // crop window per-image via object-position. Keyed by src so this only
 // affects the specific photo that needs it.
 const OBJECT_POSITION_OVERRIDES: Record<string, string> = {
-  "/uploads/nijat-hatamli.jpg": "62% center",
+  "/teachers/nijat-hatamli.jpg": "62% center",
 };
 
 export function TeacherPhoto(props: Props) {

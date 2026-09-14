@@ -9,11 +9,11 @@ import { getTeachers } from "@/lib/data";
 // happens, swap in a wider, purpose-cropped version for this card only —
 // the profile pages keep using the original photoUrl untouched.
 const CARD_PHOTO_OVERRIDES: Record<string, string> = {
-  "/uploads/nijat-hatamli.jpg": "/uploads/nijat-hatamli-torso.jpg",
-  "/uploads/eli-mustafayev.jpg": "/uploads/eli-mustafayev-torso.jpg",
-  "/uploads/nasib-ahmadov.jpg": "/uploads/nasib-ahmadov-torso.jpg",
-  "/uploads/rasul-sadigli.jpg": "/uploads/rasul-sadigli-torso.jpg",
-  "/uploads/nihat-durmusov.jpg": "/uploads/nihat-durmusov-torso.jpg",
+  "/teachers/nijat-hatamli.jpg": "/teachers/nijat-hatamli-torso.jpg",
+  "/teachers/eli-mustafayev.jpg": "/teachers/eli-mustafayev-torso.jpg",
+  "/teachers/nasib-ahmadov.jpg": "/teachers/nasib-ahmadov-torso.jpg",
+  "/teachers/rasul-sadigli.jpg": "/teachers/rasul-sadigli-torso.jpg",
+  "/teachers/nihat-durmusov.jpg": "/teachers/nihat-durmusov-torso.jpg",
 };
 
 export async function TeachersSection() {
