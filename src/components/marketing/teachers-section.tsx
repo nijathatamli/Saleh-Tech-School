@@ -11,6 +11,7 @@ import { getTeachers } from "@/lib/data";
 const CARD_PHOTO_OVERRIDES: Record<string, string> = {
   "/teachers/nijat-hatamli.jpg": "/teachers/nijat-hatamli-torso.jpg",
   "/teachers/eli-mustafayev.jpg": "/teachers/eli-mustafayev-torso.jpg",
+  "/teachers/meryem-axundova.jpg": "/teachers/meryem-axundova-torso.jpg",
   "/teachers/nasib-ahmadov.jpg": "/teachers/nasib-ahmadov-torso.jpg",
   "/teachers/rasul-sadigli.jpg": "/teachers/rasul-sadigli-torso.jpg",
   "/teachers/nihat-durmusov.jpg": "/teachers/nihat-durmusov-torso.jpg",

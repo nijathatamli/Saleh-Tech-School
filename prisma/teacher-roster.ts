@@ -39,6 +39,15 @@ export const teacherRoster: TeacherSeed[] = [
     photoUrl: "/teachers/eli-mustafayev.jpg",
   },
   {
+    name: "Məryəm Axundova",
+    email: "meryem.axundova@salehtech.az",
+    position: "Robototexnika Müəllimi (Rus sektoru)",
+    bio: "Robototexnika fənnini rus sektorunda tədris edir.",
+    experienceYears: 1,
+    specializations: ["Robotexnika", "Arduino"],
+    photoUrl: "/teachers/meryem-axundova.jpg",
+  },
+  {
     name: "Rasul Sadiqli",
     email: "emin.qasimov@salehtech.az",
     position: "Full-Stack Proqramçı",

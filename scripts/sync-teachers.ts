@@ -27,14 +27,27 @@ const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
  * slot instead of always at the end.
  */
 async function createdAtForRosterIndex(index: number): Promise<Date | undefined> {
-  for (let i = index - 1; i >= 0; i -= 1) {
-    const previous = await prisma.user.findUnique({
-      where: { email: teacherRoster[i].email },
-      select: { createdAt: true },
-    });
-    if (previous) return new Date(previous.createdAt.getTime() + 1000);
-  }
-  return undefined; // nothing earlier exists; let the default apply
+  const at = async (i: number) =>
+    (
+      await prisma.user.findUnique({
+        where: { email: teacherRoster[i].email },
+        select: { createdAt: true },
+      })
+    )?.createdAt;
+
+  let before: Date | undefined;
+  for (let i = index - 1; i >= 0 && !before; i -= 1) before = await at(i);
+
+  let after: Date | undefined;
+  for (let i = index + 1; i < teacherRoster.length && !after; i += 1) after = await at(i);
+
+  // Seeded teachers can sit milliseconds apart, so a fixed offset after
+  // `before` would overshoot `after` and land the newcomer at the end of the
+  // list. Split the gap instead.
+  if (before && after) return new Date((before.getTime() + after.getTime()) / 2);
+  if (before) return new Date(before.getTime() + 1000);
+  if (after) return new Date(after.getTime() - 1000);
+  return undefined;
 }
 
 async function main() {
