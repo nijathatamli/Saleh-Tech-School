@@ -156,7 +156,8 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
               <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Kursu tədris edir</p>
               <h3 className="mt-2 font-display text-xl">{course.teacher.user.name}</h3>
               <p className="mt-1 text-sm text-grey-500 dark:text-zinc-400">
-                {course.teacher.position} · {course.teacher.experienceYears} illik təcrübə
+                {course.teacher.position}
+                {course.teacher.experienceYears > 0 && ` · ${course.teacher.experienceYears} illik təcrübə`}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {course.teacher.specializations.map((s) => (

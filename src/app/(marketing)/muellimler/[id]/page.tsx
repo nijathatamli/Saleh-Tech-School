@@ -26,7 +26,9 @@ export default async function TeacherDetailPage({ params }: { params: { id: stri
         <div className="md:col-span-2">
           <p className="text-[10px] font-bold uppercase tracking-widest text-primary">{teacher.position}</p>
           <h1 className="mt-2 font-display text-3xl">{teacher.user.name}</h1>
-          <p className="mt-2 text-sm text-grey-500 dark:text-zinc-400">{teacher.experienceYears} illik təcrübə</p>
+          {teacher.experienceYears > 0 && (
+            <p className="mt-2 text-sm text-grey-500 dark:text-zinc-400">{teacher.experienceYears} illik təcrübə</p>
+          )}
 
           <div className="mt-6 flex flex-wrap gap-2">
             {teacher.specializations.map((s) => (

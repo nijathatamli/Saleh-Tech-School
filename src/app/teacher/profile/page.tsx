@@ -43,7 +43,9 @@ export default async function TeacherProfilePage() {
               <Badge key={s} variant="app-electric">{s}</Badge>
             ))}
           </div>
-          <p className="mt-4 text-sm text-dash-ink/50 dark:text-white/40">{teacher.experienceYears} illik təcrübə</p>
+          {teacher.experienceYears > 0 && (
+            <p className="mt-4 text-sm text-dash-ink/50 dark:text-white/40">{teacher.experienceYears} illik təcrübə</p>
+          )}
         </DashCard>
       </div>
     </div>

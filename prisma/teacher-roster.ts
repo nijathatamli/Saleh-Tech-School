@@ -23,9 +23,9 @@ export const teacherRoster: TeacherSeed[] = [
   {
     name: "Nicat Hətəmli",
     email: "tural.zeynalov@salehtech.az",
-    position: "Kiber Təhlükəsizlik üzrə Baş Mütəxəssis",
-    bio: "Respublika Kibertəhlükəsizlik olimpiadasına 4-cü yer. 5-dən çox hakaton qalibi (Metro Hakaton, Azcon Hakaton və s.).",
-    experienceYears: 10,
+    position: "Kibertəhlükəsizlik Müəllimi",
+    bio: "Respublika Kibertəhlükəsizlik Olimpiadası — 4-cü yer. 5+ hakaton qalibi (Metro, Azcon və s.).",
+    experienceYears: 0,
     specializations: ["Linux", "Şəbəkə", "Kibertəhlükəsizlik", "CTF"],
     photoUrl: "/teachers/nijat-hatamli.jpg",
   },

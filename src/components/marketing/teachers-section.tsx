@@ -60,7 +60,7 @@ export async function TeachersSection() {
             <div className="absolute bottom-0 left-0 right-0 space-y-1 p-6">
               <h3 className="teacher-name font-display text-lg text-white">{t.user.name}</h3>
               <p className="text-[10px] font-bold uppercase tracking-widest text-teal-400">{t.position}</p>
-              <p className="text-xs text-grey-200/70">{t.experienceYears} illik təcrübə</p>
+              {t.experienceYears > 0 && <p className="text-xs text-grey-200/70">{t.experienceYears} illik təcrübə</p>}
             </div>
           </Link>
         ))}
