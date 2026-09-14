@@ -1,11 +1,9 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/icon.png/route": "app/icon.png/route.js",
   "/(marketing)/page": "app/(marketing)/page.js",
   "/parent/attendance/page": "app/parent/attendance/page.js",
-  "/parent/homework/page": "app/parent/homework/page.js",
-  "/(marketing)/muellimler/page": "app/(marketing)/muellimler/page.js",
   "/(marketing)/muellimler/[id]/page": "app/(marketing)/muellimler/[id]/page.js",
-  "/(auth)/giris/page": "app/(auth)/giris/page.js",
-  "/parent/page": "app/parent/page.js",
-  "/teacher/page": "app/teacher/page.js"
+  "/(marketing)/muellimler/page": "app/(marketing)/muellimler/page.js",
+  "/parent/homework/page": "app/parent/homework/page.js"
 }
