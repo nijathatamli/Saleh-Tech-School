@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogoMark } from "@/components/app/logo-mark";
+import { Logo } from "@/components/app/logo";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
@@ -26,9 +26,8 @@ export function ParentSidebar({
 
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-dash-rule bg-dash-paper py-5 dark:border-dash-dark-rule dark:bg-dash-dark-bg md:flex">
-      <Link href={brandHref} className="mb-4 flex items-center gap-2.5 px-5 font-display text-base">
-        <LogoMark size={24} />
-        Saleh<span className="text-electric-500">.</span>Tech
+      <Link href={brandHref} className="mb-4 flex items-center px-5">
+        <Logo size={16} dotClassName="text-electric-500" />
       </Link>
 
       <nav className="flex-1 space-y-1 px-3">

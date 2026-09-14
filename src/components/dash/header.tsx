@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogoMark } from "@/components/app/logo-mark";
+import { Logo } from "@/components/app/logo";
 import { signOut } from "next-auth/react";
 import { Bell, LogOut, Settings, User } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
@@ -45,9 +45,8 @@ export function DashHeader({
 
   return (
     <header className="flex h-14 shrink-0 items-center border-b border-white/10 bg-dash-ink px-4 text-white md:px-6">
-      <Link href={brandHref} className="flex items-center gap-2 font-display text-base">
-        <LogoMark size={22} />
-        Saleh<span className="text-electric-400">.</span>Tech
+      <Link href={brandHref} className="flex items-center">
+        <Logo size={16} dotClassName="text-electric-400" />
       </Link>
 
       <div className="ml-auto flex items-center gap-1">

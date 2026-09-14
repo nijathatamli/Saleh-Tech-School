@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LogoMark } from "@/components/app/logo-mark";
+import { Logo } from "@/components/app/logo";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export function Footer() {
@@ -7,9 +7,8 @@ export function Footer() {
     <footer className="border-t border-grey-100 bg-white px-6 py-20 dark:border-zinc-800 dark:bg-black md:px-20">
       <div className="mx-auto grid max-w-7xl gap-12 pb-20 md:grid-cols-4">
         <div className="space-y-6">
-          <Link href="/" className="flex items-center font-display text-xl">
-            <LogoMark size={26} className="mr-2" />
-            Saleh<span className="text-primary">.</span>Tech
+          <Link href="/" className="flex items-center">
+            <Logo size={20} />
           </Link>
           <p className="text-sm leading-relaxed text-grey-500 dark:text-zinc-400">
             6-18 yaş arası uşaqlar üçün texnologiya və proqramlaşdırma məktəbi.

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogoMark } from "@/components/app/logo-mark";
+import { Logo } from "@/components/app/logo";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
@@ -21,9 +21,8 @@ export function Navbar() {
     <header className="fixed top-0 left-0 z-50 w-full border-b border-grey-100 bg-white/90 px-6 py-4 backdrop-blur-md dark:border-zinc-800 dark:bg-black/80">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center space-x-8">
-          <Link href="/" className="flex items-center font-display text-xl tracking-tight">
-            <LogoMark size={26} className="mr-2" />
-            Saleh<span className="text-primary">.</span>Tech
+          <Link href="/" className="flex items-center">
+            <Logo size={20} />
           </Link>
           <nav className="hidden space-x-8 text-sm font-semibold text-grey-500 dark:text-zinc-400 md:flex">
             {links.map((l) => (
