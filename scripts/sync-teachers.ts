@@ -14,27 +14,64 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import bcrypt from "bcryptjs";
 import { teacherRoster } from "../prisma/teacher-roster";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
 const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
+
+/**
+ * Teachers are listed publicly in roster order, which the app derives from
+ * `user.createdAt`. So a newly inserted teacher gets a createdAt just after the
+ * nearest earlier roster entry that already exists, landing them in the right
+ * slot instead of always at the end.
+ */
+async function createdAtForRosterIndex(index: number): Promise<Date | undefined> {
+  for (let i = index - 1; i >= 0; i -= 1) {
+    const previous = await prisma.user.findUnique({
+      where: { email: teacherRoster[i].email },
+      select: { createdAt: true },
+    });
+    if (previous) return new Date(previous.createdAt.getTime() + 1000);
+  }
+  return undefined; // nothing earlier exists; let the default apply
+}
 
 async function main() {
   const host = process.env.DATABASE_URL?.replace(/:\/\/[^@]*@/, "://***@") ?? "(unset)";
   console.log(`Syncing ${teacherRoster.length} teachers into: ${host}\n`);
 
   let updated = 0;
-  let missing = 0;
+  let created = 0;
 
-  for (const t of teacherRoster) {
+  for (const [index, t] of teacherRoster.entries()) {
     const existing = await prisma.user.findUnique({
       where: { email: t.email },
       include: { teacherProfile: true },
     });
 
-    if (!existing?.teacherProfile) {
-      console.log(`  SKIP  ${t.email} — no teacher record in this database`);
-      missing += 1;
+    if (!existing) {
+      await prisma.user.create({
+        data: {
+          name: t.name,
+          email: t.email,
+          passwordHash: await bcrypt.hash("teacher123", 10),
+          role: "TEACHER",
+          avatarUrl: t.photoUrl,
+          createdAt: await createdAtForRosterIndex(index),
+          teacherProfile: {
+            create: {
+              position: t.position,
+              bio: t.bio,
+              experienceYears: t.experienceYears,
+              specializations: t.specializations,
+              photoUrl: t.photoUrl,
+            },
+          },
+        },
+      });
+      console.log(`  NEW   ${t.name} — ${t.position} — ${t.photoUrl}`);
+      created += 1;
       continue;
     }
 
@@ -58,10 +95,7 @@ async function main() {
     updated += 1;
   }
 
-  console.log(`\nDone. ${updated} updated, ${missing} skipped.`);
-  if (missing > 0) {
-    console.log("Skipped entries exist in the roster but not in this database; seed it first.");
-  }
+  console.log(`\nDone. ${updated} updated, ${created} created.`);
 }
 
 main()
