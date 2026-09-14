@@ -1,9 +1,8 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
   "/(marketing)/page": "app/(marketing)/page.js",
-  "/parent/attendance/page": "app/parent/attendance/page.js",
-  "/parent/page": "app/parent/page.js",
-  "/parent/homework/page": "app/parent/homework/page.js",
   "/(marketing)/muellimler/[id]/page": "app/(marketing)/muellimler/[id]/page.js",
-  "/(marketing)/muellimler/page": "app/(marketing)/muellimler/page.js"
+  "/(marketing)/muellimler/page": "app/(marketing)/muellimler/page.js",
+  "/parent/attendance/page": "app/parent/attendance/page.js",
+  "/parent/homework/page": "app/parent/homework/page.js"
 }
