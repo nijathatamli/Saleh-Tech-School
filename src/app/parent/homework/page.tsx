@@ -77,7 +77,7 @@ export default async function HomeworkPage({ searchParams }: { searchParams: { c
                   <div key={s.id} className="flex flex-wrap items-center gap-4 p-6">
                     <div className="min-w-0 flex-1">
                       <p className="text-[14.5px] font-semibold">{s.homework.title}</p>
-                      <p className="mt-1 text-xs text-grey-500">
+                      <p className="mt-1 text-xs text-dash-muted">
                         {s.homework.lesson.class.course.name} · {dict.homework.dueDate} {formatDate(s.homework.dueDate)}
                       </p>
                       {s.feedback && (

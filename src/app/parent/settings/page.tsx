@@ -31,7 +31,7 @@ export default async function SettingsPage() {
         <DashCard className="flex items-center justify-between rounded-[22px] p-8">
           <div>
             <h3 className="font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.appearanceTitle}</h3>
-            <p className="mt-1 text-sm text-grey-500">{dict.settings.appearanceDesc}</p>
+            <p className="mt-1 text-sm text-dash-muted">{dict.settings.appearanceDesc}</p>
           </div>
           <DashThemeToggle light={dict.common.light} dark={dict.common.dark} />
         </DashCard>
@@ -39,7 +39,7 @@ export default async function SettingsPage() {
         <DashCard className="flex items-center justify-between rounded-[22px] p-8">
           <div>
             <h3 className="font-display text-[19px] font-semibold tracking-[-0.02em]">{dict.settings.languageTitle}</h3>
-            <p className="mt-1 text-sm text-grey-500">{dict.settings.languageDesc}</p>
+            <p className="mt-1 text-sm text-dash-muted">{dict.settings.languageDesc}</p>
           </div>
           <LanguageSwitcher locale={locale} label={dict.languageSwitcher.label} />
         </DashCard>

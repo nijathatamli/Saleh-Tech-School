@@ -57,11 +57,16 @@ const config: Config = {
         // and the marketing site are unaffected. Dark values keep the same warm
         // anchor hue as light (never switch hue between modes); card surfaces are
         // lighter than the page background, per standard dark-mode elevation.
+        // paper/ink/rule/muted resolve through CSS variables (defaults in
+        // globals.css :root match the hex values that used to live here) so a
+        // section can re-theme them locally — the parent dashboard does, to
+        // match its approved design spec — without touching anyone else.
         dash: {
-          paper: "#FFFAF3",
+          paper: "rgb(var(--dash-paper) / <alpha-value>)",
           "paper-2": "#FFF3E4",
-          ink: "#241F1A",
-          rule: "#F0E4D3",
+          ink: "rgb(var(--dash-ink) / <alpha-value>)",
+          rule: "rgb(var(--dash-rule) / <alpha-value>)",
+          muted: "rgb(var(--dash-muted) / <alpha-value>)",
           // Dark mode
           "dark-bg": "#1B1712",
           "dark-surface": "#26211B",
@@ -70,7 +75,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
-        display: ["var(--font-unbounded)", "sans-serif"],
+        display: ["var(--font-display)", "sans-serif"],
         app: ["var(--font-inter)", "sans-serif"],
       },
       keyframes: {

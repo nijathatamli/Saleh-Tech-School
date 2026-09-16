@@ -62,7 +62,7 @@ export function ParentSidebar({
         <Avatar name={user.name} src={user.avatarUrl} size={38} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-bold text-dash-ink dark:text-white">{user.name}</p>
-          <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-grey-500">{roleLabel}</p>
+          <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-dash-muted">{roleLabel}</p>
         </div>
       </div>
     </aside>

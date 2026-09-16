@@ -68,7 +68,7 @@ export default async function PaymentsPage() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14.5px] font-semibold">{p.title}</p>
-                      <p className="text-xs text-grey-500">
+                      <p className="text-xs text-dash-muted">
                         {dict.payments.invoice} #{p.invoiceNo} · {dict.payments.dueDate} {formatDate(p.dueDate)}
                       </p>
                     </div>

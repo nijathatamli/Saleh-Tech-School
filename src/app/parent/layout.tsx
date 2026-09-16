@@ -22,7 +22,7 @@ export default async function ParentLayout({ children }: { children: React.React
   if (unreadNotifications > 0) badges["/parent/notifications"] = unreadNotifications;
 
   return (
-    <div className="flex min-h-screen flex-col bg-dash-paper font-app text-dash-ink dark:bg-dash-dark-bg dark:text-white">
+    <div className="parent-theme flex min-h-screen flex-col bg-dash-paper font-app text-dash-ink dark:bg-dash-dark-bg dark:text-white">
       <ParentTopBar
         userName={parent.user.name}
         userEmail={parent.user.email}

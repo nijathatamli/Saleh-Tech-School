@@ -78,7 +78,7 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
           {monthly.length > 0 ? (
             monthly.map((m) => (
               <DashCard key={m.className} className="rounded-[22px] p-[26px]">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">
                   {m.className} · {dict.attendance.classesThisMonthLabel}
                 </p>
                 <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">
@@ -88,17 +88,17 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
             ))
           ) : (
             <DashCard className="rounded-[22px] p-[26px]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">{dict.attendance.thisMonth}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">{dict.attendance.thisMonth}</p>
               <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">—</p>
             </DashCard>
           )}
           <DashCard className="rounded-[22px] p-[26px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">{dict.attendance.overall}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">{dict.attendance.overall}</p>
             <p className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em] text-dash-ink dark:text-white">{rate}%</p>
           </DashCard>
         </div>
 
-        <DashCard className="flex flex-wrap gap-4 rounded-[22px] p-5 text-xs font-semibold text-grey-500">
+        <DashCard className="flex flex-wrap gap-4 rounded-[22px] p-5 text-xs font-semibold text-dash-muted">
           {(Object.keys(meta) as (keyof typeof meta)[]).map((key) => (
             <div key={key} className="flex items-center gap-2">
               <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${meta[key].className}`}>
@@ -128,10 +128,10 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[14.5px] font-semibold">{r.lesson.class.course.name}</p>
-                      <p className="mt-0.5 text-xs text-grey-500">{formatDate(r.date)}</p>
-                      {r.note && <p className="mt-1 text-xs italic text-grey-500">&quot;{r.note}&quot;</p>}
+                      <p className="mt-0.5 text-xs text-dash-muted">{formatDate(r.date)}</p>
+                      {r.note && <p className="mt-1 text-xs italic text-dash-muted">&quot;{r.note}&quot;</p>}
                     </div>
-                    <span className="text-xs font-semibold text-grey-500">{m.label}</span>
+                    <span className="text-xs font-semibold text-dash-muted">{m.label}</span>
                   </div>
                 );
               })}

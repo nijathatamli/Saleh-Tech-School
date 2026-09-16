@@ -142,7 +142,7 @@ export default async function ParentDashboardPage() {
           <h1 className="font-display text-[40px] font-semibold leading-[1.12] tracking-[-0.032em]">
             {greeting}, {parent.user.name.split(" ")[0]}.
           </h1>
-          <p className="mt-3 text-[16.5px] tracking-[-0.005em] text-grey-500">
+          <p className="mt-3 text-[16.5px] tracking-[-0.005em] text-dash-muted">
             {format(dict.parentDashboard.greetingSubtitleChild, { name: child.firstName })}
           </p>
         </div>
@@ -156,7 +156,7 @@ export default async function ParentDashboardPage() {
               <div className="font-display text-xl font-semibold tracking-[-0.02em]">
                 {child.firstName} {child.lastName}
               </div>
-              <div className="mt-1 text-[13.5px] text-grey-500">
+              <div className="mt-1 text-[13.5px] text-dash-muted">
                 {age} {dict.childProfile.yearsOld} {course ? `· ${course.name}` : ""}
               </div>
             </div>
@@ -181,7 +181,7 @@ export default async function ParentDashboardPage() {
         <DashCard className="flex items-center gap-[30px] rounded-[26px] p-[30px]">
           <StatRing value={rate} />
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">
               {dict.childProfile.attendance}
             </div>
             <div className="my-2 font-display text-[17px] font-semibold tracking-[-0.02em]">
@@ -195,7 +195,7 @@ export default async function ParentDashboardPage() {
               ].map(([label, value, dot]) => (
                 <div key={label as string} className="flex items-center gap-2.5">
                   <span className={`h-[7px] w-[7px] rounded-full ${dot}`} />
-                  <span className="flex-1 text-grey-500">{label}</span>
+                  <span className="flex-1 text-dash-muted">{label}</span>
                   <span className="font-semibold tabular-nums">{value}</span>
                 </div>
               ))}
@@ -211,7 +211,7 @@ export default async function ParentDashboardPage() {
           [dict.childProfile.points, child.points.toLocaleString("az-AZ")],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[22px] border border-dash-ink/[0.045] bg-white/55 px-6 py-[22px] dark:bg-white/[0.03]">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">{label}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">{label}</div>
             <div className="mt-3 font-display text-[27px] font-semibold tracking-[-0.03em]">{value}</div>
           </div>
         ))}
@@ -220,14 +220,14 @@ export default async function ParentDashboardPage() {
       <DashCard className="mb-5 rounded-[28px] p-9">
         <div className="mb-[34px]">
           <h2 className="font-display text-[23px] font-semibold tracking-[-0.025em]">{dict.parentDashboard.learningProgressTitle}</h2>
-          <p className="mt-2 text-[14.5px] text-grey-500">
+          <p className="mt-2 text-[14.5px] text-dash-muted">
             {format(dict.parentDashboard.learningProgressSubtitle, { name: child.firstName })}
           </p>
         </div>
         {subjects.length > 0 ? (
           <ProgressBars subjects={subjects} />
         ) : (
-          <p className="text-sm text-grey-500">{dict.parentDashboard.noProgressYet}</p>
+          <p className="text-sm text-dash-muted">{dict.parentDashboard.noProgressYet}</p>
         )}
       </DashCard>
 
@@ -236,7 +236,7 @@ export default async function ParentDashboardPage() {
           <div>
             <h2 className="font-display text-[23px] font-semibold tracking-[-0.025em]">{dict.childProfile.overTimeTitle}</h2>
             {trendData.length > 0 && (
-              <p className="mt-2 text-[14.5px] text-grey-500">
+              <p className="mt-2 text-[14.5px] text-dash-muted">
                 {trendData[0].label} — {trendData[trendData.length - 1].label}
               </p>
             )}
@@ -255,7 +255,7 @@ export default async function ParentDashboardPage() {
         {trendData.length > 0 ? (
           <ProgressChart data={trendData} />
         ) : (
-          <p className="text-sm text-grey-500">{dict.childProfile.noGrades}</p>
+          <p className="text-sm text-dash-muted">{dict.childProfile.noGrades}</p>
         )}
       </DashCard>
 
@@ -263,7 +263,7 @@ export default async function ParentDashboardPage() {
         <GlassCard className="flex flex-col rounded-[26px]">
           <div className="mb-6 flex items-center gap-2.5">
             <span className="h-1.5 w-1.5 rounded-full bg-electric-500" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">
               {dict.parentDashboard.nextLessonLabel}
             </span>
           </div>
@@ -276,13 +276,13 @@ export default async function ParentDashboardPage() {
                   {new Date(nextLesson.date).toLocaleTimeString("az-AZ", { hour: "2-digit", minute: "2-digit" })}
                 </span>
                 <span className="h-3.5 w-px bg-dash-ink/15" />
-                <span className="text-grey-500">{nextLesson.class.name}</span>
+                <span className="text-dash-muted">{nextLesson.class.name}</span>
               </div>
               <div className="flex items-center gap-3 border-t border-dash-ink/[0.07] pt-[22px]">
                 <Avatar name={nextLesson.class.teacher.user.name} src={nextLesson.class.teacher.user.avatarUrl} size={38} />
                 <div>
                   <div className="text-[13.5px] font-semibold">{nextLesson.class.teacher.user.name}</div>
-                  <div className="mt-0.5 text-xs text-grey-500">{nextLesson.class.teacher.position}</div>
+                  <div className="mt-0.5 text-xs text-dash-muted">{nextLesson.class.teacher.position}</div>
                 </div>
               </div>
               <Link
@@ -302,7 +302,7 @@ export default async function ParentDashboardPage() {
         </GlassCard>
 
         <div className="rounded-[26px] border border-dash-ink/[0.04] bg-grey-100/70 p-9 dark:bg-white/[0.03]">
-          <div className="mb-[22px] text-[11px] font-semibold uppercase tracking-[0.09em] text-grey-500">
+          <div className="mb-[22px] text-[11px] font-semibold uppercase tracking-[0.09em] text-dash-muted">
             {dict.parentDashboard.teacherNoteLabel}
           </div>
           {teacherNote?.feedback ? (
@@ -318,13 +318,13 @@ export default async function ParentDashboardPage() {
                 />
                 <div className="flex-1">
                   <div className="text-[13px] font-semibold">{teacherNote.homework.lesson.class.teacher.user.name}</div>
-                  <div className="mt-0.5 text-xs text-grey-500">{teacherNote.homework.lesson.class.teacher.position}</div>
+                  <div className="mt-0.5 text-xs text-dash-muted">{teacherNote.homework.lesson.class.teacher.position}</div>
                 </div>
-                {teacherNote.submittedAt && <span className="text-xs text-grey-500">{formatDate(teacherNote.submittedAt)}</span>}
+                {teacherNote.submittedAt && <span className="text-xs text-dash-muted">{formatDate(teacherNote.submittedAt)}</span>}
               </div>
             </>
           ) : (
-            <p className="text-sm text-grey-500">
+            <p className="text-sm text-dash-muted">
               {dict.parentDashboard.noTeacherNote} — {dict.parentDashboard.noTeacherNoteDesc}
             </p>
           )}
@@ -338,13 +338,13 @@ export default async function ParentDashboardPage() {
               <BookOpen className="h-[18px] w-[18px] text-electric-500" /> {dict.parentDashboard.homeworkWidgetTitle}
             </h2>
             {activeHomeworkCount > 0 && (
-              <span className="shrink-0 text-xs font-semibold text-grey-500">
+              <span className="shrink-0 text-xs font-semibold text-dash-muted">
                 {format(dict.parentDashboard.activeCount, { n: activeHomeworkCount })}
               </span>
             )}
           </div>
           {homeworkPreview.length === 0 ? (
-            <p className="text-sm text-grey-500">{dict.homework.noneTitle}</p>
+            <p className="text-sm text-dash-muted">{dict.homework.noneTitle}</p>
           ) : (
             <div className="flex flex-col gap-4">
               {homeworkPreview.map((s) => {
@@ -357,11 +357,11 @@ export default async function ParentDashboardPage() {
                   >
                     <div className="min-w-0">
                       <p className="truncate text-[14px] font-semibold">{s.homework.title}</p>
-                      <p className="mt-0.5 text-xs text-grey-500">
+                      <p className="mt-0.5 text-xs text-dash-muted">
                         {dict.homework.dueDate} {formatDate(s.homework.dueDate)}
                       </p>
                     </div>
-                    <span className={`shrink-0 text-xs font-semibold ${done ? "text-grey-500" : "text-dash-ink"}`}>
+                    <span className={`shrink-0 text-xs font-semibold ${done ? "text-dash-muted" : "text-dash-ink"}`}>
                       {meta.label}
                     </span>
                   </div>
@@ -390,7 +390,7 @@ export default async function ParentDashboardPage() {
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-[14px] font-semibold">{a.badge.name}</p>
-                    <p className="mt-0.5 text-xs text-grey-500">
+                    <p className="mt-0.5 text-xs text-dash-muted">
                       {format(dict.parentDashboard.unlockedOn, { date: formatDate(a.earnedAt) })}
                     </p>
                   </div>
@@ -406,12 +406,12 @@ export default async function ParentDashboardPage() {
           <Activity className="h-[18px] w-[18px] text-electric-500" /> {dict.parentDashboard.recentActivityTitle}
         </h2>
         {activityEvents.length === 0 ? (
-          <p className="text-sm text-grey-500">{dict.parentDashboard.noActivityTitle}</p>
+          <p className="text-sm text-dash-muted">{dict.parentDashboard.noActivityTitle}</p>
         ) : (
           <div className="flex flex-col gap-4">
             {activityEvents.map((e, i) => (
               <div key={i} className="flex items-start gap-6">
-                <span className="w-20 shrink-0 pt-px text-xs text-grey-500">{relativeDayLabel(e.date, dict)}</span>
+                <span className="w-20 shrink-0 pt-px text-xs text-dash-muted">{relativeDayLabel(e.date, dict)}</span>
                 <div className="flex min-w-0 flex-1 items-center gap-2.5 text-sm">
                   <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${i === 0 ? "bg-electric-500" : "bg-dash-ink/15"}`} />
                   <span className="min-w-0 flex-1 truncate">{e.text}</span>

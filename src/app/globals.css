@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Site-wide defaults — identical to the previous hardcoded tokens. */
+    --font-display: var(--font-unbounded);
+    --dash-paper: 255 250 243; /* #FFFAF3 */
+    --dash-ink: 36 31 26; /* #241F1A */
+    --dash-rule: 240 228 211; /* #F0E4D3 */
+    --dash-muted: 107 114 128; /* #6B7280 */
+  }
+
+  /* Parent dashboard: re-themed to its approved design spec
+     (parent-dashboard.html) — Plus Jakarta Sans headings on a neutral
+     warm-white palette. Scoped so student/teacher dashboards keep the defaults. */
+  .parent-theme {
+    --font-display: var(--font-jakarta);
+    --dash-paper: 247 247 245; /* #F7F7F5 */
+    --dash-ink: 23 23 23; /* #171717 */
+    --dash-rule: 232 232 230; /* #E8E8E6 */
+    --dash-muted: 111 111 107; /* #6F6F6B */
+  }
+
   * {
     @apply border-grey-200;
   }
