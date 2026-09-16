@@ -46,7 +46,7 @@ export function DashHeader({
   return (
     <header className="flex h-14 shrink-0 items-center border-b border-white/10 bg-dash-ink px-4 text-white md:px-6">
       <Link href={brandHref} className="flex items-center">
-        <Logo size={16} dotClassName="text-electric-400" />
+        <Logo size={16} />
       </Link>
 
       <div className="ml-auto flex items-center gap-1">

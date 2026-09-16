@@ -27,7 +27,7 @@ export function ParentSidebar({
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-dash-rule bg-dash-paper py-5 dark:border-dash-dark-rule dark:bg-dash-dark-bg md:flex">
       <Link href={brandHref} className="mb-4 flex items-center px-5">
-        <Logo size={16} dotClassName="text-electric-500" />
+        <Logo size={16} />
       </Link>
 
       <nav className="flex-1 space-y-1 px-3">
