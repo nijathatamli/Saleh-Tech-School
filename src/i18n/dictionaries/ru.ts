@@ -27,6 +27,7 @@ export const ru: Dictionary = {
     settings: "Настройки",
     portfolio: "Портфолио",
     leaderboard: "Таблица лидеров",
+    progress: "Прогресс",
   },
   topbar: {
     profile: "Профиль",

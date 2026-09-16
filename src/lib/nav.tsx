@@ -1,5 +1,7 @@
 import {
   LayoutDashboard,
+  TrendingUp,
+  CalendarCheck,
   BookOpen,
   Settings,
   School,
@@ -18,6 +20,8 @@ import type { Dictionary } from "@/i18n";
 export function getStudentNavItems(dict: Dictionary): DashNavItem[] {
   return [
     { href: "/student", label: dict.nav.dashboard, icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
+    { href: "/student/progress", label: dict.nav.progress, icon: <TrendingUp className="h-4 w-4 shrink-0" /> },
+    { href: "/student/attendance", label: dict.nav.attendance, icon: <CalendarCheck className="h-4 w-4 shrink-0" /> },
     { href: "/student/homework", label: dict.nav.homework, icon: <BookOpen className="h-4 w-4 shrink-0" /> },
     { href: "/student/portfolio", label: dict.nav.portfolio, icon: <FolderGit2 className="h-4 w-4 shrink-0" /> },
     { href: "/student/leaderboard", label: dict.nav.leaderboard, icon: <Trophy className="h-4 w-4 shrink-0" /> },

@@ -1,34 +1,18 @@
-import { redirect } from "next/navigation";
-import { DashHeader } from "@/components/dash/header";
-import { DashRail } from "@/components/dash/rail";
-import { PageTransition } from "@/components/app/page-transition";
-import { getCurrentStudent } from "@/lib/data";
-import { getStudentNavItems } from "@/lib/nav";
-import { getServerDictionary, topbarLabels } from "@/i18n/server";
+import type { Metadata } from "next";
+// The approved student dashboard UI (student-dashboard.html) — the shared
+// fonts and icon font from the parent portal, plus this design's own regular
+// icon face, base styles and generated hover rules — scoped under .sd-root.
+import "@/features/parent-dashboard/styles/fonts.css";
+import "@/features/parent-dashboard/styles/fontawesome.css";
+import "@/features/student-dashboard/styles/fa-regular.css";
+import "@/features/student-dashboard/styles/base.css";
+import "@/features/student-dashboard/styles/template.generated.css";
+import "@/features/student-dashboard/styles/portal.css";
 
-export default async function StudentLayout({ children }: { children: React.ReactNode }) {
-  const student = await getCurrentStudent();
-  if (!student) redirect("/giris");
+export const metadata: Metadata = { title: "Tələbə paneli" };
 
-  const { locale, dict } = getServerDictionary();
-
-  return (
-    <div className="flex min-h-screen flex-col bg-dash-paper font-app text-dash-ink dark:bg-dash-dark-bg dark:text-white">
-      <DashHeader
-        brandHref="/student"
-        userName={student.user?.name ?? `${student.firstName} ${student.lastName}`}
-        userEmail={student.user?.email ?? ""}
-        avatarUrl={student.avatarUrl}
-        settingsHref="/student/settings"
-        locale={locale}
-        labels={topbarLabels(dict)}
-      />
-      <div className="flex flex-1">
-        <DashRail items={getStudentNavItems(dict)} brandHref="/student" />
-        <div className="min-w-0 flex-1 pb-20 md:pb-0">
-          <PageTransition>{children}</PageTransition>
-        </div>
-      </div>
-    </div>
-  );
+// Access control lives in middleware.ts (session + STUDENT role) and the page
+// itself re-checks the session before loading data.
+export default function StudentLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

@@ -1,0 +1,12 @@
+/* Base styles + keyframes — verbatim from student-dashboard.html, scoped to .sd-root instead of body. */
+.sd-root { margin: 0; background: #F7F7F5; font-family: 'Inter', sans-serif; color: #171717; -webkit-font-smoothing: antialiased; }
+.sd-root *, .sd-root *::before, .sd-root *::after { box-sizing: border-box; }
+.sd-root a { color: #171717; text-decoration: none; }
+.sd-root a:hover { color: #E66000; }
+.sd-root button { font-family: inherit; outline: none; -webkit-tap-highlight-color: transparent; }
+.sd-root button:focus { outline: none; }
+.sd-root button:focus-visible { outline: 2px solid rgba(255,107,0,0.55); outline-offset: 2px; border-radius: inherit; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes rise-sm { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes glow-drift { 0%, 100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-40px,26px) scale(1.1); } }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(255,107,0,0.28); } 70% { box-shadow: 0 0 0 10px rgba(255,107,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); } }

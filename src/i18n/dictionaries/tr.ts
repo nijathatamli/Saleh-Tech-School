@@ -27,6 +27,7 @@ export const tr: Dictionary = {
     settings: "Ayarlar",
     portfolio: "Portfolyo",
     leaderboard: "Lider Tablosu",
+    progress: "Gelişim",
   },
   topbar: {
     profile: "Profil",

@@ -25,6 +25,7 @@ export const az = {
     settings: "Ayarlar",
     portfolio: "Portfolio",
     leaderboard: "Liderlik Cədvəli",
+    progress: "İnkişaf",
   },
   topbar: {
     profile: "Profil",

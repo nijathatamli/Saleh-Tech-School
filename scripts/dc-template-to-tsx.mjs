@@ -10,20 +10,21 @@
 //   style="{{ x }}"                 -> style={sx(x)}      (runtime string -> object)
 //   style-hover / style-active / style-focus -> a generated :hover/:active/:focus class
 //
-// Usage: node scripts/dc-template-to-tsx.mjs
+// Usage: node scripts/dc-template-to-tsx.mjs [feature ...]   (default: every feature below)
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseFragment } from "parse5";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const featureDir = join(here, "..", "src", "features", "parent-dashboard");
-const templatePath = join(featureDir, "template.html");
-const tsxOut = join(featureDir, "template.generated.tsx");
-const cssOut = join(featureDir, "styles", "template.generated.css");
 
-const html = readFileSync(templatePath, "utf8");
-const fragment = parseFragment(html);
+// One entry per compiled design: the feature folder under src/features, the
+// class the template root gets (scopes the feature's CSS) and the prefix for
+// the generated hover/active/focus classes.
+const FEATURES = {
+  "parent-dashboard": { root: "pp-root", prefix: "pp" },
+  "student-dashboard": { root: "sd-root", prefix: "sd" },
+};
 
 // ---------- helpers -------------------------------------------------------
 
@@ -154,25 +155,23 @@ function attrValue(value, scope) {
 
 // ---------- state classes (style-hover / style-active / style-focus) --------
 
-const stateRules = new Map(); // "hover|css" -> className
-const cssLines = [];
+let current; // { root, prefix, stateRules, cssLines, loopCounter, rootElement } for the feature being compiled
+
 function stateClass(kind, css) {
   const key = `${kind}|${css}`;
-  let cls = stateRules.get(key);
+  let cls = current.stateRules.get(key);
   if (!cls) {
-    cls = `pp-${kind[0]}${stateRules.size + 1}`;
-    stateRules.set(key, cls);
+    cls = `${current.prefix}-${kind[0]}${current.stateRules.size + 1}`;
+    current.stateRules.set(key, cls);
     const decls = splitDecls(css)
       .map((d) => `${d} !important`)
       .join("; ");
-    cssLines.push(`.pp-root .${cls}:${kind} { ${decls}; }`);
+    current.cssLines.push(`.${current.root} .${cls}:${kind} { ${decls}; }`);
   }
   return cls;
 }
 
 // ---------- emit ------------------------------------------------------------
-
-let loopCounter = 0;
 
 function isWhitespaceOnly(node) {
   return node.nodeName === "#text" && node.value.trim() === "";
@@ -224,7 +223,7 @@ function emitElement(node, scope, indent) {
   if (node.nodeName === "sc-for") {
     const list = expr(attrs.list.match(BINDING_ONE)?.[1] ?? attrs.list, scope);
     const as = attrs.as;
-    const idx = `i${loopCounter++}`;
+    const idx = `i${current.loopCounter++}`;
     const inner = new Set(scope);
     inner.add(as);
     const body = emitChildren(node, inner, indent + "    ");
@@ -261,7 +260,7 @@ function emitElement(node, scope, indent) {
     props.push(`${reactAttrName(name)}=${attrValue(value, scope)}`);
   }
 
-  if (node === rootElement) classes.unshift("pp-root");
+  if (node === current.rootElement) classes.unshift(current.root);
 
   if (classExpr && classes.length) {
     props.push(`className={${classExpr.slice(1, -1)} + ${JSON.stringify(" " + classes.join(" "))}}`);
@@ -281,14 +280,24 @@ function emitElement(node, scope, indent) {
   return `${indent}${open}>\n${kids.join("\n")}\n${indent}</${tag}>`;
 }
 
-const rootElement = fragment.childNodes.find((n) => n.nodeName !== "#text" && n.nodeName !== "#comment");
-const others = fragment.childNodes.filter((n) => n !== rootElement && !(n.nodeName === "#text" && n.value.trim() === ""));
-if (others.length) throw new Error("template must have exactly one root element");
+function compile(feature) {
+  const cfg = FEATURES[feature];
+  if (!cfg) throw new Error(`unknown feature "${feature}" — known: ${Object.keys(FEATURES).join(", ")}`);
+  const featureDir = join(here, "..", "src", "features", feature);
+  const templatePath = join(featureDir, "template.html");
+  const tsxOut = join(featureDir, "template.generated.tsx");
+  const cssOut = join(featureDir, "styles", "template.generated.css");
 
-const body = emitElement(rootElement, new Set(), "    ");
+  const fragment = parseFragment(readFileSync(templatePath, "utf8"));
+  const rootElement = fragment.childNodes.find((n) => n.nodeName !== "#text" && n.nodeName !== "#comment");
+  const others = fragment.childNodes.filter((n) => n !== rootElement && !(n.nodeName === "#text" && n.value.trim() === ""));
+  if (others.length) throw new Error("template must have exactly one root element");
 
-const tsx = `/* eslint-disable */
-// GENERATED FILE — do not edit. Source: src/features/parent-dashboard/template.html
+  current = { ...cfg, stateRules: new Map(), cssLines: [], loopCounter: 0, rootElement };
+  const body = emitElement(rootElement, new Set(), "    ");
+
+  const tsx = `/* eslint-disable */
+// GENERATED FILE — do not edit. Source: src/features/${feature}/template.html
 // Regenerate with: node scripts/dc-template-to-tsx.mjs
 import { Fragment } from "react";
 import { sx } from "./sx";
@@ -301,9 +310,13 @@ ${body}
 }
 `;
 
-writeFileSync(tsxOut, tsx);
-writeFileSync(
-  cssOut,
-  `/* GENERATED FILE — do not edit. Hover/active/focus styles lifted from the template's style-* attributes. */\n${cssLines.join("\n")}\n`
-);
-console.log(`wrote ${tsxOut} (${tsx.length} chars), ${cssOut} (${cssLines.length} rules)`);
+  writeFileSync(tsxOut, tsx);
+  writeFileSync(
+    cssOut,
+    `/* GENERATED FILE — do not edit. Hover/active/focus styles lifted from the template's style-* attributes. */\n${current.cssLines.join("\n")}\n`
+  );
+  console.log(`wrote ${tsxOut} (${tsx.length} chars), ${cssOut} (${current.cssLines.length} rules)`);
+}
+
+const requested = process.argv.slice(2);
+for (const feature of requested.length ? requested : Object.keys(FEATURES)) compile(feature);
