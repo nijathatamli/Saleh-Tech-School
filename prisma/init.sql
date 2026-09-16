@@ -35,6 +35,8 @@ CREATE TABLE "User" (
 CREATE TABLE "ParentProfile" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "notifyLessons" BOOLEAN NOT NULL DEFAULT true,
+    "notifyGrades" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "ParentProfile_pkey" PRIMARY KEY ("id")
 );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans, Unbounded } from "next/font/google";
+import { Inter, Unbounded } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/providers";
 import "./globals.css";
@@ -9,13 +9,6 @@ const unbounded = Unbounded({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-unbounded",
-  display: "swap",
-});
-// Heading face for the parent dashboard only (see .parent-theme in globals.css).
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-jakarta",
   display: "swap",
 });
 export const metadata: Metadata = {
@@ -31,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="az"
-      className={`${inter.variable} ${unbounded.variable} ${jakarta.variable}`}
+      className={`${inter.variable} ${unbounded.variable}`}
       suppressHydrationWarning
     >
       <head>

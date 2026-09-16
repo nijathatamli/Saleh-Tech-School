@@ -1,10 +1,6 @@
 import {
   LayoutDashboard,
-  Users,
-  CalendarCheck,
   BookOpen,
-  CreditCard,
-  Bell,
   Settings,
   School,
   ClipboardList,
@@ -18,18 +14,6 @@ import {
 import type { NavItem } from "@/components/app/sidebar";
 import type { DashNavItem } from "@/components/dash/sidebar";
 import type { Dictionary } from "@/i18n";
-
-export function getParentNavItems(dict: Dictionary): DashNavItem[] {
-  return [
-    { href: "/parent", label: dict.nav.parentHome, icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/children", label: dict.nav.myChildren, icon: <Users className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/attendance", label: dict.nav.attendance, icon: <CalendarCheck className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/homework", label: dict.nav.homework, icon: <BookOpen className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/payments", label: dict.nav.payments, icon: <CreditCard className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/notifications", label: dict.nav.notifications, icon: <Bell className="h-4 w-4 shrink-0" /> },
-    { href: "/parent/settings", label: dict.nav.parentSettings, icon: <Settings className="h-4 w-4 shrink-0" /> },
-  ];
-}
 
 export function getStudentNavItems(dict: Dictionary): DashNavItem[] {
   return [

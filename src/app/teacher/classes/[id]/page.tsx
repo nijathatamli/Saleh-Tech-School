@@ -9,6 +9,7 @@ import { DashLedgerCard, DashLedgerRow } from "@/components/dash/ledger";
 import { DashTabs } from "@/components/dash/tabs";
 import { Avatar } from "@/components/ui/avatar";
 import { attendanceRate, averageProgress, averageGrade, formatDate } from "@/lib/utils";
+import { NewLessonForm } from "./new-lesson-form";
 
 export const dynamic = "force-dynamic";
 
@@ -22,22 +23,25 @@ export default async function TeacherClassDetailPage({ params }: { params: { id:
   if (!classGroup) notFound();
 
   const lessonsTab = (
-    classGroup.lessons.length === 0 ? (
-      <DashEmptyState icon={CalendarCheck} title="Hələ dərs yoxdur" />
-    ) : (
-      <DashLedgerCard>
-        {classGroup.lessons.map((l) => (
-          <Link key={l.id} href={`/teacher/classes/${classGroup.id}/attendance/${l.id}`}>
-            <DashLedgerRow
-              icon={CalendarCheck}
-              title={l.title}
-              meta={formatDate(l.date)}
-              trailing={<span className="text-xs font-bold text-electric-600">Davamiyyəti işarələ</span>}
-            />
-          </Link>
-        ))}
-      </DashLedgerCard>
-    )
+    <div className="space-y-6">
+      <NewLessonForm classId={classGroup.id} />
+      {classGroup.lessons.length === 0 ? (
+        <DashEmptyState icon={CalendarCheck} title="Hələ dərs yoxdur" />
+      ) : (
+        <DashLedgerCard>
+          {classGroup.lessons.map((l) => (
+            <Link key={l.id} href={`/teacher/classes/${classGroup.id}/attendance/${l.id}`}>
+              <DashLedgerRow
+                icon={CalendarCheck}
+                title={l.title}
+                meta={`${formatDate(l.date)} · ${new Date(l.date).toLocaleTimeString("az-AZ", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku" })}`}
+                trailing={<span className="text-xs font-bold text-electric-600">Davamiyyəti işarələ</span>}
+              />
+            </Link>
+          ))}
+        </DashLedgerCard>
+      )}
+    </div>
   );
 
   const rosterTab = (

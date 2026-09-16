@@ -1,0 +1,80 @@
+/* Integration shim: parent-dashboard.html rendered against a bare browser
+   stylesheet, while this app ships Tailwind's preflight and a few global
+   rules. Everything here only neutralises those globals inside the portal so
+   the file's own inline styles render exactly as they do standalone. */
+
+/* Preflight overrides UA defaults for these elements (margins, line-height,
+   font, display) — put the UA values back; the template's inline styles then
+   layer on top precisely as in the original. */
+.pp-root h1,
+.pp-root h2,
+.pp-root h3,
+.pp-root p,
+.pp-root label,
+.pp-root svg,
+.pp-root input,
+.pp-root button {
+  all: revert;
+}
+/* …but keep the file's own base rules that the revert also cleared */
+.pp-root h1,
+.pp-root h2,
+.pp-root h3,
+.pp-root p,
+.pp-root label,
+.pp-root svg,
+.pp-root input,
+.pp-root button,
+.pp-root input::before,
+.pp-root button::before,
+.pp-root input::after,
+.pp-root button::after {
+  box-sizing: border-box;
+}
+.pp-root {
+  line-height: normal;
+}
+.pp-root button {
+  font-family: inherit;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pp-root button:focus {
+  outline: none;
+}
+.pp-root button:focus-visible {
+  outline: 2px solid rgba(255, 107, 0, 0.55);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+/* globals.css animates colour on every element and adds a focus ring; the file has neither. */
+.pp-root,
+.pp-root *,
+.pp-root *::before,
+.pp-root *::after {
+  transition: none;
+}
+.pp-root :focus-visible {
+  box-shadow: none;
+}
+
+/* The file keeps its desktop and phone layouts as two trees; here the viewport picks one. */
+.pp-desktop {
+  display: block;
+}
+.pp-mobile {
+  display: none;
+}
+@media (max-width: 767.98px) {
+  .pp-desktop {
+    display: none;
+  }
+  .pp-mobile {
+    display: block;
+  }
+}
+
+/* The site-wide themed cursor is not part of the approved UI. */
+html.pp-portal .cursor-fox {
+  display: none;
+}

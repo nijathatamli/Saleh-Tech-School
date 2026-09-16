@@ -39,6 +39,9 @@ model ParentProfile {
   id       String  @id @default(cuid())
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Portal notification preferences (Tənzimləmələr → Bildirişlər toggles)
+  notifyLessons Boolean @default(true)
+  notifyGrades  Boolean @default(true)
   children StudentProfile[]
   payments Payment[]
 }

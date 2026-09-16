@@ -9,6 +9,7 @@ import { DashSectionLabel } from "@/components/dash/ledger";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { attendanceRate } from "@/lib/utils";
+import { BadgesCard, SkillProgressCard } from "./progress-forms";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,14 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
       attendance: true,
       projects: true,
       grades: true,
+      progress: { orderBy: { percent: "desc" } },
+      studentBadges: { include: { badge: true }, orderBy: { earnedAt: "desc" } },
     },
   });
   if (!student) notFound();
+
+  const allBadges = await prisma.badge.findMany({ orderBy: { name: "asc" } });
+  const earnedIds = new Set(student.studentBadges.map((b) => b.badgeId));
 
   const rate = attendanceRate(student.attendance);
 
@@ -114,6 +120,15 @@ export default async function TeacherStudentProfilePage({ params }: { params: { 
                 </div>
               )}
             </DashCard>
+          </div>
+
+          <div className="space-y-8">
+            <SkillProgressCard studentId={student.id} skills={student.progress} />
+            <BadgesCard
+              studentId={student.id}
+              earned={student.studentBadges.map((b) => ({ id: b.id, name: b.badge.name, emoji: b.badge.emoji, earnedAt: b.earnedAt }))}
+              available={allBadges.filter((b) => !earnedIds.has(b.id))}
+            />
           </div>
         </div>
       </div>
