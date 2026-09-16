@@ -13,12 +13,11 @@ export function renderTemplate(v: TemplateVals) {
       <div className="pp-desktop">
         <div style={{ position: "relative", zIndex: "1" }}>
           <nav style={{ position: "fixed", top: "22px", left: "22px", bottom: "22px", width: "236px", zIndex: "20", display: "flex", flexDirection: "column", padding: "22px 14px", borderRadius: "30px", background: "rgba(255,255,255,0.62)", backdropFilter: "blur(22px) saturate(170%)", WebkitBackdropFilter: "blur(22px) saturate(170%)", border: "1px solid rgba(23,23,23,0.055)", boxShadow: "0 1px 0 rgba(255,255,255,0.7) inset,0 22px 50px -30px rgba(23,23,23,0.28)" }}>
-            <div style={{ padding: "6px 12px 26px 12px", display: "flex", alignItems: "center", gap: "11px" }}>
-              <span style={{ width: "30px", height: "30px", borderRadius: "10px", background: "#171717", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: "700", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>S</span>
-              <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "14.5px", fontWeight: "600", letterSpacing: "-0.01em" }}>
-                Saleh
-                <span style={{ color: "#FF6B00" }}>.</span>
-                Tech
+            <div style={{ padding: "6px 12px 26px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <img src="/logo-s.png" alt="" width="42" height="38" style={{ width: "42px", height: "38px", flexShrink: "0", userSelect: "none" }} />
+              <span style={{ display: "flex", flexDirection: "column", fontFamily: "var(--font-unbounded),sans-serif", fontSize: "20px", fontWeight: "400", lineHeight: "0.95", letterSpacing: "-0.02em", color: "#1A1A1A" }}>
+                <span>Tech</span>
+                <span>School</span>
               </span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
