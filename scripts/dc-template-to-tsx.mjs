@@ -24,6 +24,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const FEATURES = {
   "parent-dashboard": { root: "pp-root", prefix: "pp" },
   "student-dashboard": { root: "sd-root", prefix: "sd" },
+  "teacher-dashboard": { root: "td-root", prefix: "td" },
 };
 
 // ---------- helpers -------------------------------------------------------

@@ -1,0 +1,80 @@
+/* Integration shim: teacher-dashboard.html rendered against a bare browser
+   stylesheet, while this app ships Tailwind's preflight and a few global
+   rules. Everything here only neutralises those globals inside the portal so
+   the file's own inline styles render exactly as they do standalone. */
+
+/* Preflight overrides UA defaults for these elements (margins, line-height,
+   font, display) — put the UA values back; the template's inline styles then
+   layer on top precisely as in the original. */
+.td-root h1,
+.td-root h2,
+.td-root h3,
+.td-root p,
+.td-root label,
+.td-root svg,
+.td-root input,
+.td-root button {
+  all: revert;
+}
+/* …but keep the file's own base rules that the revert also cleared */
+.td-root h1,
+.td-root h2,
+.td-root h3,
+.td-root p,
+.td-root label,
+.td-root svg,
+.td-root input,
+.td-root button,
+.td-root input::before,
+.td-root button::before,
+.td-root input::after,
+.td-root button::after {
+  box-sizing: border-box;
+}
+.td-root {
+  line-height: normal;
+}
+.td-root button {
+  font-family: inherit;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.td-root button:focus {
+  outline: none;
+}
+.td-root button:focus-visible {
+  outline: 2px solid rgba(255, 107, 0, 0.55);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+/* globals.css animates colour on every element and adds a focus ring; the file has neither. */
+.td-root,
+.td-root *,
+.td-root *::before,
+.td-root *::after {
+  transition: none;
+}
+.td-root :focus-visible {
+  box-shadow: none;
+}
+
+/* The file keeps its desktop and phone layouts as two trees; here the viewport picks one. */
+.td-desktop {
+  display: block;
+}
+.td-mobile {
+  display: none;
+}
+@media (max-width: 767.98px) {
+  .td-desktop {
+    display: none;
+  }
+  .td-mobile {
+    display: block;
+  }
+}
+
+/* The site-wide themed cursor is not part of the approved UI. */
+html.td-portal .cursor-fox {
+  display: none;
+}

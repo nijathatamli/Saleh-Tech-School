@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Users,
   TrendingUp,
   CalendarCheck,
   BookOpen,
@@ -41,6 +42,7 @@ export function getTeacherNavItems(): DashNavItem[] {
     { href: "/teacher", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
     { href: "/teacher/classes", label: "Siniflərim", icon: <School className="h-4 w-4 shrink-0" /> },
     { href: "/teacher/homework", label: "Ev tapşırıqları", icon: <ClipboardList className="h-4 w-4 shrink-0" /> },
+    { href: "/teacher/students", label: "Tələbələr", icon: <Users className="h-4 w-4 shrink-0" /> },
     { href: "/teacher/profile", label: "Profil", icon: <User className="h-4 w-4 shrink-0" /> },
   ];
 }
