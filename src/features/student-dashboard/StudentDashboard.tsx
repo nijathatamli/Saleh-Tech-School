@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import { useRefreshOnReturn } from "@/lib/use-refresh-on-return";
 import { renderTemplate } from "./template.generated";
 import { buildVals, mobileKeyForRoute, routeForMobileKey, HOME, ROUTES, type Actions, type HwFilter, type MobileKey, type Route, type UiState } from "./logic";
 import { submitHomework, updateStudentAvatar } from "./actions";
@@ -108,6 +109,7 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
   }, []);
 
   const refresh = useCallback(() => startTransition(() => router.refresh()), [router]);
+  useRefreshOnReturn();
 
   const actions: Actions = {
     go: (href) => {
@@ -144,7 +146,7 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
           toast.success("Tapşırıq təhvil verildi.");
           router.refresh();
         } else {
-          toast.error("Tapşırıq təhvil verilə bilmədi.");
+          toast.error(result.error === "forbidden" ? "Bu tapşırıq sizin deyil." : result.error === "invalid" ? "Bu tapşırıq artıq təhvil verilib." : "Tapşırıq təhvil verilə bilmədi.");
         }
       });
     },
@@ -157,7 +159,8 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
     if (!file) return;
     try {
       const url = await uploadFile(file);
-      await updateStudentAvatar(url);
+      const result = await updateStudentAvatar(url);
+      if (!result.ok) throw new Error("Şəkil yadda saxlanıla bilmədi.");
       toast.success("Profil şəkli yeniləndi.");
       refresh();
     } catch (err) {

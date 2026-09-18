@@ -4,7 +4,7 @@
 import { MONTHS, clock, dayDiff, dayMonth, initialsOf, longDate, parts, twoDigits, type Parts } from "@/features/parent-dashboard/az";
 import { WEEKDAYS_LONG } from "@/features/student-dashboard/az";
 import { AVATAR_BASES } from "./avatar-bases.generated";
-import type { TeacherClass, TeacherDashboardData, TeacherStudent } from "./types";
+import type { NoteVisibility, TeacherClass, TeacherDashboardData, TeacherStudent } from "./types";
 import type { RosterVal, TemplateVals } from "./vals";
 
 export const ACCENT = "#FF6B00";
@@ -44,6 +44,9 @@ export type UiState = {
   scores: Record<string, string>;
   gradesSaved: boolean;
   newHwClassId: string | null;
+  /** student ids picked for the new homework; null = the whole class */
+  newHwStudentIds: string[] | null;
+  noteVisibility: NoteVisibility;
 };
 
 export type Actions = {
@@ -69,8 +72,11 @@ export type Actions = {
   pickScore: (submissionId: string, score: string) => void;
   saveGrades: (rows: { submissionId: string; inputName: string }[]) => void;
   setNewHwClass: (id: string) => void;
-  createHw: (classId: string | null) => void;
-  sendNote: (studentId: string) => void;
+  toggleNewHwStudent: (id: string, all: string[]) => void;
+  createHw: (classId: string | null, studentIds: string[] | null) => void;
+  setNoteVisibility: (v: NoteVisibility) => void;
+  sendNote: (studentId: string, visibility: NoteVisibility) => void;
+  deleteNote: (noteId: string) => void;
   writeParent: (email: string | null, studentName: string) => void;
   changeAvatar: () => void;
   saveProfile: () => void;
@@ -123,7 +129,7 @@ export function studentMetrics(s: TeacherStudent, now: Parts) {
 export function buildVals(data: TeacherDashboardData, state: UiState, act: Actions): TemplateVals {
   const accent = ACCENT;
   const accentText = ACCENT_TEXT;
-  const { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftTime, attMarks, attSaved, scores, gradesSaved } = state;
+  const { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftTime, attMarks, attSaved, scores, gradesSaved, noteVisibility } = state;
   const now = parts(data.now);
   const first = data.teacher.name.trim().split(/\s+/)[0] ?? "";
 
@@ -295,6 +301,10 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
   const pickedIso = `${month.y}-${twoDigits(month.m + 1)}-${twoDigits(picked)}`;
   const draftClassId = state.draftClassId ?? data.classes[0]?.id ?? null;
   const newHwClassId = state.newHwClassId ?? data.classes[0]?.id ?? null;
+  const newHwRoster = newHwClassId ? rosterOf(newHwClassId) : [];
+  const newHwPicked = state.newHwStudentIds ?? newHwRoster.map((s) => s.id);
+  const VISIBILITY_LABEL: Record<NoteVisibility, string> = { PRIVATE: "Yalnız mən", PARENT: "Valideyn", STUDENT: "Tələbə və valideyn" };
+  const myNotes = activeStudent ? data.notes.filter((n) => n.studentId === activeStudent.id) : [];
 
   const markedCount = rosterOrFallback.filter((s) => attMarks[s.id]).length;
   const gradedCount = gradeRows.filter(({ s, sub }) => scores[sub?.id ?? ""] || (sub?.status === "GRADED" && !scores[sub.id] && s)).length;
@@ -409,7 +419,17 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
     },
     studentSkills: (activeStudent?.skills ?? []).map((k) => ({ name: k.name, pctLabel: `${k.pct}%`, barStyle: bar(k.pct) })),
     noSkills: !activeStudent?.skills.length,
-    onSendNote: () => act.sendNote(activeStudent?.id ?? ""),
+    noteVisibilities: (["PRIVATE", "PARENT", "STUDENT"] as NoteVisibility[]).map((v) => ({ label: VISIBILITY_LABEL[v], style: smallBtn(noteVisibility === v), onPick: () => act.setNoteVisibility(v) })),
+    studentNotes: myNotes.map((n, i) => ({
+      body: n.body,
+      when: `${relativeDay(parts(n.createdAt), now)} · ${clock(parts(n.createdAt))}`,
+      visibilityLabel: VISIBILITY_LABEL[n.visibility],
+      rowStyle: `display:flex;align-items:flex-start;gap:14px;padding:14px 0;${i ? "border-top:1px solid rgba(23,23,23,0.055)" : ""}`,
+      chipStyle: chip(n.visibility === "PRIVATE" ? "done" : n.visibility === "STUDENT" ? "due" : "open"),
+      onDelete: () => act.deleteNote(n.id),
+    })),
+    noNotes: myNotes.length === 0,
+    onSendNote: () => act.sendNote(activeStudent?.id ?? "", noteVisibility),
     onWriteParent: () => act.writeParent(parentOf(activeStudent), activeStudent?.name ?? ""),
 
     markedLabel: `${markedCount} / ${rosterOrFallback.length}`,
@@ -471,11 +491,12 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
     onSaveGrades: () => act.saveGrades(gradeRows.filter(({ sub }) => !!sub).map(({ sub }) => ({ submissionId: sub!.id, inputName: `fb-${sub!.id}` }))),
 
     newHwClasses: data.classes.map((c) => ({ label: c.code, style: smallBtn(newHwClassId === c.id), onPick: () => act.setNewHwClass(c.id) })),
+    newHwStudents: newHwRoster.map((s) => ({ label: s.name, style: smallBtn(newHwPicked.includes(s.id)), onPick: () => act.toggleNewHwStudent(s.id, newHwRoster.map((x) => x.id)) })),
     hwDefaultDue: (() => {
       const d = new Date(Date.UTC(now.y, now.m, now.d + 7));
       return `${d.getUTCFullYear()}-${twoDigits(d.getUTCMonth() + 1)}-${twoDigits(d.getUTCDate())}`;
     })(),
-    onCreateHw: () => act.createHw(newHwClassId),
+    onCreateHw: () => act.createHw(newHwClassId, state.newHwStudentIds),
 
     hasNextLesson: !!nextLesson,
     noNextLesson: !nextLesson,

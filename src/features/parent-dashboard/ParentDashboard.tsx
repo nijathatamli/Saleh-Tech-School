@@ -9,6 +9,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { toast } from "sonner";
+import { useRefreshOnReturn } from "@/lib/use-refresh-on-return";
 import { setLocaleAction } from "@/i18n/actions";
 import { renderTemplate } from "./template.generated";
 import { buildVals, mobileKeyForRoute, routeForMobileKey, HOME, ROUTES, type Actions, type HwFilter, type Lang, type MobileKey, type Route, type UiState } from "./logic";
@@ -96,6 +97,7 @@ export function ParentDashboard({ data, initialRoute, initialChildIndex }: { dat
   );
 
   const refresh = useCallback(() => startTransition(() => router.refresh()), [router]);
+  useRefreshOnReturn();
 
   const actions: Actions = {
     go: (href) => {

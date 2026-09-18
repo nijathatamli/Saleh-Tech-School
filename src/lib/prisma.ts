@@ -8,7 +8,15 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefi
 // Prisma's native Rust engine connection layer entirely. That engine has a known
 // incompatibility with our local dev database's non-standard server_version
 // banner (PGlite, a WASM-compiled Postgres). node-postgres itself connects fine.
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+// The local PGlite socket serves a single client at a time, so in development
+// the idle connection is released quickly — scripts (patches, tests) can then
+// take their turn between requests.
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 1,
+  idleTimeoutMillis: process.env.NODE_ENV === "development" ? 750 : 10_000,
+});
+pool.on("error", (err) => console.error("[pg pool]", err.message));
 const adapter = new PrismaPg(pool);
 
 export const prisma =

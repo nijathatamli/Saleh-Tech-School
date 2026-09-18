@@ -14,6 +14,9 @@ CREATE TYPE "SubmissionStatus" AS ENUM ('PENDING', 'SUBMITTED', 'GRADED', 'OVERD
 CREATE TYPE "PaymentStatus" AS ENUM ('PAID', 'PENDING', 'OVERDUE');
 
 -- CreateEnum
+CREATE TYPE "NoteVisibility" AS ENUM ('PRIVATE', 'PARENT', 'STUDENT');
+
+-- CreateEnum
 CREATE TYPE "LeadStage" AS ENUM ('NEW', 'CONTACTED', 'TRIAL_LESSON', 'TRIAL_COMPLETED', 'INTERESTED', 'REGISTERED');
 
 -- CreateTable
@@ -151,6 +154,8 @@ CREATE TABLE "Attendance" (
     "status" "AttendanceStatus" NOT NULL,
     "note" TEXT,
     "date" TIMESTAMP(3) NOT NULL,
+    "markedById" TEXT,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Attendance_pkey" PRIMARY KEY ("id")
 );
@@ -302,6 +307,8 @@ CREATE TABLE "Notification" (
     "body" TEXT NOT NULL,
     "type" TEXT NOT NULL DEFAULT 'info',
     "read" BOOLEAN NOT NULL DEFAULT false,
+    "entityType" TEXT,
+    "entityId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
@@ -433,3 +440,33 @@ ALTER TABLE "TrialBooking" ADD CONSTRAINT "TrialBooking_courseId_fkey" FOREIGN K
 -- AddForeignKey
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- CreateTable
+CREATE TABLE "StudentNote" (
+    "id" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "teacherId" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "visibility" "NoteVisibility" NOT NULL DEFAULT 'PARENT',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "StudentNote_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AuditLog" (
+    "id" TEXT NOT NULL,
+    "actorUserId" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "entityType" TEXT NOT NULL,
+    "entityId" TEXT NOT NULL,
+    "before" JSONB,
+    "after" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_markedById_fkey" FOREIGN KEY ("markedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "StudentNote" ADD CONSTRAINT "StudentNote_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "StudentProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "StudentNote" ADD CONSTRAINT "StudentNote_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "TeacherProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

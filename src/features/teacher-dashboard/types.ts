@@ -36,6 +36,16 @@ export type TeacherLesson = {
   minutes: number;
 };
 
+export type NoteVisibility = "PRIVATE" | "PARENT" | "STUDENT";
+
+export type TeacherNote = {
+  id: string;
+  studentId: string;
+  body: string;
+  visibility: NoteVisibility;
+  createdAt: string;
+};
+
 export type TeacherHomework = {
   id: string;
   lessonId: string;
@@ -59,6 +69,8 @@ export type TeacherDashboardData = {
   students: TeacherStudent[];
   lessons: TeacherLesson[];
   homeworks: TeacherHomework[];
+  /** this teacher's own notes about their students (every visibility) */
+  notes: TeacherNote[];
   unreadNotifications: number;
   /** Server clock at render time — the client renders "today"/"ago" from this so SSR and hydration agree. */
   now: number;

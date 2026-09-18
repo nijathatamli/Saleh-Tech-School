@@ -72,6 +72,8 @@ export type LeaderboardRow = {
   avatarUrl: string | null;
 };
 
+export type StudentNoteView = { id: string; body: string; teacherName: string; createdAt: string };
+
 export type StudentDashboardData = {
   student: {
     id: string;
@@ -94,6 +96,8 @@ export type StudentDashboardData = {
   badges: StudentBadge[];
   upcomingLessons: StudentLesson[];
   leaderboard: LeaderboardRow[];
+  /** teacher notes the student may read (visibility STUDENT) */
+  notes: StudentNoteView[];
   /** 1-based position of the signed-in student among all students by points */
   myRank: number;
   unreadNotifications: number;

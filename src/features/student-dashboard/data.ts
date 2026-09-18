@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLeaderboard } from "@/lib/data";
+import { noteVisibilityFor } from "@/lib/access";
 import type { StudentDashboardData } from "./types";
 
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
@@ -41,7 +42,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
   const now = new Date();
   const classIds = student.enrollments.map((e) => e.classId).filter((id): id is string => !!id);
 
-  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications] = await Promise.all([
+  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications, notes] = await Promise.all([
     classIds.length
       ? prisma.lesson.findMany({
           where: { classId: { in: classIds }, date: { gte: now } },
@@ -54,6 +55,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
     getLeaderboard(8),
     prisma.studentProfile.count({ where: { points: { gt: student.points } } }),
     student.userId ? prisma.notification.count({ where: { userId: student.userId, read: false } }) : 0,
+    prisma.studentNote.findMany({ where: { studentId: student.id, ...noteVisibilityFor("STUDENT") }, include: { teacher: { include: { user: true } } }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const earned = new Map(student.studentBadges.map((b) => [b.badgeId, b.earnedAt]));
@@ -137,6 +139,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
       points: s.points,
       avatarUrl: s.avatarUrl,
     })),
+    notes: notes.map((n) => ({ id: n.id, body: n.body, teacherName: n.teacher.user.name, createdAt: n.createdAt.toISOString() })),
     myRank: aboveMe + 1,
     unreadNotifications,
     now: now.getTime(),

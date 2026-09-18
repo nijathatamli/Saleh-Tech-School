@@ -63,13 +63,14 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
   const lessonIds = teacher.classes.flatMap((c) => c.lessons.map((l) => l.id));
   const studentIds = [...new Set(teacher.classes.flatMap((c) => c.enrollments.map((e) => e.studentId)))];
 
-  const [attendance, submissions, unreadNotifications] = await Promise.all([
+  const [attendance, submissions, unreadNotifications, notes] = await Promise.all([
     prisma.attendance.findMany({ where: { lessonId: { in: lessonIds }, studentId: { in: studentIds } } }),
     prisma.submission.findMany({
       where: { studentId: { in: studentIds }, homework: { lesson: { classId: { in: classIds } } } },
       include: { homework: true },
     }),
     prisma.notification.count({ where: { userId: teacher.userId, read: false } }),
+    prisma.studentNote.findMany({ where: { teacherId: teacher.id, studentId: { in: studentIds } }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const classes: TeacherClass[] = teacher.classes.map((c, i) => ({
@@ -130,6 +131,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
         l.homeworks.map((h) => ({ id: h.id, lessonId: l.id, classId: c.id, title: h.title, description: h.description, dueDate: h.dueDate.toISOString() }))
       )
     ),
+    notes: notes.map((n) => ({ id: n.id, studentId: n.studentId, body: n.body, visibility: n.visibility, createdAt: n.createdAt.toISOString() })),
     unreadNotifications,
     now: now.getTime(),
   };

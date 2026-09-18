@@ -1,50 +1,72 @@
 "use server";
 
-// Server actions behind the student dashboard's controls: handing in homework
-// and changing the avatar (the actions the previous student pages used, moved
-// here unchanged apart from revalidating the single dashboard route).
+// Server actions behind the student dashboard. The submission a student hands
+// in must be their own (src/lib/access.ts resolves it against the signed-in
+// student); the status change, its audit entry and the teacher's notification
+// commit in one transaction.
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { AccessError, accessResult, requireStudent, requireStudentOwnsSubmission } from "@/lib/access";
+import { audit, notifyUsers } from "@/lib/events";
 
-const DASHBOARD = "/student";
+type Fail = { ok: false; error: "unauthenticated" | "forbidden" | "not-found" | "invalid" | "failed" };
+type Ok = { ok: true } | Fail;
 
-async function studentSession() {
+async function actor() {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "STUDENT") return null;
-  return session;
+  if (!session?.user || session.user.role !== "STUDENT") throw new AccessError("unauthenticated");
+  return session.user.id;
 }
 
-export async function submitHomework(submissionId: string) {
-  const session = await studentSession();
-  if (!session) return { ok: false as const };
-
-  const submission = await prisma.submission.findFirst({
-    where: { id: submissionId },
-    include: { student: true },
-  });
-  if (!submission || submission.student.userId !== session.user.id) return { ok: false as const };
-  if (submission.status !== "PENDING" && submission.status !== "OVERDUE") return { ok: false as const };
-
-  await prisma.submission.update({
-    where: { id: submissionId },
-    data: { status: "SUBMITTED", submittedAt: new Date() },
-  });
-
-  revalidatePath(DASHBOARD, "layout");
+function revalidate() {
+  revalidatePath("/student", "layout");
   revalidatePath("/teacher", "layout");
-  return { ok: true as const };
+  revalidatePath("/parent", "layout");
 }
 
-export async function updateStudentAvatar(avatarUrl: string) {
-  const session = await studentSession();
-  if (!session) return;
+async function run(fn: (userId: string) => Promise<Ok>): Promise<Ok> {
+  try {
+    const userId = await actor();
+    const result = await fn(userId);
+    if (result.ok) revalidate();
+    return result;
+  } catch (err) {
+    if (err instanceof AccessError) return accessResult(err);
+    console.error("[student action]", err);
+    return { ok: false, error: "failed" };
+  }
+}
 
-  await prisma.studentProfile.update({
-    where: { userId: session.user.id },
-    data: { avatarUrl },
+/** Hands in the student's own homework: PENDING/OVERDUE → SUBMITTED, audited, teacher notified. */
+export async function submitHomework(submissionId: string): Promise<Ok> {
+  return run(async (userId) => {
+    const { student, submission } = await requireStudentOwnsSubmission(userId, submissionId);
+    if (submission.status !== "PENDING" && submission.status !== "OVERDUE") return { ok: false, error: "invalid" };
+    await prisma.$transaction(async (tx) => {
+      const now = new Date();
+      await tx.submission.update({ where: { id: submission.id }, data: { status: "SUBMITTED", submittedAt: now } });
+      await audit(tx, { actorUserId: userId, action: "submission.submit", entityType: "submission", entityId: submission.id, before: { status: submission.status }, after: { status: "SUBMITTED", submittedAt: now.toISOString() } });
+      const teacher = await tx.teacherProfile.findUnique({ where: { id: submission.homework.lesson.class.teacherId }, select: { userId: true } });
+      const me = await tx.studentProfile.findUniqueOrThrow({ where: { id: student.id }, select: { firstName: true, lastName: true } });
+      if (teacher) {
+        await notifyUsers(tx, [teacher.userId], {
+          title: "Yeni təhvil",
+          body: `${me.firstName} ${me.lastName} "${submission.homework.title}" tapşırığını təhvil verdi.`,
+          entityType: "submission",
+          entityId: submission.id,
+        });
+      }
+    });
+    return { ok: true };
   });
+}
 
-  revalidatePath(DASHBOARD, "layout");
+export async function updateStudentAvatar(avatarUrl: string): Promise<Ok> {
+  return run(async (userId) => {
+    const student = await requireStudent(userId);
+    await prisma.studentProfile.update({ where: { id: student.id }, data: { avatarUrl } });
+    return { ok: true };
+  });
 }

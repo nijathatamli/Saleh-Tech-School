@@ -1,29 +1,13 @@
-// Parent notifications. Teacher-side actions call this when something a
-// parent should hear about happens (a lesson is scheduled, attendance is
-// marked, homework is set or graded, a badge is awarded). Honours each
-// parent's portal preferences (Tənzimləmələr → Bildirişlər).
+// Kept for compatibility: notifications now live in src/lib/events.ts and are
+// written inside the same transaction as the change they announce.
 import { prisma } from "@/lib/prisma";
+import { notifyParentsOfStudents as notify, type NotifyCategory } from "@/lib/events";
 
-export type NotifyCategory = "lessons" | "grades";
+export type { NotifyCategory };
 
-export async function notifyParentsOfStudents(
+export function notifyParentsOfStudents(
   studentIds: string[],
   notification: { title: string; body: string; type?: "info" | "success" | "warning" | "error"; category: NotifyCategory }
 ) {
-  if (studentIds.length === 0) return 0;
-  const parents = await prisma.parentProfile.findMany({
-    where: { children: { some: { id: { in: studentIds } } } },
-    select: { userId: true, notifyLessons: true, notifyGrades: true },
-  });
-  const recipients = parents.filter((p) => (notification.category === "lessons" ? p.notifyLessons : p.notifyGrades));
-  if (recipients.length === 0) return 0;
-  const { count } = await prisma.notification.createMany({
-    data: recipients.map((p) => ({
-      userId: p.userId,
-      title: notification.title,
-      body: notification.body,
-      type: notification.type ?? "info",
-    })),
-  });
-  return count;
+  return notify(prisma, studentIds, notification);
 }

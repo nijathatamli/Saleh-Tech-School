@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/i18n/server";
+import { noteVisibilityFor } from "@/lib/access";
 import type { PortalChild, PortalData } from "./types";
 
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
@@ -25,6 +26,7 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           progress: { orderBy: { percent: "desc" } },
           grades: { orderBy: { createdAt: "asc" } },
           studentBadges: { include: { badge: true }, orderBy: { earnedAt: "desc" } },
+          notes: { where: noteVisibilityFor("PARENT"), include: { teacher: { include: { user: true } } }, orderBy: { createdAt: "desc" } },
           attendance: {
             include: { lesson: { include: { class: { include: { course: true } } } } },
             orderBy: { date: "desc" },
@@ -104,6 +106,14 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           name: b.badge.name,
           emoji: b.badge.emoji,
           earnedAt: b.earnedAt.toISOString(),
+        })),
+        notes: child.notes.map((n) => ({
+          id: n.id,
+          body: n.body,
+          teacherName: n.teacher.user.name,
+          teacherPosition: n.teacher.position,
+          teacherPhotoUrl: n.teacher.photoUrl ?? n.teacher.user.avatarUrl,
+          createdAt: n.createdAt.toISOString(),
         })),
         nextLesson: nextLesson
           ? {

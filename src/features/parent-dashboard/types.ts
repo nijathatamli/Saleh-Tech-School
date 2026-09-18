@@ -38,6 +38,8 @@ export type PortalLesson = {
   link: string | null;
 };
 
+export type PortalNote = { id: string; body: string; teacherName: string; teacherPosition: string; teacherPhotoUrl: string | null; createdAt: string };
+
 export type PortalChild = {
   id: string;
   firstName: string;
@@ -55,6 +57,8 @@ export type PortalChild = {
   submissions: PortalSubmission[];
   badges: { id: string; code: string; name: string; emoji: string; earnedAt: string }[];
   nextLesson: PortalLesson | null;
+  /** teacher notes the parent may read (visibility PARENT or STUDENT), newest first */
+  notes: PortalNote[];
 };
 
 export type PortalNotification = {

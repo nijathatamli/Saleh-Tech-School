@@ -66,6 +66,7 @@ export type ClassCardVal = {
   onAttendance: Handler;
 };
 export type HwRowVal = { title: string; meta: string; due: string; status: string; rowStyle: string; icon: string; iconStyle: string; chipStyle: string; onOpen: Handler };
+export type NoteVal = { body: string; when: string; visibilityLabel: string; rowStyle: string; chipStyle: string; onDelete: Handler };
 export type FieldVal = { label: string; value: string; name: string; readOnly: boolean };
 export type ToggleVal = { label: string; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
 export type MobileNavVal = { label: string; icon: string; style: string; labelStyle: string; dotStyle: string; onGo: Handler };
@@ -111,6 +112,9 @@ export interface TemplateVals {
   openNewHw: Handler;
   studentSkills: SkillVal[];
   noSkills: boolean;
+  noteVisibilities: PickVal[];
+  studentNotes: NoteVal[];
+  noNotes: boolean;
   onSendNote: Handler;
   onWriteParent: Handler;
 
@@ -133,6 +137,7 @@ export interface TemplateVals {
 
   // new homework
   newHwClasses: PickVal[];
+  newHwStudents: PickVal[];
   hwDefaultDue: string;
   onCreateHw: Handler;
 

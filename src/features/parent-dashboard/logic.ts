@@ -295,9 +295,16 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
   const lessonDiff = lessonP ? dayDiff(now, lessonP) : 0;
   const lessonWhen = lessonP ? `${lessonDiff === 0 ? "Bugün" : lessonDiff === 1 ? "Sabah" : dayMonth(lessonP)} · ${clock(lessonP)}` : "";
 
-  const note = [...(child?.submissions ?? [])]
+  // The teacher-note card: the newest note the parent may read; graded feedback as a fallback.
+  const latestNote = child?.notes[0] ?? null;
+  const latestFeedback = [...(child?.submissions ?? [])]
     .filter((s) => s.feedback)
     .sort((a, b) => (b.submittedAt ?? b.dueDate).localeCompare(a.submittedAt ?? a.dueDate))[0];
+  const note = latestNote
+    ? { feedback: latestNote.body, teacherName: latestNote.teacherName, teacherPosition: latestNote.teacherPosition, teacherPhotoUrl: latestNote.teacherPhotoUrl, at: latestNote.createdAt }
+    : latestFeedback
+      ? { feedback: latestFeedback.feedback as string, teacherName: latestFeedback.teacherName, teacherPosition: latestFeedback.teacherPosition, teacherPhotoUrl: latestFeedback.teacherPhotoUrl, at: latestFeedback.submittedAt ?? latestFeedback.dueDate }
+      : null;
 
   // ---- achievements / activity -------------------------------------------------
   const badges = [...(child?.badges ?? [])].sort((a, b) => b.earnedAt.localeCompare(a.earnedAt));
@@ -496,7 +503,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
     noteTeacherAvatar: avatar(AVATAR_BASES.noteTeacherAvatar, note?.teacherPhotoUrl),
     noteTeacher: note?.teacherName ?? "",
     noteTeacherRole: note?.teacherPosition ?? "",
-    noteDate: note ? dayMonthShortYear(parts(note.submittedAt ?? note.dueDate)) : "",
+    noteDate: note ? dayMonthShortYear(parts(note.at)) : "",
 
     homeworkActiveLabel: `${activeCount} aktiv`,
     hasHomework: activeCount > 0,

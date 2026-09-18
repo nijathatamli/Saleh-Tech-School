@@ -402,6 +402,7 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
       })),
     ...earnedBadges.map((b) => ({ at: b.earnedAt as string, what: `${b.name} açıldı`, xp: "" })),
     ...data.projects.map((p) => ({ at: p.createdAt, what: `${p.title} layihəsi tamamlandı`, xp: `+${XP_RULES.project} XP` })),
+    ...data.notes.map((n) => ({ at: n.createdAt, what: `Müəllim qeydi (${n.teacherName}): ${n.body}`, xp: "" })),
   ]
     .filter((e) => new Date(e.at).getTime() <= data.now)
     .sort((a, b) => b.at.localeCompare(a.at))
