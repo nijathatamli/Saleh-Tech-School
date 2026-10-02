@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 190" width="300" height="190" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-style="italic">
+  <g fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <polygon points="30,150 270,150 78,28"/>
+    <line x1="78" y1="28" x2="102" y2="150"/>
+  </g>
+  <g fill="#1a1a1a">
+    <text x="12" y="165">A</text>
+    <text x="276" y="165">B</text>
+    <text x="70" y="20">C</text>
+    <text x="96" y="172">D</text>
+  </g>
+</svg>

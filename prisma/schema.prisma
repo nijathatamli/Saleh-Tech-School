@@ -18,34 +18,34 @@ enum Role {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  passwordHash  String
-  role          Role
-  phone         String?
-  avatarUrl     String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  phone        String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   parentProfile  ParentProfile?
   teacherProfile TeacherProfile?
   studentProfile StudentProfile?
 
-  notifications Notification[]
-  attendanceMarked Attendance[] @relation("AttendanceMarkedBy")
+  notifications    Notification[]
+  attendanceMarked Attendance[]   @relation("AttendanceMarkedBy")
   auditLogs        AuditLog[]
 }
 
 model ParentProfile {
-  id       String  @id @default(cuid())
-  userId   String  @unique
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String           @id @default(cuid())
+  userId        String           @unique
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   // Portal notification preferences (Tənzimləmələr → Bildirişlər toggles)
-  notifyLessons Boolean @default(true)
-  notifyGrades  Boolean @default(true)
-  children StudentProfile[]
-  payments Payment[]
+  notifyLessons Boolean          @default(true)
+  notifyGrades  Boolean          @default(true)
+  children      StudentProfile[]
+  payments      Payment[]
 }
 
 model TeacherProfile {
@@ -58,34 +58,34 @@ model TeacherProfile {
   specializations String[]
   photoUrl        String?
 
-  classes  ClassGroup[]
-  courses  Course[]
-  notes    StudentNote[]
+  classes ClassGroup[]
+  courses Course[]
+  notes   StudentNote[]
 }
 
 model StudentProfile {
-  id         String   @id @default(cuid())
-  userId     String?  @unique
-  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String        @id @default(cuid())
+  userId     String?       @unique
+  user       User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   parentId   String
   parent     ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
   firstName  String
   lastName   String
   birthDate  DateTime
   avatarUrl  String?
-  level      Int      @default(1)
-  xp         Int      @default(0)
-  points     Int      @default(0)
-  streakDays Int      @default(0)
+  level      Int           @default(1)
+  xp         Int           @default(0)
+  points     Int           @default(0)
+  streakDays Int           @default(0)
 
-  enrollments Enrollment[]
-  attendance  Attendance[]
-  submissions Submission[]
-  progress    SkillProgress[]
+  enrollments   Enrollment[]
+  attendance    Attendance[]
+  submissions   Submission[]
+  progress      SkillProgress[]
   studentBadges StudentBadge[]
-  projects    Project[]
-  grades      Grade[]
-  notes       StudentNote[]
+  projects      Project[]
+  grades        Grade[]
+  notes         StudentNote[]
 }
 
 // ---------- Courses / Curriculum ----------
@@ -97,30 +97,30 @@ enum Level {
 }
 
 model Course {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  name          String
-  shortDesc     String
-  longDesc      String   @db.Text
-  category      String // lookup key for the icon/color in the UI (e.g. "cybersecurity", "python")
-  coverImageUrl String?
-  minAge        Int
-  maxAge        Int
-  level         Level
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  name           String
+  shortDesc      String
+  longDesc       String          @db.Text
+  category       String // lookup key for the icon/color in the UI (e.g. "cybersecurity", "python")
+  coverImageUrl  String?
+  minAge         Int
+  maxAge         Int
+  level          Level
   durationMonths Int
   lessonsPerWeek Int
   lessonMinutes  Int
-  price         Int // AZN / month
-  tags          String[]
-  featured      Boolean  @default(false)
-  teacherId     String?
-  teacher       TeacherProfile? @relation(fields: [teacherId], references: [id])
-  createdAt     DateTime @default(now())
+  price          Int // AZN / month
+  tags           String[]
+  featured       Boolean         @default(false)
+  teacherId      String?
+  teacher        TeacherProfile? @relation(fields: [teacherId], references: [id])
+  createdAt      DateTime        @default(now())
 
-  modules     CourseModule[]
-  skills      String[]
-  enrollments Enrollment[]
-  classes     ClassGroup[]
+  modules       CourseModule[]
+  skills        String[]
+  enrollments   Enrollment[]
+  classes       ClassGroup[]
   trialBookings TrialBooking[]
 }
 
@@ -134,41 +134,41 @@ model CourseModule {
 }
 
 model Enrollment {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   studentId String
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   classId   String?
-  class     ClassGroup? @relation(fields: [classId], references: [id])
-  startedAt DateTime @default(now())
-  status    String   @default("active") // active | completed | paused
+  class     ClassGroup?    @relation(fields: [classId], references: [id])
+  startedAt DateTime       @default(now())
+  status    String         @default("active") // active | completed | paused
 }
 
 model ClassGroup {
-  id         String   @id @default(cuid())
-  name       String
-  courseId   String
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  teacherId  String
-  teacher    TeacherProfile @relation(fields: [teacherId], references: [id])
-  schedule   String   // e.g. "Ç.a - Cümə, 18:00"
+  id                     String         @id @default(cuid())
+  name                   String
+  courseId               String
+  course                 Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacherId              String
+  teacher                TeacherProfile @relation(fields: [teacherId], references: [id])
+  schedule               String // e.g. "Ç.a - Cümə, 18:00"
   // Expected session count for a full month of this recurring weekly class,
   // set by the teacher (e.g. 2 lessons/week ≈ 8/month). Used as the "y" in
   // the parent-facing "x/y classes attended this month" figure.
-  monthlyExpectedClasses Int @default(8)
+  monthlyExpectedClasses Int            @default(8)
 
   enrollments Enrollment[]
   lessons     Lesson[]
 }
 
 model Lesson {
-  id          String   @id @default(cuid())
-  classId     String
-  class       ClassGroup @relation(fields: [classId], references: [id], onDelete: Cascade)
-  title       String
-  description String   @db.Text
-  date        DateTime
+  id           String     @id @default(cuid())
+  classId      String
+  class        ClassGroup @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title        String
+  description  String     @db.Text
+  date         DateTime
   materialsUrl String?
   videoUrl     String?
 
@@ -186,18 +186,18 @@ enum AttendanceStatus {
 }
 
 model Attendance {
-  id        String @id @default(cuid())
-  studentId String
-  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  lessonId  String
-  lesson    Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  status    AttendanceStatus
-  note      String?
-  date      DateTime
+  id         String           @id @default(cuid())
+  studentId  String
+  student    StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lessonId   String
+  lesson     Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status     AttendanceStatus
+  note       String?
+  date       DateTime
   // audit: which user last marked it and when
   markedById String?
-  markedBy   User?    @relation("AttendanceMarkedBy", fields: [markedById], references: [id])
-  updatedAt  DateTime @default(now()) @updatedAt
+  markedBy   User?            @relation("AttendanceMarkedBy", fields: [markedById], references: [id])
+  updatedAt  DateTime         @default(now()) @updatedAt
 }
 
 model Homework {
@@ -219,38 +219,38 @@ enum SubmissionStatus {
 }
 
 model Submission {
-  id         String   @id @default(cuid())
-  homeworkId String
-  homework   Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
-  studentId  String
-  student    StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  status     SubmissionStatus @default(PENDING)
-  score      Int?
-  feedback   String?
+  id          String           @id @default(cuid())
+  homeworkId  String
+  homework    Homework         @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     StudentProfile   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status      SubmissionStatus @default(PENDING)
+  score       Int?
+  feedback    String?
   submittedAt DateTime?
 
   grade Grade?
 }
 
 model Grade {
-  id           String   @id @default(cuid())
+  id           String         @id @default(cuid())
   studentId    String
   student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  submissionId String?  @unique
-  submission   Submission? @relation(fields: [submissionId], references: [id])
+  submissionId String?        @unique
+  submission   Submission?    @relation(fields: [submissionId], references: [id])
   subject      String
   score        Int
-  maxScore     Int      @default(100)
-  createdAt    DateTime @default(now())
+  maxScore     Int            @default(100)
+  createdAt    DateTime       @default(now())
 }
 
 model SkillProgress {
-  id        String @id @default(cuid())
+  id        String         @id @default(cuid())
   studentId String
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   skill     String
   percent   Int
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime       @updatedAt
 }
 
 // ---------- Gamification ----------
@@ -266,24 +266,24 @@ model Badge {
 }
 
 model StudentBadge {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   studentId String
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   badgeId   String
-  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
-  earnedAt  DateTime @default(now())
+  badge     Badge          @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime       @default(now())
 }
 
 model Project {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  title       String
-  description String   @db.Text
-  imageUrl    String
+  id           String         @id @default(cuid())
+  studentId    String
+  student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title        String
+  description  String         @db.Text
+  imageUrl     String
   technologies String[]
-  courseTag   String
-  createdAt   DateTime @default(now())
+  courseTag    String
+  createdAt    DateTime       @default(now())
 }
 
 // ---------- Payments ----------
@@ -295,18 +295,18 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id          String   @id @default(cuid())
-  parentId    String
-  parent      ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  title       String
-  amount      Int
-  status      PaymentStatus
-  dueDate     DateTime
-  paidAt      DateTime?
-  invoiceNo   String   @unique
+  id                 String        @id @default(cuid())
+  parentId           String
+  parent             ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  title              String
+  amount             Int
+  status             PaymentStatus
+  dueDate            DateTime
+  paidAt             DateTime?
+  invoiceNo          String        @unique
   // Set when a parent uploads a cheque/receipt photo; moves status to PENDING
   // pending admin confirmation.
-  receiptUrl  String?
+  receiptUrl         String?
   receiptSubmittedAt DateTime?
 }
 
@@ -333,40 +333,40 @@ enum LeadStage {
 }
 
 model TrialBooking {
-  id           String    @id @default(cuid())
-  parentName   String
-  parentPhone  String
-  studentName  String
-  studentAge   Int
-  courseId     String?
-  course       Course?   @relation(fields: [courseId], references: [id])
+  id            String    @id @default(cuid())
+  parentName    String
+  parentPhone   String
+  studentName   String
+  studentAge    Int
+  courseId      String?
+  course        Course?   @relation(fields: [courseId], references: [id])
   preferredDate DateTime
   preferredTime String
-  stage        LeadStage @default(NEW)
-  createdAt    DateTime  @default(now())
+  stage         LeadStage @default(NEW)
+  createdAt     DateTime  @default(now())
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   email     String
-  token     String   @unique
+  token     String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  body      String
-  type      String   @default("info") // info | success | warning | error
-  read      Boolean  @default(false)
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String
+  body       String
+  type       String   @default("info") // info | success | warning | error
+  read       Boolean  @default(false)
   // the record the notification is about (e.g. "attendance" + Attendance.id)
   entityType String?
   entityId   String?
-  createdAt DateTime @default(now())
+  createdAt  DateTime @default(now())
 }
 
 // ---------- Notes / audit ----------
@@ -404,17 +404,107 @@ model AuditLog {
   createdAt   DateTime @default(now())
 }
 
-model ScholarshipApplication {
-  id              String   @id @default(cuid())
-  applicationCode String   @unique
-  fullName        String
-  email           String
-  phone           String
-  age             Int
-  courseInterest  String   @default("cybersecurity")
-  score           Int
-  totalQuestions  Int
-  passed          Boolean
-  answers         Json
-  createdAt       DateTime @default(now())
+// ---------- Scholarship exam ("Reqamsal Gələcək") ----------
+// Scholarship candidates are not portal users (no email/role), so they get their own
+// FIN + password identity instead of a User row. The question bank is imported from the
+// DOCX files in /questions by scripts/scholarship/parse-questions.mjs -> prisma/scholarship
+// -> scripts/scholarship-sync.mjs; nothing parses DOCX at request time.
+
+enum ScholarshipSubject {
+  LOGIC
+  MATH
+  ENGLISH
+}
+
+enum ScholarshipAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+model ScholarshipCategory {
+  key        String @id // "1-2", "11" — taken from the question file name
+  label      String // "1–2-ci sinif"
+  gradeFrom  Int
+  gradeTo    Int
+  sortOrder  Int
+  sourceFile String
+
+  questions ScholarshipQuestion[]
+  students  ScholarshipStudent[]
+}
+
+model ScholarshipQuestion {
+  id           String              @id @default(cuid())
+  categoryKey  String
+  category     ScholarshipCategory @relation(fields: [categoryKey], references: [key], onDelete: Cascade)
+  subject      ScholarshipSubject
+  part         Int                 @default(1) // "Riyaziyyat 1" / "Riyaziyyat 2" in the source
+  number       Int // number in the source file (matches its answer key)
+  position     Int // order within the category's exam
+  stem         String              @db.Text // sanitized rich text (text, <sup>/<sub>, MathML)
+  options      Json // [{ label: "A", html: "..." }]; empty = typed answer
+  imageIds     String[]
+  correctLabel String? // "A".."E"
+  answerText   String? // for typed answers
+  translations Json? // { en: { stem, options: [{label, html}] }, ru: { ... } }; Azerbaijani is the base text
+  updatedAt    DateTime            @updatedAt
+
+  @@unique([categoryKey, subject, part, number])
+  @@index([categoryKey, position])
+}
+
+model ScholarshipMedia {
+  id          String @id // content hash
+  contentType String
+  data        Bytes
+}
+
+model ScholarshipStudent {
+  id           String              @id @default(cuid())
+  name         String
+  surname      String
+  phone        String
+  email        String
+  language     String              @default("az") // exam language chosen at registration: az | en | ru
+  finHash      String              @unique // HMAC-SHA256 of the normalised FIN (lookup + uniqueness)
+  finEncrypted String // AES-256-GCM, only readable with the server key (shown to admins)
+  categoryKey  String
+  category     ScholarshipCategory @relation(fields: [categoryKey], references: [key])
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  attempts ScholarshipAttempt[]
+  code     ScholarshipCode?
+}
+
+// A 32-character code the school hands to its own course students. Registration (and
+// therefore the exam) is impossible without an unused code, and each code works once.
+model ScholarshipCode {
+  id        String              @id @default(cuid())
+  code      String              @unique
+  note      String? // admin label, e.g. the group it was issued to
+  createdAt DateTime            @default(now())
+  usedAt    DateTime?
+  studentId String?             @unique
+  student   ScholarshipStudent? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+}
+
+model ScholarshipAttempt {
+  id                 String                   @id @default(cuid())
+  studentId          String                   @unique // one exam attempt per student
+  student            ScholarshipStudent       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status             ScholarshipAttemptStatus @default(IN_PROGRESS)
+  startedAt          DateTime                 @default(now())
+  expiresAt          DateTime
+  finishedAt         DateTime?
+  questionIds        String[] // frozen at start, in exam order
+  answers            Json                     @default("{}") // { [questionId]: "B" | "typed text" }
+  score              Int?
+  total              Int
+  percent            Int?
+  scholarshipPercent Int? // discount earned, derived from percent (see SCHOLARSHIP_TIERS)
+  subjectScores      Json? // { LOGIC: { correct, total }, ... }
+  timedOut           Boolean                  @default(false)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 }

@@ -13,6 +13,7 @@ import {
   KanbanSquare,
   GraduationCap,
   BadgeCheck,
+  Award,
 } from "lucide-react";
 import type { NavItem } from "@/components/app/sidebar";
 import type { DashNavItem } from "@/components/dash/sidebar";
@@ -53,4 +54,5 @@ export const adminNav: NavItem[] = [
   { href: "/admin/students", label: "Tələbələr", icon: <GraduationCap className="h-4 w-4 shrink-0" /> },
   { href: "/admin/teachers", label: "Müəllimlər", icon: <BadgeCheck className="h-4 w-4 shrink-0" /> },
   { href: "/admin/courses", label: "Kurslar", icon: <BookOpen className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/scholarship", label: "Təqaüd imtahanı", icon: <Award className="h-4 w-4 shrink-0" /> },
 ];

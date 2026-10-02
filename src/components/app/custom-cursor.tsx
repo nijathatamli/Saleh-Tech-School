@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 const INTERACTIVE_SELECTOR =
-  'a, button, input, textarea, select, label, summary, [role="button"], [role="link"], .highlight-card, .teacher-card, .course-card';
+  'a, button, input, textarea, select, label, summary, [role="button"], [role="link"], .teacher-card, .course-card';
 
 function lerp(from: number, to: number, t: number) {
   return from + (to - from) * t;

@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "node scripts/db-apply-patches.mjs && next build",
+    "build": "node scripts/db-apply-patches.mjs && node scripts/scholarship-sync.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -13,7 +13,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:sync-teachers": "tsx scripts/sync-teachers.ts",
     "db:studio": "prisma studio",
-    "db:server": "node scripts/pg-dev-server.mjs"
+    "db:server": "node scripts/pg-dev-server.mjs",
+    "scholarship:parse": "node scripts/scholarship/parse-questions.mjs",
+    "scholarship:sync": "node scripts/scholarship-sync.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -56,6 +58,7 @@
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
     "dotenv": "^17.4.2",
+    "jszip": "^3.10.2",
     "parse5": "^7.3.0",
     "postcss": "^8.4.47",
     "prisma": "^5.20.0",

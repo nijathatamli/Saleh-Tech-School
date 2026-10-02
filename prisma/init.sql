@@ -314,27 +314,6 @@ CREATE TABLE "Notification" (
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "ScholarshipApplication" (
-    "id" TEXT NOT NULL,
-    "applicationCode" TEXT NOT NULL,
-    "fullName" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
-    "age" INTEGER NOT NULL,
-    "courseInterest" TEXT NOT NULL DEFAULT 'cybersecurity',
-    "score" INTEGER NOT NULL,
-    "totalQuestions" INTEGER NOT NULL,
-    "passed" BOOLEAN NOT NULL,
-    "answers" JSONB NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "ScholarshipApplication_pkey" PRIMARY KEY ("id")
-);
-
--- CreateIndex
-CREATE UNIQUE INDEX "ScholarshipApplication_applicationCode_key" ON "ScholarshipApplication"("applicationCode");
-
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -470,3 +449,131 @@ ALTER TABLE "Attendance" ADD CONSTRAINT "Attendance_markedById_fkey" FOREIGN KEY
 ALTER TABLE "StudentNote" ADD CONSTRAINT "StudentNote_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "StudentProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "StudentNote" ADD CONSTRAINT "StudentNote_teacherId_fkey" FOREIGN KEY ("teacherId") REFERENCES "TeacherProfile"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- CreateEnum
+CREATE TYPE "ScholarshipSubject" AS ENUM ('LOGIC', 'MATH', 'ENGLISH');
+
+-- CreateEnum
+CREATE TYPE "ScholarshipAttemptStatus" AS ENUM ('IN_PROGRESS', 'SUBMITTED');
+
+-- CreateTable
+CREATE TABLE "ScholarshipCategory" (
+    "key" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "gradeFrom" INTEGER NOT NULL,
+    "gradeTo" INTEGER NOT NULL,
+    "sortOrder" INTEGER NOT NULL,
+    "sourceFile" TEXT NOT NULL,
+
+    CONSTRAINT "ScholarshipCategory_pkey" PRIMARY KEY ("key")
+);
+
+-- CreateTable
+CREATE TABLE "ScholarshipQuestion" (
+    "id" TEXT NOT NULL,
+    "categoryKey" TEXT NOT NULL,
+    "subject" "ScholarshipSubject" NOT NULL,
+    "part" INTEGER NOT NULL DEFAULT 1,
+    "number" INTEGER NOT NULL,
+    "position" INTEGER NOT NULL,
+    "stem" TEXT NOT NULL,
+    "options" JSONB NOT NULL,
+    "imageIds" TEXT[],
+    "correctLabel" TEXT,
+    "answerText" TEXT,
+    "translations" JSONB,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ScholarshipQuestion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ScholarshipMedia" (
+    "id" TEXT NOT NULL,
+    "contentType" TEXT NOT NULL,
+    "data" BYTEA NOT NULL,
+
+    CONSTRAINT "ScholarshipMedia_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ScholarshipStudent" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "surname" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "language" TEXT NOT NULL DEFAULT 'az',
+    "finHash" TEXT NOT NULL,
+    "finEncrypted" TEXT NOT NULL,
+    "categoryKey" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ScholarshipStudent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ScholarshipCode" (
+    "id" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "note" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "usedAt" TIMESTAMP(3),
+    "studentId" TEXT,
+
+    CONSTRAINT "ScholarshipCode_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ScholarshipAttempt" (
+    "id" TEXT NOT NULL,
+    "studentId" TEXT NOT NULL,
+    "status" "ScholarshipAttemptStatus" NOT NULL DEFAULT 'IN_PROGRESS',
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "finishedAt" TIMESTAMP(3),
+    "questionIds" TEXT[],
+    "answers" JSONB NOT NULL DEFAULT '{}',
+    "score" INTEGER,
+    "total" INTEGER NOT NULL,
+    "percent" INTEGER,
+    "scholarshipPercent" INTEGER,
+    "subjectScores" JSONB,
+    "timedOut" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ScholarshipAttempt_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "ScholarshipQuestion_categoryKey_position_idx" ON "ScholarshipQuestion"("categoryKey", "position");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipQuestion_categoryKey_subject_part_number_key" ON "ScholarshipQuestion"("categoryKey", "subject", "part", "number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipStudent_finHash_key" ON "ScholarshipStudent"("finHash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipCode_code_key" ON "ScholarshipCode"("code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipCode_studentId_key" ON "ScholarshipCode"("studentId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ScholarshipAttempt_studentId_key" ON "ScholarshipAttempt"("studentId");
+
+-- AddForeignKey
+ALTER TABLE "ScholarshipQuestion" ADD CONSTRAINT "ScholarshipQuestion_categoryKey_fkey" FOREIGN KEY ("categoryKey") REFERENCES "ScholarshipCategory"("key") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScholarshipStudent" ADD CONSTRAINT "ScholarshipStudent_categoryKey_fkey" FOREIGN KEY ("categoryKey") REFERENCES "ScholarshipCategory"("key") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScholarshipCode" ADD CONSTRAINT "ScholarshipCode_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "ScholarshipStudent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScholarshipAttempt" ADD CONSTRAINT "ScholarshipAttempt_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "ScholarshipStudent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

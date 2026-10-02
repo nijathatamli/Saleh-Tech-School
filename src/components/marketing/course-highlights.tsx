@@ -1,9 +1,5 @@
-"use client";
-
-import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 type Highlight = {
   bg: string;
@@ -16,11 +12,6 @@ type Highlight = {
   levelLabel: string;
   durationLabel: string;
   tags: string[];
-  instructor: string;
-  price: string;
-  start: string;
-  seats: string;
-  format: string;
 };
 
 const highlights: Highlight[] = [
@@ -34,11 +25,6 @@ const highlights: Highlight[] = [
     levelLabel: "Başlanğıc",
     durationLabel: "15 ay",
     tags: ["figma", "javascript", "html", "css", "cybersecurity"],
-    instructor: "Emin Qasımov",
-    price: "180 AZN/ay",
-    start: "16 Sentyabr 2026",
-    seats: "4 yer qalıb",
-    format: "Həftədə 2 dərs, offline",
   },
   {
     bg: "bg-red-50 dark:bg-red-950/40",
@@ -50,11 +36,6 @@ const highlights: Highlight[] = [
     levelLabel: "Qabaqcıl",
     durationLabel: "12 ay",
     tags: ["şəbəkə", "linux", "blue team", "red team", "pentest"],
-    instructor: "Tural Zeynalov",
-    price: "220 AZN/ay",
-    start: "23 Sentyabr 2026",
-    seats: "2 yer qalıb",
-    format: "Həftədə 3 dərs, offline",
   },
   {
     bg: "bg-green-50 dark:bg-green-950/40",
@@ -66,11 +47,6 @@ const highlights: Highlight[] = [
     levelLabel: "Başlanğıc",
     durationLabel: "6 ay",
     tags: ["arduino", "lego", "vex", "sensor", "led", "steam"],
-    instructor: "Nigar Əliyeva",
-    price: "160 AZN/ay",
-    start: "30 Sentyabr 2026",
-    seats: "6 yer qalıb",
-    format: "Həftədə 2 dərs, offline",
   },
   {
     bg: "bg-lime-50 dark:bg-lime-950/40",
@@ -83,11 +59,6 @@ const highlights: Highlight[] = [
     levelLabel: "Başlanğıc",
     durationLabel: "1 ay",
     tags: ["nitq", "liderlik", "inkişaf", "soft skills", "komanda idarəetməsi"],
-    instructor: "Emin Qasımov",
-    price: "140 AZN/ay",
-    start: "7 Oktyabr 2026",
-    seats: "8 yer qalıb",
-    format: "Həftədə 1 dərs, offline",
   },
   {
     bg: "bg-green-100 dark:bg-green-950/40",
@@ -99,11 +70,6 @@ const highlights: Highlight[] = [
     levelLabel: "Başlanğıc",
     durationLabel: "3 ay",
     tags: ["html", "css", "figma", "IT"],
-    instructor: "Nigar Əliyeva",
-    price: "120 AZN/ay",
-    start: "14 Oktyabr 2026",
-    seats: "10 yer qalıb",
-    format: "Həftədə 2 dərs, offline",
   },
   {
     bg: "bg-blue-50 dark:bg-blue-950/40",
@@ -115,17 +81,10 @@ const highlights: Highlight[] = [
     levelLabel: "Qabaqcıl",
     durationLabel: "8 ay",
     tags: ["artificial intelligence", "AI", "machine learning", "computer vision"],
-    instructor: "Tural Zeynalov",
-    price: "240 AZN/ay",
-    start: "21 Oktyabr 2026",
-    seats: "3 yer qalıb",
-    format: "Həftədə 3 dərs, online",
   },
 ];
 
 export function CourseHighlights() {
-  const [active, setActive] = useState<Highlight | null>(null);
-
   return (
     <section className="px-6 py-32 md:px-20">
       <div className="mx-auto mb-20 max-w-2xl space-y-4 text-center">
@@ -137,7 +96,6 @@ export function CourseHighlights() {
         {highlights.map((h) => (
           <div
             key={h.title}
-            onClick={() => setActive(h)}
             className={`highlight-card relative overflow-hidden rounded-3xl border-2 p-8 ${h.bg} ${h.border}`}
           >
             <Image
@@ -181,55 +139,6 @@ export function CourseHighlights() {
           </div>
         ))}
       </div>
-
-      {active && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-6"
-          style={{ backdropFilter: "blur(4px)" }}
-          onClick={(e) => e.target === e.currentTarget && setActive(null)}
-        >
-          <div className="animate-pop-in relative w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl dark:bg-zinc-900">
-            <button
-              onClick={() => setActive(null)}
-              className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-grey-100 text-secondary transition-colors hover:bg-grey-200 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
-              aria-label="Bağla"
-            >
-              ✕
-            </button>
-            <span className="mb-4 inline-block rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
-              Kurs məlumatı (demo)
-            </span>
-            <h3 className="mb-6 font-display text-2xl leading-snug">{active.title}</h3>
-            <ul className="space-y-4 text-sm">
-              {[
-                ["Müəllim", active.instructor],
-                ["Qiymət", active.price],
-                ["Növbəti başlanğıc", active.start],
-                ["Qalan yerlər", active.seats],
-                ["Format", active.format],
-              ].map(([label, value], i, arr) => (
-                <li
-                  key={label}
-                  className={`flex items-center justify-between ${i < arr.length - 1 ? "border-b border-grey-100 pb-3 dark:border-zinc-800" : ""}`}
-                >
-                  <span className="text-grey-500 dark:text-zinc-400">{label}</span>
-                  <span className="font-bold text-secondary dark:text-white">{value}</span>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/sinaq-dersi"
-              onClick={() => setActive(null)}
-              className="mt-8 block rounded-full bg-primary px-8 py-4 text-center text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-primary-dark"
-            >
-              Sınaq dərsinə yazıl
-            </Link>
-            <p className="mt-4 text-center text-[10px] text-grey-500 dark:text-zinc-400">
-              *Nümunə məlumatdır, dəqiq detallar üçün bizimlə əlaqə saxlayın.
-            </p>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

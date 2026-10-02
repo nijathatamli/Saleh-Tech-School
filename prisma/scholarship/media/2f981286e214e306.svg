@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 190" width="300" height="190" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-style="italic">
+  <g fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <polygon points="40,160 190,160 246,63 96,63"/>
+    <line x1="96" y1="63" x2="210" y2="125"/>
+    <polyline points="198,113 210,106 217,118" stroke-width="1.5"/>
+    <path d="M62 160 A22 22 0 0 0 51 141" stroke-width="1.5"/>
+  </g>
+  <g fill="#1a1a1a">
+    <text x="20" y="176">A</text>
+    <text x="192" y="180">B</text>
+    <text x="252" y="62">C</text>
+    <text x="80" y="56">D</text>
+    <text x="216" y="132">E</text>
+    <text x="66" y="150" font-size="13" font-style="normal">60°</text>
+  </g>
+</svg>

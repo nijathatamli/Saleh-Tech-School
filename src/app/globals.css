@@ -47,7 +47,7 @@
 .hero-mascot { transition: transform 0.4s ease; }
 .hero-mascot:hover { transform: translateY(-6px) scale(1.04) rotate(-2deg); }
 
-.highlight-card { transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.45s ease, border-color 0.45s ease; cursor: pointer; }
+.highlight-card { transition: transform 0.35s ease, box-shadow 0.35s ease, background-color 0.45s ease, border-color 0.45s ease; }
 .highlight-card:hover { transform: translateY(-8px) scale(1.015); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
 .highlight-card:active { transform: translateY(-4px) scale(0.99); }
 
@@ -111,3 +111,8 @@
     background-image: repeating-linear-gradient(to bottom, transparent, transparent 39px, rgba(255, 255, 255, 0.035) 39px, rgba(255, 255, 255, 0.035) 40px);
   }
 }
+
+/* Scholarship exam: question text may contain MathML produced from Word equations */
+.rich-text math { font-size: 1.3em; }
+.rich-text math[display="block"] { display: block math; }
+.rich-text sup, .rich-text sub { font-size: 0.75em; line-height: 0; }
