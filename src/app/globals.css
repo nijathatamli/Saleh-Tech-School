@@ -69,6 +69,14 @@
   }
 }
 
+/* The fox follows a mouse. On touch screens (and with reduced motion) the script never
+   activates it, so it must stay hidden instead of sitting at the top-left corner. */
+.cursor-fox {
+  display: none;
+}
+.custom-cursor-active .cursor-fox {
+  display: block;
+}
 .cursor-fox {
   position: fixed;
   top: 0;
