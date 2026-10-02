@@ -6,7 +6,7 @@ export type SubjectKey = "LOGIC" | "MATH" | "ENGLISH";
 // Exam order and the labels shown in the UI.
 export const SUBJECT_ORDER: SubjectKey[] = ["LOGIC", "MATH", "ENGLISH"];
 export const SUBJECTS: Record<SubjectKey, { label: string; blurb: string }> = {
-  LOGIC: { label: "Logic", blurb: "Məntiqi düşüncə, ardıcıllıqlar və problem həlli." },
+  LOGIC: { label: "Məntiq", blurb: "Məntiqi düşüncə, ardıcıllıqlar və problem həlli." },
   MATH: { label: "Math", blurb: "Riyaziyyat: hesablama, həndəsə və məsələ həlli." },
   ENGLISH: { label: "English", blurb: "İngilis dilində məntiq, anlama və sözlər." },
 };

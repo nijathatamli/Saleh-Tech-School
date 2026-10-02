@@ -32,7 +32,7 @@ export default async function ScholarshipAboutPage() {
             Reqamsal <span className="text-primary">Gələcək</span>
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-grey-500 dark:text-zinc-400">
-            Kursumuzun tələbəsi kimi qeydiyyatdan keç, sinfinə uyğun imtahanı ver və Logic, Math və English üzrə bacarıqlarını nümayiş etdir.
+            Kursumuzun tələbəsi kimi qeydiyyatdan keç, sinfinə uyğun imtahanı ver və Məntiq, Math və English üzrə bacarıqlarını nümayiş etdir.
           </p>
           <div className="flex flex-col gap-4 pt-2 sm:flex-row">
             <Link href={`${SCHOLARSHIP_BASE}/qeydiyyat`} className={primaryButton}>Qeydiyyatdan keç</Link>

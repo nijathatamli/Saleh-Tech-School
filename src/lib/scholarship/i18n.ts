@@ -6,7 +6,7 @@ export const isLang = (v: unknown): v is Lang => typeof v === "string" && (LANGS
 
 type Subject = "LOGIC" | "MATH" | "ENGLISH";
 export const SUBJECT_LABELS: Record<Lang, Record<Subject, string>> = {
-  az: { LOGIC: "Logic", MATH: "Math", ENGLISH: "English" },
+  az: { LOGIC: "Məntiq", MATH: "Math", ENGLISH: "English" },
   en: { LOGIC: "Logic", MATH: "Math", ENGLISH: "English" },
   ru: { LOGIC: "Логика", MATH: "Математика", ENGLISH: "Английский" },
 };
