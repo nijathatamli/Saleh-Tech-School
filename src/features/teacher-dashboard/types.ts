@@ -16,6 +16,9 @@ export type TeacherStudent = {
   attendance: { lessonId: string; status: AttendanceStatus; date: string }[];
   submissions: { id: string; homeworkId: string; status: SubmissionStatus; score: number | null; feedback: string | null; submittedAt: string | null; dueDate: string }[];
   skills: { name: string; pct: number }[];
+  /** lessons the teacher confirmed as completed for this student in their class, and the class's payment-cycle size */
+  completedLessons: number;
+  cycleSize: number;
 };
 
 export type TeacherClass = {

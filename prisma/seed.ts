@@ -5,6 +5,13 @@ import { Pool } from "pg";
 import bcrypt from "bcryptjs";
 import { teacherRoster } from "./teacher-roster";
 
+// The seed creates demo accounts whose passwords are written in this file (admin123, teacher123, …). Running it against a
+// shared or production database hands everybody who can read the repository a way in, so it only runs against a local database.
+if (!/@(127\.0\.0\.1|localhost|\[::1\])[:/]/.test(process.env.DATABASE_URL ?? "") && process.env.ALLOW_REMOTE_SEED !== "1") {
+  console.error("Refusing to seed a non-local database (demo accounts with public passwords). Set ALLOW_REMOTE_SEED=1 only for a throw-away staging database.");
+  process.exit(1);
+}
+
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });

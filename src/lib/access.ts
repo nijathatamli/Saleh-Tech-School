@@ -49,7 +49,7 @@ export async function requireParentOfStudent(userId: string, studentId: string, 
 /** The class must belong to this teacher. */
 export async function requireTeacherOwnsClass(userId: string, classId: string, db: Db = prisma) {
   const teacher = await requireTeacher(userId, db);
-  const classGroup = await db.classGroup.findFirst({ where: { id: classId, teacherId: teacher.id }, select: { id: true } });
+  const classGroup = await db.classGroup.findFirst({ where: { id: classId, teacherId: teacher.id, status: "ACTIVE" }, select: { id: true } });
   if (!classGroup) throw new AccessError("forbidden", "class is not taught by this teacher");
   return { teacher, classId: classGroup.id };
 }
@@ -57,7 +57,7 @@ export async function requireTeacherOwnsClass(userId: string, classId: string, d
 /** The lesson must belong to one of this teacher's classes. */
 export async function requireTeacherOwnsLesson(userId: string, lessonId: string, db: Db = prisma) {
   const teacher = await requireTeacher(userId, db);
-  const lesson = await db.lesson.findFirst({ where: { id: lessonId, class: { teacherId: teacher.id } }, include: { class: true } });
+  const lesson = await db.lesson.findFirst({ where: { id: lessonId, class: { teacherId: teacher.id, status: "ACTIVE" } }, include: { class: true } });
   if (!lesson) throw new AccessError("forbidden", "lesson is not taught by this teacher");
   return { teacher, lesson };
 }
@@ -65,7 +65,7 @@ export async function requireTeacherOwnsLesson(userId: string, lessonId: string,
 /** The student must be enrolled in one of this teacher's classes. */
 export async function requireTeacherOwnsStudent(userId: string, studentId: string, db: Db = prisma) {
   const teacher = await requireTeacher(userId, db);
-  const enrollment = await db.enrollment.findFirst({ where: { studentId, class: { teacherId: teacher.id } }, select: { studentId: true } });
+  const enrollment = await db.enrollment.findFirst({ where: { studentId, class: { teacherId: teacher.id, status: "ACTIVE" } }, select: { studentId: true } });
   if (!enrollment) throw new AccessError("forbidden", "student is not taught by this teacher");
   return { teacher, studentId: enrollment.studentId };
 }
@@ -74,7 +74,7 @@ export async function requireTeacherOwnsStudent(userId: string, studentId: strin
 export async function requireTeacherOwnsHomework(userId: string, homeworkId: string, db: Db = prisma) {
   const teacher = await requireTeacher(userId, db);
   const homework = await db.homework.findFirst({
-    where: { id: homeworkId, lesson: { class: { teacherId: teacher.id } } },
+    where: { id: homeworkId, lesson: { class: { teacherId: teacher.id, status: "ACTIVE" } } },
     include: { lesson: { include: { class: { include: { course: true } } } } },
   });
   if (!homework) throw new AccessError("forbidden", "homework is not taught by this teacher");

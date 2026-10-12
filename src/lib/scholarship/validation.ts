@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MSG } from "./config";
+import { PROGRAMS } from "./i18n";
 
 export function normalizeFin(raw: string): string {
   return raw.replace(/\s+/g, "").toUpperCase();
@@ -48,6 +49,7 @@ export const registerSchema = z
     email: emailSchema,
     code: codeSchema,
     language: z.enum(["az", "en", "ru"]).default("az"),
+    program: z.enum(PROGRAMS, { errorMap: () => ({ message: MSG.required }) }),
   });
 
 export const answerSchema = z.object({

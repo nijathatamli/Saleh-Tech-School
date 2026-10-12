@@ -1,77 +1,62 @@
-import { ArrowRight, Phone, Calendar } from "lucide-react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getLeadsByStage } from "@/lib/data";
-import { AppTopbar } from "@/components/app/topbar";
+import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { LEAD_STAGES, listApplications } from "@/lib/admin/admissions";
+import { AdminTopbar } from "@/components/admin/admin-topbar";
+import { ConvertDialog, StageSelect } from "@/components/admin/admission-actions";
+import { STAGE_LABEL } from "@/lib/admin/labels";
+import { Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
-import { advanceLeadStage } from "./actions";
 
+import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
+const SIZE = 25;
 
-const columns = [
-  { stage: "NEW", label: "Yeni", color: "bg-electric-500" },
-  { stage: "CONTACTED", label: "Əlaqə saxlanılıb", color: "bg-teal-500" },
-  { stage: "TRIAL_LESSON", label: "Sınaq dərsi", color: "bg-amber-500" },
-  { stage: "TRIAL_COMPLETED", label: "Sınaq bitib", color: "bg-amber-500" },
-  { stage: "INTERESTED", label: "Maraqlıdır", color: "bg-orange-500" },
-  { stage: "REGISTERED", label: "Qeydiyyatdan keçib", color: "bg-emerald-500" },
-] as const;
-
-export default async function AdminLeadsPage() {
-  const session = await getServerSession(authOptions);
-  const leads = await getLeadsByStage();
-
+export default async function AdminAdmissionsPage({ searchParams }: { searchParams: { q?: string; stage?: string; page?: string } }) {
+  await adminGuard();
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const [data, classes] = await Promise.all([
+    listApplications({ q: searchParams.q?.trim() || undefined, stage: searchParams.stage || undefined, page, size: SIZE }),
+    prisma.classGroup.findMany({ where: { status: "ACTIVE" }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
+  ]);
+  const tab = (stage: string | undefined, label: string, count?: number) => {
+    const qs = new URLSearchParams({ ...(stage ? { stage } : {}), ...(searchParams.q ? { q: searchParams.q } : {}) });
+    const on = (searchParams.stage ?? "") === (stage ?? "");
+    return <Link key={label} href={`/admin/leads?${qs}`} className={`whitespace-nowrap rounded-full border px-4 py-1.5 text-xs font-bold ${on ? "border-electric-500 bg-electric-50 text-electric-700" : "border-navy-100 bg-white text-navy-600 hover:bg-navy-50"}`}>{label}{count !== undefined ? ` · ${count}` : ""}</Link>;
+  };
+  const totalAll = Object.values(data.counts).reduce((a, b) => a + b, 0);
   return (
     <div>
-      <AppTopbar title="CRM / Leads" userName={session?.user?.name ?? "Admin"} userEmail={session?.user?.email ?? ""} />
-
-      <div className="p-6 md:p-10">
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {columns.map((col) => {
-            const items = leads.filter((l) => l.stage === col.stage);
-            return (
-              <div key={col.stage} className="w-72 shrink-0">
-                <div className="mb-3 flex items-center gap-2 px-1">
-                  <span className={`h-2.5 w-2.5 rounded-full ${col.color}`} />
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-navy-900">{col.label}</h3>
-                  <span className="ml-auto rounded-full bg-navy-100 px-2 py-0.5 text-[10px] font-bold text-navy-600">
-                    {items.length}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {items.map((lead) => (
-                    <div key={lead.id} className="rounded-2xl border border-navy-100 bg-white p-4 shadow-sm shadow-navy-900/[0.03]">
-                      <p className="text-sm font-bold text-navy-900">{lead.parentName}</p>
-                      <p className="text-xs text-navy-400">{lead.studentName} · {lead.studentAge} yaş</p>
-                      {lead.course && (
-                        <p className="mt-2 rounded-lg bg-navy-50 px-2 py-1 text-[11px] font-bold text-electric-600">
-                          {lead.course.name}
-                        </p>
-                      )}
-                      <div className="mt-3 space-y-1 text-[11px] text-navy-400">
-                        <div className="flex items-center gap-1.5">
-                          <Phone className="h-3 w-3" /> {lead.parentPhone}
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-3 w-3" /> {formatDate(lead.preferredDate)} · {lead.preferredTime}
-                        </div>
-                      </div>
-                      {col.stage !== "REGISTERED" && (
-                        <form action={advanceLeadStage.bind(null, lead.id)} className="mt-3">
-                          <Button type="submit" variant="app-outline" size="sm" className="w-full">
-                            <span className="flex items-center justify-center gap-1">
-                              İrəli <ArrowRight className="h-3 w-3" />
-                            </span>
-                          </Button>
-                        </form>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+      <AdminTopbar title="Qəbul / Müraciətlər" subtitle="Sınaq dərsi müraciətlərindən tələbəyə qədər" />
+      <div className="space-y-6 p-6 md:p-10">
+        <div className="flex flex-wrap gap-2">{tab(undefined, "Hamısı", totalAll)}{LEAD_STAGES.map((s) => tab(s, STAGE_LABEL[s], data.counts[s] ?? 0))}</div>
+        <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
+          {searchParams.stage && <input type="hidden" name="stage" value={searchParams.stage} />}
+          <input name="q" defaultValue={searchParams.q} placeholder="Valideyn, şagird və ya telefon..." className="w-72 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />
+          <Button type="submit" variant="app-outline" size="sm">Axtar</Button>
+        </form>
+        <div className={card}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-navy-100"><th className={th}>Şagird</th><th className={th}>Valideyn</th><th className={th}>Kurs</th><th className={th}>Sınaq vaxtı</th><th className={th}>Mərhələ</th><th className={th}></th></tr></thead>
+              <tbody>
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Müraciət tapılmadı.</td></tr>}
+                {data.items.map((a) => (
+                  <tr key={a.id} className="border-b border-navy-50 last:border-0">
+                    <td className="px-4 py-3"><p className="font-bold text-navy-900">{a.studentName}</p><p className="text-xs text-navy-400">{a.studentAge} yaş · müraciət {fmtDate(a.createdAt)}</p></td>
+                    <td className="px-4 py-3"><p className="text-navy-900">{a.parentName}</p><p className="text-xs text-navy-400">{a.parentPhone}</p></td>
+                    <td className="px-4 py-3 text-navy-600">{a.courseName ?? "—"}</td>
+                    <td className="px-4 py-3 text-xs text-navy-600">{fmtDate(a.preferredDate).split(",")[0]} · {a.preferredTime}</td>
+                    <td className="px-4 py-3">{a.stage === "REGISTERED" ? <Badge variant="success">{STAGE_LABEL.REGISTERED}</Badge> : <StageSelect id={a.id} stage={a.stage} />}</td>
+                    <td className="px-4 py-3 text-right">
+                      {a.convertedStudentId ? <Link href={`/admin/students/${a.convertedStudentId}`} className="text-xs font-bold text-electric-600 hover:underline">Tələbəyə bax</Link> : a.stage !== "REJECTED" ? <ConvertDialog app={{ id: a.id, parentName: a.parentName, parentPhone: a.parentPhone, studentName: a.studentName, studentAge: a.studentAge }} classes={classes} /> : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination base="/admin/leads" params={{ q: searchParams.q, stage: searchParams.stage }} page={page} total={data.total} size={SIZE} />
         </div>
       </div>
     </div>

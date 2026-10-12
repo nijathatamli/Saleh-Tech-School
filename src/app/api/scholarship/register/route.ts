@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { MSG, SESSION_MAX_AGE_SECONDS } from "@/lib/scholarship/config";
 import { fail, ok, readJson, route } from "@/lib/scholarship/http";
+import { notifyAdmins } from "@/lib/events";
 import { SESSION_COOKIE, clientIp, cookieOptions, createSessionToken, encryptFin, hashFin, rateLimit } from "@/lib/scholarship/security";
 import { fieldErrors, registerSchema } from "@/lib/scholarship/validation";
 
@@ -25,7 +26,7 @@ export const POST = route(
       const missing = Object.values(fields).some((m) => m === MSG.required);
       return fail(400, missing ? MSG.required : Object.values(fields)[0], { fields });
     }
-    const { name, surname, category, fin, phone, email, code, language } = parsed.data;
+    const { name, surname, category, fin, phone, email, code, language, program } = parsed.data;
 
     // guessing codes is the one thing worth throttling hard
     const guesses = rateLimit(`code:${ip}`, 12, 10 * 60_000);
@@ -48,7 +49,7 @@ export const POST = route(
         studentId = existing.id;
         // the form was filled in again: keep the latest details, unless the exam is already finished
         const done = await prisma.scholarshipAttempt.findFirst({ where: { studentId, status: "SUBMITTED" }, select: { id: true } });
-        if (!done) await prisma.scholarshipStudent.update({ where: { id: studentId }, data: { name, surname, phone, email, language } });
+        if (!done) await prisma.scholarshipStudent.update({ where: { id: studentId }, data: { name, surname, phone, email, language, program } });
       } else return fail(409, MSG.codeUsed, { fields: { code: MSG.codeUsed } });
     } else {
       if (existing) return fail(409, MSG.finTaken, { fields: { fin: MSG.finTaken } });
@@ -58,7 +59,7 @@ export const POST = route(
           const claimed = await tx.scholarshipCode.updateMany({ where: { id: codeRow.id, usedAt: null }, data: { usedAt: new Date() } });
           if (claimed.count === 0) throw new Error("CODE_USED");
           const student = await tx.scholarshipStudent.create({
-            data: { name, surname, phone, email, language, categoryKey: cat.key, finHash, finEncrypted: encryptFin(fin) },
+            data: { name, surname, phone, email, language, program, categoryKey: cat.key, finHash, finEncrypted: encryptFin(fin) },
             select: { id: true },
           });
           await tx.scholarshipCode.update({ where: { id: codeRow.id }, data: { studentId: student.id } });
@@ -73,6 +74,13 @@ export const POST = route(
       }
     }
 
+    if (!codeRow.usedAt) {
+      try {
+        await notifyAdmins(prisma, { title: "Yeni təqaüd qeydiyyatı", body: `${name} ${surname} (${category} sinif qrupu) imtahana qeydiyyatdan keçdi.`, type: "info", event: "NEW_SCHOLARSHIP_REGISTRATION", entityType: "scholarship", entityId: studentId });
+      } catch (e) {
+        console.error("[scholarship] admin notification failed", e);
+      }
+    }
     const res = ok({ ok: true }, 201);
     res.cookies.set(SESSION_COOKIE, await createSessionToken(studentId), { ...cookieOptions, maxAge: SESSION_MAX_AGE_SECONDS });
     return res;

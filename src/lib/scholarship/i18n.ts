@@ -4,9 +4,17 @@ export type Lang = (typeof LANGS)[number];
 export const LANG_NAMES: Record<Lang, string> = { az: "Azərbaycan dili", en: "English", ru: "Русский" };
 export const isLang = (v: unknown): v is Lang => typeof v === "string" && (LANGS as readonly string[]).includes(v);
 
+export const PROGRAMS = ["cybersecurity", "electronics", "programming", "robotics", "ai"] as const;
+export type Program = (typeof PROGRAMS)[number];
+export const PROGRAM_LABELS: Record<Lang, Record<Program, string>> = {
+  az: { cybersecurity: "Kibertəhlükəsizlik", electronics: "Elektronika", programming: "Proqramlaşdırma", robotics: "Robototexnika", ai: "Süni intellekt" },
+  en: { cybersecurity: "Cybersecurity", electronics: "Electronics", programming: "Programming", robotics: "Robotics", ai: "Artificial Intelligence" },
+  ru: { cybersecurity: "Кибербезопасность", electronics: "Электроника", programming: "Программирование", robotics: "Робототехника", ai: "Искусственный интеллект" },
+};
+
 type Subject = "LOGIC" | "MATH" | "ENGLISH";
 export const SUBJECT_LABELS: Record<Lang, Record<Subject, string>> = {
-  az: { LOGIC: "Məntiq", MATH: "Math", ENGLISH: "English" },
+  az: { LOGIC: "Məntiq", MATH: "Riyaziyyat", ENGLISH: "İngilis dili" },
   en: { LOGIC: "Logic", MATH: "Math", ENGLISH: "English" },
   ru: { LOGIC: "Логика", MATH: "Математика", ENGLISH: "Английский" },
 };

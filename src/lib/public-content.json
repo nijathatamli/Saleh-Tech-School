@@ -1,0 +1,1326 @@
+{
+  "generatedAt": "2026-10-12T15:49:35.503Z",
+  "teachers": [
+    {
+      "id": "cmtinzjr00001v9elg886sumt",
+      "position": "Kibertəhlükəsizlik Müəllimi",
+      "bio": "Respublika Kibertəhlükəsizlik Olimpiadası — 4-cü yer. 5+ hakaton qalibi (Metro, Azcon və s.).",
+      "experienceYears": 0,
+      "specializations": [
+        "Linux",
+        "Şəbəkə",
+        "Kibertəhlükəsizlik",
+        "CTF"
+      ],
+      "photoUrl": "/teachers/nijat-hatamli.jpg",
+      "user": {
+        "name": "Nicat Hətəmli",
+        "avatarUrl": "/teachers/nijat-hatamli.jpg"
+      },
+      "courses": [
+        {
+          "id": "kibertehlukesizlik",
+          "slug": "kibertehlukesizlik",
+          "name": "Kibertəhlükəsizlik",
+          "shortDesc": "Rəqəmsal dünyanı təhlükəsiz et!",
+          "longDesc": "Tələbələr şəbəkə təhlükəsizliyi, etik hakerlik və rəqəmsal müdafiə prinsiplərini praktiki CTF tapşırıqları ilə öyrənirlər.",
+          "category": "cybersecurity",
+          "coverImageUrl": null,
+          "minAge": 10,
+          "maxAge": 18,
+          "level": "ADVANCED",
+          "durationMonths": 8,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 220,
+          "tags": [
+            "linux",
+            "şəbəkə",
+            "ctf",
+            "etik hakerlik"
+          ],
+          "featured": true,
+          "teacherId": "cmtinzjr00001v9elg886sumt",
+          "createdAt": "2026-09-01T08:49:44.941Z",
+          "skills": [
+            "Şəbəkə təhlükəsizliyi",
+            "Linux əməliyyat sistemi",
+            "Kriptoqrafiya əsasları",
+            "Etik hakerlik",
+            "CTF strategiyaları"
+          ],
+          "active": true
+        },
+        {
+          "id": "linux",
+          "slug": "linux",
+          "name": "Linux",
+          "shortDesc": "Açıq mənbəli əməliyyat sistemini mənimsə!",
+          "longDesc": "Linux komanda sətri, fayl sistemi idarəçiliyi və server administrasiyası əsasları.",
+          "category": "linux",
+          "coverImageUrl": null,
+          "minAge": 13,
+          "maxAge": 18,
+          "level": "INTERMEDIATE",
+          "durationMonths": 4,
+          "lessonsPerWeek": 1,
+          "lessonMinutes": 90,
+          "price": 160,
+          "tags": [
+            "linux",
+            "terminal",
+            "server"
+          ],
+          "featured": false,
+          "teacherId": "cmtinzjr00001v9elg886sumt",
+          "createdAt": "2026-09-01T08:49:51.668Z",
+          "skills": [
+            "Bash skriptləşdirmə",
+            "Fayl sistemi idarəçiliyi",
+            "İstifadəçi icazələri",
+            "Server əsasları"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "cmu0woe7e000181bozj92x52x",
+      "position": "Elektrik-Elektronika Müəllimi",
+      "bio": "Elektrik-elektronika fənni üzrə müəllim.",
+      "experienceYears": 0,
+      "specializations": [
+        "Elektrik",
+        "Elektronika"
+      ],
+      "photoUrl": "/teachers/eli-mustafayev.jpg",
+      "user": {
+        "name": "Əli Mustafayev",
+        "avatarUrl": "/teachers/eli-mustafayev.jpg"
+      },
+      "courses": []
+    },
+    {
+      "id": "cmu13oo1g0001wd3hojunfrxe",
+      "position": "Robototexnika Müəllimi (Rus sektoru)",
+      "bio": "Robototexnika fənnini rus sektorunda tədris edir.",
+      "experienceYears": 0,
+      "specializations": [
+        "Robotexnika",
+        "Arduino"
+      ],
+      "photoUrl": "/teachers/meryem-axundova.jpg",
+      "user": {
+        "name": "Məryəm Axundova",
+        "avatarUrl": "/teachers/meryem-axundova.jpg"
+      },
+      "courses": []
+    },
+    {
+      "id": "cmtinzm740003v9elsi3k38te",
+      "position": "Full-Stack Proqramçı",
+      "bio": "Proqramlaşdırma fənni üzrə müəllim.",
+      "experienceYears": 0,
+      "specializations": [
+        "JavaScript",
+        "Python",
+        "React",
+        "Node.js"
+      ],
+      "photoUrl": "/teachers/rasul-sadigli.jpg",
+      "user": {
+        "name": "Rasul Sadiqli",
+        "avatarUrl": "/teachers/rasul-sadigli.jpg"
+      },
+      "courses": [
+        {
+          "id": "proqramlashdirma",
+          "slug": "proqramlashdirma",
+          "name": "Proqramlaşdırma",
+          "shortDesc": "Texnologiya dünyasına ilk addımını at!",
+          "longDesc": "JavaScript əsasında məntiqi düşüncə, alqoritmlər və interaktiv veb layihələr qurmağı öyrədən əsas proqramlaşdırma kursu.",
+          "category": "programming",
+          "coverImageUrl": null,
+          "minAge": 10,
+          "maxAge": 15,
+          "level": "BEGINNER",
+          "durationMonths": 15,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 180,
+          "tags": [
+            "javascript",
+            "html",
+            "css",
+            "alqoritm"
+          ],
+          "featured": true,
+          "teacherId": "cmtinzm740003v9elsi3k38te",
+          "createdAt": "2026-09-01T08:49:45.784Z",
+          "skills": [
+            "Alqoritmik düşüncə",
+            "JavaScript əsasları",
+            "HTML/CSS",
+            "Git/GitHub",
+            "Debug etmə"
+          ],
+          "active": true
+        },
+        {
+          "id": "python",
+          "slug": "python",
+          "name": "Python ilə Proqramlaşdırma",
+          "shortDesc": "Dünyanın ən populyar dilini əyləncəli layihələrlə öyrən!",
+          "longDesc": "Python dilinin əsaslarından tutmuş məlumat analizinə qədər geniş spektrdə praktiki layihələr üzərində iş.",
+          "category": "python",
+          "coverImageUrl": null,
+          "minAge": 9,
+          "maxAge": 14,
+          "level": "BEGINNER",
+          "durationMonths": 6,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 75,
+          "price": 160,
+          "tags": [
+            "python",
+            "data",
+            "avtomatlaşdırma"
+          ],
+          "featured": false,
+          "teacherId": "cmtinzm740003v9elsi3k38te",
+          "createdAt": "2026-09-01T08:49:46.622Z",
+          "skills": [
+            "Python sintaksisi",
+            "Data strukturları",
+            "Fayl əməliyyatları",
+            "Kiçik oyunlar yaratmaq"
+          ],
+          "active": true
+        },
+        {
+          "id": "web-development",
+          "slug": "web-development",
+          "name": "Web Development",
+          "shortDesc": "Müasir, cavabdehli veb saytlar qur!",
+          "longDesc": "HTML, CSS və JavaScript-dən React-a qədər müasir veb inkişaf stekini əhatə edən qabaqcıl kurs.",
+          "category": "web",
+          "coverImageUrl": null,
+          "minAge": 13,
+          "maxAge": 18,
+          "level": "INTERMEDIATE",
+          "durationMonths": 7,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 200,
+          "tags": [
+            "html",
+            "css",
+            "react",
+            "javascript"
+          ],
+          "featured": false,
+          "teacherId": "cmtinzm740003v9elsi3k38te",
+          "createdAt": "2026-09-01T08:49:49.140Z",
+          "skills": [
+            "Responsive dizayn",
+            "JavaScript ES6+",
+            "React əsasları",
+            "API inteqrasiyası"
+          ],
+          "active": true
+        },
+        {
+          "id": "oyun-yaratma",
+          "slug": "oyun-yaratma",
+          "name": "Oyun Yaratma",
+          "shortDesc": "Öz kompüter oyununu yarat!",
+          "longDesc": "Tələbələr oyun dizaynı prinsiplərini öyrənir və özlərinin 2D oyunlarını hazırlayırlar.",
+          "category": "game",
+          "coverImageUrl": null,
+          "minAge": 11,
+          "maxAge": 16,
+          "level": "INTERMEDIATE",
+          "durationMonths": 6,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 190,
+          "tags": [
+            "oyun dizaynı",
+            "javascript",
+            "yaradıcılıq"
+          ],
+          "featured": false,
+          "teacherId": "cmtinzm740003v9elsi3k38te",
+          "createdAt": "2026-09-01T08:49:50.825Z",
+          "skills": [
+            "Oyun dizaynı prinsipləri",
+            "Sprite və animasiya",
+            "Kollizyon aşkarlama",
+            "Səviyyə dizaynı"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "cmtinzmz60005v9elyfk0i73z",
+      "position": "Robototexnika Mühəndisi",
+      "bio": "Robototexnika fənni üzrə müəllim.",
+      "experienceYears": 0,
+      "specializations": [
+        "Arduino",
+        "Robotexnika",
+        "Süni İntellekt"
+      ],
+      "photoUrl": "/teachers/nasib-ahmadov.jpg",
+      "user": {
+        "name": "Nasib Əhmədov",
+        "avatarUrl": "/teachers/nasib-ahmadov.jpg"
+      },
+      "courses": [
+        {
+          "id": "robotexnika",
+          "slug": "robotexnika",
+          "name": "Robotexnika",
+          "shortDesc": "Öz robotunu yarat, proqramla və idarə et!",
+          "longDesc": "Arduino və sensor sistemləri ilə tanışlıqdan başlayaraq, tələbələr öz avtonom robotlarını qururlar.",
+          "category": "robotics",
+          "coverImageUrl": null,
+          "minAge": 8,
+          "maxAge": 12,
+          "level": "BEGINNER",
+          "durationMonths": 6,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 170,
+          "tags": [
+            "arduino",
+            "sensor",
+            "steam"
+          ],
+          "featured": true,
+          "teacherId": "cmtinzmz60005v9elyfk0i73z",
+          "createdAt": "2026-09-01T08:49:47.461Z",
+          "skills": [
+            "Arduino proqramlaşdırma",
+            "Sensor inteqrasiyası",
+            "Elektrik dövrələri",
+            "Komanda işi"
+          ],
+          "active": true
+        },
+        {
+          "id": "suni-intellekt",
+          "slug": "suni-intellekt",
+          "name": "Süni İntellekt Mühəndisliyi",
+          "shortDesc": "Gələcəyin texnologiyasını öyrən!",
+          "longDesc": "Maşın öyrənməsi əsaslarından kompüter görməsinə qədər müasir süni intellekt konsepsiyalarına giriş.",
+          "category": "ai",
+          "coverImageUrl": null,
+          "minAge": 14,
+          "maxAge": 18,
+          "level": "ADVANCED",
+          "durationMonths": 8,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 240,
+          "tags": [
+            "ai",
+            "machine learning",
+            "computer vision"
+          ],
+          "featured": true,
+          "teacherId": "cmtinzmz60005v9elyfk0i73z",
+          "createdAt": "2026-09-01T08:49:49.980Z",
+          "skills": [
+            "Python üçün ML kitabxanaları",
+            "Neyron şəbəkələr əsasları",
+            "Data hazırlama",
+            "Model qiymətləndirmə"
+          ],
+          "active": true
+        }
+      ]
+    },
+    {
+      "id": "cmtinznr50007v9el5svp5255",
+      "position": "Elektronika və IoT Mütəxəssisi",
+      "bio": "Elektronika və IoT fənni üzrə müəllim.",
+      "experienceYears": 0,
+      "specializations": [
+        "Elektronika",
+        "IoT",
+        "Arduino",
+        "Sensor sistemləri"
+      ],
+      "photoUrl": "/teachers/nihat-durmusov.jpg",
+      "user": {
+        "name": "Nihat Durmuşov",
+        "avatarUrl": "/teachers/nihat-durmusov.jpg"
+      },
+      "courses": [
+        {
+          "id": "elektronika",
+          "slug": "elektronika",
+          "name": "Elektronika",
+          "shortDesc": "Elektrik dövrələrinin sirlərini kəşf et!",
+          "longDesc": "Əsas elektronika komponentləri, dövrə qurma və lehimləmə bacarıqları praktiki tapşırıqlarla öyrədilir.",
+          "category": "electronics",
+          "coverImageUrl": null,
+          "minAge": 10,
+          "maxAge": 16,
+          "level": "INTERMEDIATE",
+          "durationMonths": 5,
+          "lessonsPerWeek": 1,
+          "lessonMinutes": 90,
+          "price": 150,
+          "tags": [
+            "dövrə",
+            "lehimləmə",
+            "komponentlər"
+          ],
+          "featured": false,
+          "teacherId": "cmtinznr50007v9el5svp5255",
+          "createdAt": "2026-09-01T08:49:48.302Z",
+          "skills": [
+            "Dövrə sxemləri",
+            "Lehimləmə",
+            "Rezistor/kondensator hesablamaları",
+            "Breadboard prototipləmə"
+          ],
+          "active": true
+        },
+        {
+          "id": "iot",
+          "slug": "iot",
+          "name": "IoT Sistemləri",
+          "shortDesc": "Əşyaların internetini kəşf et!",
+          "longDesc": "Sensor məlumatlarının internetə ötürülməsi və ağıllı ev sistemlərinin qurulması üzrə praktiki kurs.",
+          "category": "iot",
+          "coverImageUrl": null,
+          "minAge": 13,
+          "maxAge": 18,
+          "level": "ADVANCED",
+          "durationMonths": 6,
+          "lessonsPerWeek": 2,
+          "lessonMinutes": 90,
+          "price": 210,
+          "tags": [
+            "iot",
+            "wifi",
+            "sensor"
+          ],
+          "featured": false,
+          "teacherId": "cmtinznr50007v9el5svp5255",
+          "createdAt": "2026-09-01T08:49:52.503Z",
+          "skills": [
+            "Sensor məlumatlarının toplanması",
+            "Bulud inteqrasiyası",
+            "Ağıllı ev protokolları",
+            "Real vaxt monitorinq"
+          ],
+          "active": true
+        }
+      ]
+    }
+  ],
+  "courses": [
+    {
+      "id": "kibertehlukesizlik",
+      "slug": "kibertehlukesizlik",
+      "name": "Kibertəhlükəsizlik",
+      "shortDesc": "Rəqəmsal dünyanı təhlükəsiz et!",
+      "longDesc": "Tələbələr şəbəkə təhlükəsizliyi, etik hakerlik və rəqəmsal müdafiə prinsiplərini praktiki CTF tapşırıqları ilə öyrənirlər.",
+      "category": "cybersecurity",
+      "coverImageUrl": null,
+      "minAge": 10,
+      "maxAge": 18,
+      "level": "ADVANCED",
+      "durationMonths": 8,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 220,
+      "tags": [
+        "linux",
+        "şəbəkə",
+        "ctf",
+        "etik hakerlik"
+      ],
+      "featured": true,
+      "teacherId": "cmtinzjr00001v9elg886sumt",
+      "createdAt": "2026-09-01T08:49:44.941Z",
+      "skills": [
+        "Şəbəkə təhlükəsizliyi",
+        "Linux əməliyyat sistemi",
+        "Kriptoqrafiya əsasları",
+        "Etik hakerlik",
+        "CTF strategiyaları"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzjr00001v9elg886sumt",
+        "position": "Kibertəhlükəsizlik Müəllimi",
+        "bio": "Respublika Kibertəhlükəsizlik Olimpiadası — 4-cü yer. 5+ hakaton qalibi (Metro, Azcon və s.).",
+        "experienceYears": 0,
+        "specializations": [
+          "Linux",
+          "Şəbəkə",
+          "Kibertəhlükəsizlik",
+          "CTF"
+        ],
+        "photoUrl": "/teachers/nijat-hatamli.jpg",
+        "user": {
+          "name": "Nicat Hətəmli",
+          "avatarUrl": "/teachers/nijat-hatamli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzoj1000av9el6qyt0k5r",
+          "courseId": "kibertehlukesizlik",
+          "order": 1,
+          "title": "Networking",
+          "summary": "Şəbəkə protokolları və infrastrukturun əsasları."
+        },
+        {
+          "id": "cmtinzoj1000bv9elko83m8mu",
+          "courseId": "kibertehlukesizlik",
+          "order": 2,
+          "title": "Linux",
+          "summary": "Linux əməliyyat sistemi və komanda sətri."
+        },
+        {
+          "id": "cmtinzoj1000cv9elzefvmbi5",
+          "courseId": "kibertehlukesizlik",
+          "order": 3,
+          "title": "Cybersecurity Fundamentals",
+          "summary": "Təhlükəsizliyin əsas prinsipləri və hədəf modelləri."
+        },
+        {
+          "id": "cmtinzoj1000dv9elh12oaicb",
+          "courseId": "kibertehlukesizlik",
+          "order": 4,
+          "title": "Web Security",
+          "summary": "Veb tətbiqlərdə ən çox rast gəlinən zəifliklər."
+        },
+        {
+          "id": "cmtinzoj1000ev9elfbjzv4a0",
+          "courseId": "kibertehlukesizlik",
+          "order": 5,
+          "title": "Cryptography",
+          "summary": "Şifrələmə alqoritmləri və praktiki tətbiqləri."
+        },
+        {
+          "id": "cmtinzoj1000fv9eld575lyka",
+          "courseId": "kibertehlukesizlik",
+          "order": 6,
+          "title": "CTF",
+          "summary": "Capture The Flag formatında komanda yarışlarına hazırlıq."
+        },
+        {
+          "id": "cmtinzoj1000gv9elepycr21p",
+          "courseId": "kibertehlukesizlik",
+          "order": 7,
+          "title": "Ethical Hacking",
+          "summary": "Nüfuzetmə testi metodologiyası və alətləri."
+        }
+      ]
+    },
+    {
+      "id": "proqramlashdirma",
+      "slug": "proqramlashdirma",
+      "name": "Proqramlaşdırma",
+      "shortDesc": "Texnologiya dünyasına ilk addımını at!",
+      "longDesc": "JavaScript əsasında məntiqi düşüncə, alqoritmlər və interaktiv veb layihələr qurmağı öyrədən əsas proqramlaşdırma kursu.",
+      "category": "programming",
+      "coverImageUrl": null,
+      "minAge": 10,
+      "maxAge": 15,
+      "level": "BEGINNER",
+      "durationMonths": 15,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 180,
+      "tags": [
+        "javascript",
+        "html",
+        "css",
+        "alqoritm"
+      ],
+      "featured": true,
+      "teacherId": "cmtinzm740003v9elsi3k38te",
+      "createdAt": "2026-09-01T08:49:45.784Z",
+      "skills": [
+        "Alqoritmik düşüncə",
+        "JavaScript əsasları",
+        "HTML/CSS",
+        "Git/GitHub",
+        "Debug etmə"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzm740003v9elsi3k38te",
+        "position": "Full-Stack Proqramçı",
+        "bio": "Proqramlaşdırma fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "JavaScript",
+          "Python",
+          "React",
+          "Node.js"
+        ],
+        "photoUrl": "/teachers/rasul-sadigli.jpg",
+        "user": {
+          "name": "Rasul Sadiqli",
+          "avatarUrl": "/teachers/rasul-sadigli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzp6g000jv9eluhwykqiu",
+          "courseId": "proqramlashdirma",
+          "order": 1,
+          "title": "Əsas Anlayışlar",
+          "summary": "Dəyişənlər, şərtlər və dövrlər."
+        },
+        {
+          "id": "cmtinzp6g000kv9el0kj015mz",
+          "courseId": "proqramlashdirma",
+          "order": 2,
+          "title": "Funksiyalar",
+          "summary": "Kodun təkrar istifadə oluna bilən hissələri."
+        },
+        {
+          "id": "cmtinzp6g000lv9elertgabx8",
+          "courseId": "proqramlashdirma",
+          "order": 3,
+          "title": "HTML & CSS",
+          "summary": "Veb səhifələrin strukturu və dizaynı."
+        },
+        {
+          "id": "cmtinzp6g000mv9el4i1mxhcx",
+          "courseId": "proqramlashdirma",
+          "order": 4,
+          "title": "DOM & İnteraktivlik",
+          "summary": "İstifadəçi ilə dinamik qarşılıqlı əlaqə."
+        },
+        {
+          "id": "cmtinzp6g000nv9elyd63f1dh",
+          "courseId": "proqramlashdirma",
+          "order": 5,
+          "title": "Yekun Layihə",
+          "summary": "Baştan-başa interaktiv veb tətbiqi."
+        }
+      ]
+    },
+    {
+      "id": "python",
+      "slug": "python",
+      "name": "Python ilə Proqramlaşdırma",
+      "shortDesc": "Dünyanın ən populyar dilini əyləncəli layihələrlə öyrən!",
+      "longDesc": "Python dilinin əsaslarından tutmuş məlumat analizinə qədər geniş spektrdə praktiki layihələr üzərində iş.",
+      "category": "python",
+      "coverImageUrl": null,
+      "minAge": 9,
+      "maxAge": 14,
+      "level": "BEGINNER",
+      "durationMonths": 6,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 75,
+      "price": 160,
+      "tags": [
+        "python",
+        "data",
+        "avtomatlaşdırma"
+      ],
+      "featured": false,
+      "teacherId": "cmtinzm740003v9elsi3k38te",
+      "createdAt": "2026-09-01T08:49:46.622Z",
+      "skills": [
+        "Python sintaksisi",
+        "Data strukturları",
+        "Fayl əməliyyatları",
+        "Kiçik oyunlar yaratmaq"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzm740003v9elsi3k38te",
+        "position": "Full-Stack Proqramçı",
+        "bio": "Proqramlaşdırma fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "JavaScript",
+          "Python",
+          "React",
+          "Node.js"
+        ],
+        "photoUrl": "/teachers/rasul-sadigli.jpg",
+        "user": {
+          "name": "Rasul Sadiqli",
+          "avatarUrl": "/teachers/rasul-sadigli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzptp000qv9elzfmgzrqh",
+          "courseId": "python",
+          "order": 1,
+          "title": "Python Əsasları",
+          "summary": "Sintaksis, dəyişənlər və tiplər."
+        },
+        {
+          "id": "cmtinzptp000rv9el2kdvey6v",
+          "courseId": "python",
+          "order": 2,
+          "title": "İdarəetmə Strukturları",
+          "summary": "Şərtlər, dövrlər və funksiyalar."
+        },
+        {
+          "id": "cmtinzptp000sv9eljtxvajbw",
+          "courseId": "python",
+          "order": 3,
+          "title": "Data Strukturları",
+          "summary": "Siyahılar, lüğətlər və çoxluqlar."
+        },
+        {
+          "id": "cmtinzptp000tv9elhrhnr093",
+          "courseId": "python",
+          "order": 4,
+          "title": "Mini Layihələr",
+          "summary": "Kiçik konsol oyunları və alətlər."
+        }
+      ]
+    },
+    {
+      "id": "robotexnika",
+      "slug": "robotexnika",
+      "name": "Robotexnika",
+      "shortDesc": "Öz robotunu yarat, proqramla və idarə et!",
+      "longDesc": "Arduino və sensor sistemləri ilə tanışlıqdan başlayaraq, tələbələr öz avtonom robotlarını qururlar.",
+      "category": "robotics",
+      "coverImageUrl": null,
+      "minAge": 8,
+      "maxAge": 12,
+      "level": "BEGINNER",
+      "durationMonths": 6,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 170,
+      "tags": [
+        "arduino",
+        "sensor",
+        "steam"
+      ],
+      "featured": true,
+      "teacherId": "cmtinzmz60005v9elyfk0i73z",
+      "createdAt": "2026-09-01T08:49:47.461Z",
+      "skills": [
+        "Arduino proqramlaşdırma",
+        "Sensor inteqrasiyası",
+        "Elektrik dövrələri",
+        "Komanda işi"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzmz60005v9elyfk0i73z",
+        "position": "Robototexnika Mühəndisi",
+        "bio": "Robototexnika fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "Arduino",
+          "Robotexnika",
+          "Süni İntellekt"
+        ],
+        "photoUrl": "/teachers/nasib-ahmadov.jpg",
+        "user": {
+          "name": "Nasib Əhmədov",
+          "avatarUrl": "/teachers/nasib-ahmadov.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzqh1000wv9eledzjexy3",
+          "courseId": "robotexnika",
+          "order": 1,
+          "title": "Arduino Əsasları",
+          "summary": "Mikrokontroller və əsas komponentlər."
+        },
+        {
+          "id": "cmtinzqh1000xv9elftexkvbw",
+          "courseId": "robotexnika",
+          "order": 2,
+          "title": "Sensorlar",
+          "summary": "İşıq, məsafə və hərəkət sensorları."
+        },
+        {
+          "id": "cmtinzqh1000yv9el7rrm6mp6",
+          "courseId": "robotexnika",
+          "order": 3,
+          "title": "Motorlar",
+          "summary": "Hərəkət mexanizmləri və idarəetmə."
+        },
+        {
+          "id": "cmtinzqh1000zv9elv9uy6tbe",
+          "courseId": "robotexnika",
+          "order": 4,
+          "title": "Avtonom Robot",
+          "summary": "Bütün komponentləri birləşdirən yekun layihə."
+        }
+      ]
+    },
+    {
+      "id": "elektronika",
+      "slug": "elektronika",
+      "name": "Elektronika",
+      "shortDesc": "Elektrik dövrələrinin sirlərini kəşf et!",
+      "longDesc": "Əsas elektronika komponentləri, dövrə qurma və lehimləmə bacarıqları praktiki tapşırıqlarla öyrədilir.",
+      "category": "electronics",
+      "coverImageUrl": null,
+      "minAge": 10,
+      "maxAge": 16,
+      "level": "INTERMEDIATE",
+      "durationMonths": 5,
+      "lessonsPerWeek": 1,
+      "lessonMinutes": 90,
+      "price": 150,
+      "tags": [
+        "dövrə",
+        "lehimləmə",
+        "komponentlər"
+      ],
+      "featured": false,
+      "teacherId": "cmtinznr50007v9el5svp5255",
+      "createdAt": "2026-09-01T08:49:48.302Z",
+      "skills": [
+        "Dövrə sxemləri",
+        "Lehimləmə",
+        "Rezistor/kondensator hesablamaları",
+        "Breadboard prototipləmə"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinznr50007v9el5svp5255",
+        "position": "Elektronika və IoT Mütəxəssisi",
+        "bio": "Elektronika və IoT fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "Elektronika",
+          "IoT",
+          "Arduino",
+          "Sensor sistemləri"
+        ],
+        "photoUrl": "/teachers/nihat-durmusov.jpg",
+        "user": {
+          "name": "Nihat Durmuşov",
+          "avatarUrl": "/teachers/nihat-durmusov.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzr4e0012v9eli5rjygox",
+          "courseId": "elektronika",
+          "order": 1,
+          "title": "Əsas Komponentlər",
+          "summary": "Rezistor, kondensator, diod."
+        },
+        {
+          "id": "cmtinzr4e0013v9el6kd80j6u",
+          "courseId": "elektronika",
+          "order": 2,
+          "title": "Dövrə Qurma",
+          "summary": "Breadboard üzərində praktiki dövrələr."
+        },
+        {
+          "id": "cmtinzr4e0014v9elpskp9qpo",
+          "courseId": "elektronika",
+          "order": 3,
+          "title": "Lehimləmə",
+          "summary": "Təhlükəsiz lehimləmə texnikaları."
+        },
+        {
+          "id": "cmtinzr4e0015v9elhylx7z1t",
+          "courseId": "elektronika",
+          "order": 4,
+          "title": "Layihə",
+          "summary": "Funksional elektron qurğu hazırlamaq."
+        }
+      ]
+    },
+    {
+      "id": "web-development",
+      "slug": "web-development",
+      "name": "Web Development",
+      "shortDesc": "Müasir, cavabdehli veb saytlar qur!",
+      "longDesc": "HTML, CSS və JavaScript-dən React-a qədər müasir veb inkişaf stekini əhatə edən qabaqcıl kurs.",
+      "category": "web",
+      "coverImageUrl": null,
+      "minAge": 13,
+      "maxAge": 18,
+      "level": "INTERMEDIATE",
+      "durationMonths": 7,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 200,
+      "tags": [
+        "html",
+        "css",
+        "react",
+        "javascript"
+      ],
+      "featured": false,
+      "teacherId": "cmtinzm740003v9elsi3k38te",
+      "createdAt": "2026-09-01T08:49:49.140Z",
+      "skills": [
+        "Responsive dizayn",
+        "JavaScript ES6+",
+        "React əsasları",
+        "API inteqrasiyası"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzm740003v9elsi3k38te",
+        "position": "Full-Stack Proqramçı",
+        "bio": "Proqramlaşdırma fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "JavaScript",
+          "Python",
+          "React",
+          "Node.js"
+        ],
+        "photoUrl": "/teachers/rasul-sadigli.jpg",
+        "user": {
+          "name": "Rasul Sadiqli",
+          "avatarUrl": "/teachers/rasul-sadigli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzrro0018v9elleq8t4yq",
+          "courseId": "web-development",
+          "order": 1,
+          "title": "Semantik HTML",
+          "summary": "Strukturlaşdırılmış, əlçatan veb səhifələr."
+        },
+        {
+          "id": "cmtinzrro0019v9el8edi869x",
+          "courseId": "web-development",
+          "order": 2,
+          "title": "Müasir CSS",
+          "summary": "Flexbox, Grid və responsive dizayn."
+        },
+        {
+          "id": "cmtinzrro001av9elt2kps26v",
+          "courseId": "web-development",
+          "order": 3,
+          "title": "JavaScript ES6+",
+          "summary": "Müasir JavaScript sintaksisi və konsepsiyaları."
+        },
+        {
+          "id": "cmtinzrro001bv9elj29gdc9x",
+          "courseId": "web-development",
+          "order": 4,
+          "title": "React Əsasları",
+          "summary": "Komponent əsaslı interfeys qurma."
+        },
+        {
+          "id": "cmtinzrro001cv9elbapjxxft",
+          "courseId": "web-development",
+          "order": 5,
+          "title": "Yekun Layihə",
+          "summary": "Tam funksional veb tətbiqi."
+        }
+      ]
+    },
+    {
+      "id": "suni-intellekt",
+      "slug": "suni-intellekt",
+      "name": "Süni İntellekt Mühəndisliyi",
+      "shortDesc": "Gələcəyin texnologiyasını öyrən!",
+      "longDesc": "Maşın öyrənməsi əsaslarından kompüter görməsinə qədər müasir süni intellekt konsepsiyalarına giriş.",
+      "category": "ai",
+      "coverImageUrl": null,
+      "minAge": 14,
+      "maxAge": 18,
+      "level": "ADVANCED",
+      "durationMonths": 8,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 240,
+      "tags": [
+        "ai",
+        "machine learning",
+        "computer vision"
+      ],
+      "featured": true,
+      "teacherId": "cmtinzmz60005v9elyfk0i73z",
+      "createdAt": "2026-09-01T08:49:49.980Z",
+      "skills": [
+        "Python üçün ML kitabxanaları",
+        "Neyron şəbəkələr əsasları",
+        "Data hazırlama",
+        "Model qiymətləndirmə"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzmz60005v9elyfk0i73z",
+        "position": "Robototexnika Mühəndisi",
+        "bio": "Robototexnika fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "Arduino",
+          "Robotexnika",
+          "Süni İntellekt"
+        ],
+        "photoUrl": "/teachers/nasib-ahmadov.jpg",
+        "user": {
+          "name": "Nasib Əhmədov",
+          "avatarUrl": "/teachers/nasib-ahmadov.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzsf0001fv9elx3bupovk",
+          "courseId": "suni-intellekt",
+          "order": 1,
+          "title": "Python üçün Data Elmi",
+          "summary": "NumPy və Pandas ilə iş."
+        },
+        {
+          "id": "cmtinzsf0001gv9el5aqlsegj",
+          "courseId": "suni-intellekt",
+          "order": 2,
+          "title": "Maşın Öyrənməsi Əsasları",
+          "summary": "Nəzarətli və nəzarətsiz öyrənmə."
+        },
+        {
+          "id": "cmtinzsf0001hv9elk08jww34",
+          "courseId": "suni-intellekt",
+          "order": 3,
+          "title": "Neyron Şəbəkələr",
+          "summary": "Dərin öyrənmənin əsasları."
+        },
+        {
+          "id": "cmtinzsf0001iv9eljkjiwxf3",
+          "courseId": "suni-intellekt",
+          "order": 4,
+          "title": "Kompüter Görməsi",
+          "summary": "Şəkil tanıma tətbiqləri."
+        },
+        {
+          "id": "cmtinzsf0001jv9el3360trad",
+          "courseId": "suni-intellekt",
+          "order": 5,
+          "title": "Yekun Layihə",
+          "summary": "Real data ilə ML modeli qurmaq."
+        }
+      ]
+    },
+    {
+      "id": "oyun-yaratma",
+      "slug": "oyun-yaratma",
+      "name": "Oyun Yaratma",
+      "shortDesc": "Öz kompüter oyununu yarat!",
+      "longDesc": "Tələbələr oyun dizaynı prinsiplərini öyrənir və özlərinin 2D oyunlarını hazırlayırlar.",
+      "category": "game",
+      "coverImageUrl": null,
+      "minAge": 11,
+      "maxAge": 16,
+      "level": "INTERMEDIATE",
+      "durationMonths": 6,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 190,
+      "tags": [
+        "oyun dizaynı",
+        "javascript",
+        "yaradıcılıq"
+      ],
+      "featured": false,
+      "teacherId": "cmtinzm740003v9elsi3k38te",
+      "createdAt": "2026-09-01T08:49:50.825Z",
+      "skills": [
+        "Oyun dizaynı prinsipləri",
+        "Sprite və animasiya",
+        "Kollizyon aşkarlama",
+        "Səviyyə dizaynı"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzm740003v9elsi3k38te",
+        "position": "Full-Stack Proqramçı",
+        "bio": "Proqramlaşdırma fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "JavaScript",
+          "Python",
+          "React",
+          "Node.js"
+        ],
+        "photoUrl": "/teachers/rasul-sadigli.jpg",
+        "user": {
+          "name": "Rasul Sadiqli",
+          "avatarUrl": "/teachers/rasul-sadigli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzt2h001mv9elme12izdc",
+          "courseId": "oyun-yaratma",
+          "order": 1,
+          "title": "Oyun Dizaynı Əsasları",
+          "summary": "Mexanika, qaydalar və məqsədlər."
+        },
+        {
+          "id": "cmtinzt2h001nv9elbw6x73c5",
+          "courseId": "oyun-yaratma",
+          "order": 2,
+          "title": "Sprite və Animasiya",
+          "summary": "Xarakter və obyekt hərəkəti."
+        },
+        {
+          "id": "cmtinzt2h001ov9eljrjyhvso",
+          "courseId": "oyun-yaratma",
+          "order": 3,
+          "title": "Fizika və Kollizyon",
+          "summary": "Toqquşma aşkarlama sistemləri."
+        },
+        {
+          "id": "cmtinzt2h001pv9el91cpgn90",
+          "courseId": "oyun-yaratma",
+          "order": 4,
+          "title": "Yekun Oyun",
+          "summary": "Tam oynanıla bilən 2D oyun."
+        }
+      ]
+    },
+    {
+      "id": "linux",
+      "slug": "linux",
+      "name": "Linux",
+      "shortDesc": "Açıq mənbəli əməliyyat sistemini mənimsə!",
+      "longDesc": "Linux komanda sətri, fayl sistemi idarəçiliyi və server administrasiyası əsasları.",
+      "category": "linux",
+      "coverImageUrl": null,
+      "minAge": 13,
+      "maxAge": 18,
+      "level": "INTERMEDIATE",
+      "durationMonths": 4,
+      "lessonsPerWeek": 1,
+      "lessonMinutes": 90,
+      "price": 160,
+      "tags": [
+        "linux",
+        "terminal",
+        "server"
+      ],
+      "featured": false,
+      "teacherId": "cmtinzjr00001v9elg886sumt",
+      "createdAt": "2026-09-01T08:49:51.668Z",
+      "skills": [
+        "Bash skriptləşdirmə",
+        "Fayl sistemi idarəçiliyi",
+        "İstifadəçi icazələri",
+        "Server əsasları"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinzjr00001v9elg886sumt",
+        "position": "Kibertəhlükəsizlik Müəllimi",
+        "bio": "Respublika Kibertəhlükəsizlik Olimpiadası — 4-cü yer. 5+ hakaton qalibi (Metro, Azcon və s.).",
+        "experienceYears": 0,
+        "specializations": [
+          "Linux",
+          "Şəbəkə",
+          "Kibertəhlükəsizlik",
+          "CTF"
+        ],
+        "photoUrl": "/teachers/nijat-hatamli.jpg",
+        "user": {
+          "name": "Nicat Hətəmli",
+          "avatarUrl": "/teachers/nijat-hatamli.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinztpw001sv9eltb2jp8di",
+          "courseId": "linux",
+          "order": 1,
+          "title": "Terminal Əsasları",
+          "summary": "Əsas komandalar və naviqasiya."
+        },
+        {
+          "id": "cmtinztpw001tv9elimnr8wvn",
+          "courseId": "linux",
+          "order": 2,
+          "title": "Fayl Sistemi",
+          "summary": "İcazələr və qovluq strukturu."
+        },
+        {
+          "id": "cmtinztpw001uv9el6leq0ajm",
+          "courseId": "linux",
+          "order": 3,
+          "title": "Bash Skriptləri",
+          "summary": "Tapşırıqların avtomatlaşdırılması."
+        },
+        {
+          "id": "cmtinztpw001vv9el9lx00bx8",
+          "courseId": "linux",
+          "order": 4,
+          "title": "Server Əsasları",
+          "summary": "Xidmətlərin idarə edilməsi."
+        }
+      ]
+    },
+    {
+      "id": "iot",
+      "slug": "iot",
+      "name": "IoT Sistemləri",
+      "shortDesc": "Əşyaların internetini kəşf et!",
+      "longDesc": "Sensor məlumatlarının internetə ötürülməsi və ağıllı ev sistemlərinin qurulması üzrə praktiki kurs.",
+      "category": "iot",
+      "coverImageUrl": null,
+      "minAge": 13,
+      "maxAge": 18,
+      "level": "ADVANCED",
+      "durationMonths": 6,
+      "lessonsPerWeek": 2,
+      "lessonMinutes": 90,
+      "price": 210,
+      "tags": [
+        "iot",
+        "wifi",
+        "sensor"
+      ],
+      "featured": false,
+      "teacherId": "cmtinznr50007v9el5svp5255",
+      "createdAt": "2026-09-01T08:49:52.503Z",
+      "skills": [
+        "Sensor məlumatlarının toplanması",
+        "Bulud inteqrasiyası",
+        "Ağıllı ev protokolları",
+        "Real vaxt monitorinq"
+      ],
+      "active": true,
+      "teacher": {
+        "id": "cmtinznr50007v9el5svp5255",
+        "position": "Elektronika və IoT Mütəxəssisi",
+        "bio": "Elektronika və IoT fənni üzrə müəllim.",
+        "experienceYears": 0,
+        "specializations": [
+          "Elektronika",
+          "IoT",
+          "Arduino",
+          "Sensor sistemləri"
+        ],
+        "photoUrl": "/teachers/nihat-durmusov.jpg",
+        "user": {
+          "name": "Nihat Durmuşov",
+          "avatarUrl": "/teachers/nihat-durmusov.jpg"
+        }
+      },
+      "modules": [
+        {
+          "id": "cmtinzud3001yv9el9py9pfoy",
+          "courseId": "iot",
+          "order": 1,
+          "title": "IoT Əsasları",
+          "summary": "Cihazlar arası kommunikasiya."
+        },
+        {
+          "id": "cmtinzud3001zv9eltky4i5o7",
+          "courseId": "iot",
+          "order": 2,
+          "title": "Sensor Şəbəkələri",
+          "summary": "Məlumat toplama sistemləri."
+        },
+        {
+          "id": "cmtinzud30020v9el3dtds8yc",
+          "courseId": "iot",
+          "order": 3,
+          "title": "Bulud İnteqrasiyası",
+          "summary": "Real vaxt data ötürülməsi."
+        },
+        {
+          "id": "cmtinzud30021v9el2mmrc3cj",
+          "courseId": "iot",
+          "order": 4,
+          "title": "Ağıllı Ev Layihəsi",
+          "summary": "Tam funksional IoT sistemi."
+        }
+      ]
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "bayramova-ulviyye",
+      "name": "Bayramova Ülviyyə",
+      "role": "Həkim-Radioloq",
+      "courseTag": "Elektronika, Robotexnika",
+      "rating": 5,
+      "quote": "Oğlum Bayramov Çingiz Saleh Tech School-da elektronika və robotexnika kurslarına qatılır, həm dərslər həm müəllimlər oğlumda bu ixtisasa qarşı sevgisini marağını artırdı, telefon kamputer kimi vaxtını boşa xərcləmək əvəzinə övladımı bu kurslara yönəltməkdə bizə yol göstərən Vəfa xanıma Anar bəyə öz dərin təşəkkürümü bildirirəm, nə yaxşı ki belə pedoqoqlar və dövrün tələbinə uyğun kurslar var. Yolunuz açıq, uğurlarınız bol olsun İnşaAllah",
+      "avatarUrl": "/parents/bayramova-ulviyye.png",
+      "featured": true
+    },
+    {
+      "id": "gulnar-islamova",
+      "name": "Gülnar İslamova",
+      "role": "Hüseyn və Emin İslamovun valideyni",
+      "courseTag": "Robotexnika",
+      "rating": 5,
+      "quote": "Övladlarim robotexnika dərslərinə böyük həvəslə gedirlər. Həm PRAM, həm də Scratch dərslərini çox sevirlər. Dərslərin həm əyləncəli, həm də öyrədici olması bizim üçün çox xoşdur. Uşaqların özləri yaradaraq, düşünərək və praktiki şəkildə öyrənməsi çox faydalıdır. Müəlliməmizə uşaqlara olan gözəl münasibəti, səbr və sevgisi üçün çox təşəkkür edirəm.❤️",
+      "avatarUrl": "/parents/gulnar-islamova.png",
+      "featured": true
+    },
+    {
+      "id": "aysel-esgerova",
+      "name": "Aysel Əsgərova",
+      "role": "Camalın valideyni",
+      "courseTag": "Kibertəhlükəsizlik",
+      "rating": 5,
+      "quote": "Gözəl insanlar. Sizlərin yanınıza Müəllim kollektivinizdə sizin sevgidən qaynaqlanaraq uşaqların qəlblərinə düzgün yerdən toxunurlar. Sağlam mühitdə sağlam gələcək yetişir. Sizdə o toxumu əkənlərdənsiz var olun. Bu arada Vəfa xanım sizə bildirmək istəyirəmki Camalın Kiber təhlükəsizlik müəllimdən biliklərlə yanaşı motivasiyaedici sözləri və davranışları üçün Camalın oxumağa fikirləri dəyişib. Sizə və kollektivinizə dərin təşəkkürlər.",
+      "avatarUrl": "/parents/aysel-esgerova.png",
+      "featured": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "cmtio09gx005sv9elq78x4u7c",
+      "title": "Şəbəkə Skaneri",
+      "description": "Yerli şəbəkədəki aktiv qurğuları aşkar edən Python skripti.",
+      "imageUrl": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_4d78f13579_72fa6a1d65880b79.png",
+      "technologies": [
+        "Python",
+        "Nmap",
+        "Sockets"
+      ],
+      "courseTag": "cybersecurity",
+      "createdAt": "2026-09-01T08:50:12.081Z"
+    },
+    {
+      "id": "cmtio09gx005tv9elkq0d83hb",
+      "title": "Şifrə Meneceri",
+      "description": "Şifrələnmiş yerli şifrə saxlama tətbiqi.",
+      "imageUrl": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_4d78f13579_72fa6a1d65880b79.png",
+      "technologies": [
+        "Python",
+        "Cryptography"
+      ],
+      "courseTag": "cybersecurity",
+      "createdAt": "2026-09-01T08:50:12.081Z"
+    },
+    {
+      "id": "cmtio09gx005uv9elmjl7hsnp",
+      "title": "Arduino Robot",
+      "description": "Maneələrdən avtomatik yayınan sensor əsaslı robot.",
+      "imageUrl": "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_55f76a70f6_e6f3256ef5c6b526.png",
+      "technologies": [
+        "Arduino",
+        "C++",
+        "Ultrasonic Sensor"
+      ],
+      "courseTag": "robotics",
+      "createdAt": "2026-09-01T08:50:12.081Z"
+    }
+  ]
+}

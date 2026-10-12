@@ -111,6 +111,8 @@ export interface TemplateVals {
   taskBar: string;
   taskXp: string;
   onStartTask: Handler;
+  hasClasses: boolean;
+  myClasses: { name: string; meta: string; bar: string; progressLabel: string; statusLabel: string; statusStyle: string; payLabel: string; payStyle: string }[];
   hasCourse: boolean;
   courseName: string;
   courseModuleLabel: string;

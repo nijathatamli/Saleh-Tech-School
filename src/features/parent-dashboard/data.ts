@@ -22,8 +22,9 @@ export async function loadParentPortal(): Promise<PortalData | null> {
       user: true,
       children: {
         include: {
-          enrollments: { include: { course: true }, orderBy: { startedAt: "asc" } },
+          enrollments: { where: { OR: [{ classId: null }, { class: { status: "ACTIVE" } }] }, include: { course: true }, orderBy: { startedAt: "asc" } },
           progress: { orderBy: { percent: "desc" } },
+          payments: { where: { cycle: { not: null } }, orderBy: { createdAt: "desc" }, take: 12, include: { class: { select: { name: true } } } },
           grades: { orderBy: { createdAt: "asc" } },
           studentBadges: { include: { badge: true }, orderBy: { earnedAt: "desc" } },
           notes: { where: noteVisibilityFor("PARENT"), include: { teacher: { include: { user: true } } }, orderBy: { createdAt: "desc" } },
@@ -56,7 +57,7 @@ export async function loadParentPortal(): Promise<PortalData | null> {
       const classIds = child.enrollments.map((e) => e.classId).filter((id): id is string => !!id);
       const nextLesson = classIds.length
         ? await prisma.lesson.findFirst({
-            where: { classId: { in: classIds }, date: { gte: now } },
+            where: { classId: { in: classIds }, date: { gte: now }, status: { not: "CANCELLED" } },
             orderBy: { date: "asc" },
             include: { class: { include: { course: true, teacher: { include: { user: true } } } } },
           })
@@ -106,6 +107,17 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           name: b.badge.name,
           emoji: b.badge.emoji,
           earnedAt: b.earnedAt.toISOString(),
+        })),
+        payments: child.payments.map((p) => ({
+          id: p.id,
+          className: p.class?.name ?? "—",
+          cycle: p.cycle ?? 0,
+          lessonsFrom: p.lessonsFrom ?? 0,
+          lessonsTo: p.lessonsTo ?? 0,
+          amount: p.amount,
+          status: p.status,
+          dueDate: p.dueDate.toISOString(),
+          paidAt: iso(p.paidAt),
         })),
         notes: child.notes.map((n) => ({
           id: n.id,

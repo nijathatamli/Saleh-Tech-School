@@ -95,6 +95,23 @@
           </sc-for>
         </section>
 
+        <sc-if value="{{ hasPayments }}"><section style="padding:30px 34px;border-radius:28px;background:#fff;border:1px solid rgba(23,23,23,0.05);box-shadow:0 1px 2px rgba(23,23,23,0.03);margin-bottom:20px;animation:rise 0.5s ease both;animation-delay:130ms">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+            <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.025em;margin:0">Ödənişlər</h2>
+            <span style="font-size:12.5px;color:#6F6F6B">{{ paymentsHeadline }}</span>
+          </div>
+          <sc-for list="{{ payments }}" as="p">
+            <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:14px 0;border-top:1px solid rgba(23,23,23,0.055)">
+              <div style="flex:1;min-width:200px">
+                <div style="font-size:14.5px;font-weight:600;letter-spacing:-0.01em">{{ p.title }}</div>
+                <div style="font-size:12.5px;color:#6F6F6B;margin-top:4px">{{ p.meta }}</div>
+              </div>
+              <div style="font-size:14.5px;font-weight:600">{{ p.amount }}</div>
+              <span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span>
+            </div>
+          </sc-for>
+        </section></sc-if>
+
         <section style="padding:34px 36px;border-radius:28px;background:#fff;border:1px solid rgba(23,23,23,0.05);box-shadow:0 1px 2px rgba(23,23,23,0.03);margin-bottom:20px;animation:rise 0.5s ease both;animation-delay:160ms">
           <div style="margin-bottom:34px">
             <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:23px;font-weight:600;letter-spacing:-0.025em;margin:0">Öyrənmə inkişafı</h2>
@@ -374,7 +391,7 @@
             <div style="display:flex;flex-direction:column;gap:11px">
               <sc-if value="{{ noNotifications }}"><div style="padding:22px 26px;border-radius:22px;background:rgba(255,255,255,0.5);border:1px solid rgba(23,23,23,0.045);font-size:14px;color:#6F6F6B">Hələ bildiriş yoxdur.</div></sc-if>
               <sc-for list="{{ notifications }}" as="n">
-                <div style="{{ n.rowStyle }}" sc-camel-on-click="{{ n.onOpen }}">
+                <div role="button" sc-camel-tab-index="0" style="{{ n.rowStyle }}" sc-camel-on-click="{{ n.onOpen }}">
                   <span style="{{ n.iconStyle }}"><i class="{{ n.icon }}" style="font-size:13px"></i></span>
                   <div style="flex:1;min-width:0">
                     <div style="display:flex;align-items:center;gap:9px">
@@ -407,7 +424,7 @@
                 <sc-for list="{{ fields }}" as="f">
                   <div>
                     <label style="display:block;font-size:12px;font-weight:600;color:#6F6F6B;margin-bottom:9px">{{ f.label }}</label>
-                    <input type="text" sc-camel-default-value="{{ f.value }}" name="{{ f.name }}" sc-camel-read-only="{{ f.readOnly }}" style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
+                    <input type="text" aria-label="{{ f.label }}" sc-camel-default-value="{{ f.value }}" name="{{ f.name }}" sc-camel-read-only="{{ f.readOnly }}" style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
                   </div>
                 </sc-for>
               </div>
@@ -421,7 +438,7 @@
                     <div style="font-size:14.5px;font-weight:500">{{ t.label }}</div>
                     <div style="font-size:12.5px;color:#6F6F6B;margin-top:5px">{{ t.desc }}</div>
                   </div>
-                  <button sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
+                  <button role="switch" aria-label="{{ t.label }}" aria-checked="{{ t.on }}" sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
                 </div>
               </sc-for>
               <div style="display:flex;align-items:center;gap:20px;padding:22px 0 4px 0">
@@ -609,7 +626,7 @@
                       <div style="font-size:14px;font-weight:500">{{ t.label }}</div>
                       <div style="font-size:12px;color:#6F6F6B;margin-top:5px">{{ t.desc }}</div>
                     </div>
-                    <button sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
+                    <button role="switch" aria-label="{{ t.label }}" aria-checked="{{ t.on }}" sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
                   </div>
                 </sc-for>
                 <div style="display:flex;align-items:center;gap:16px;padding:20px 0 6px 0">

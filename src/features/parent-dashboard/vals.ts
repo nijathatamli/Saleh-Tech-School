@@ -9,6 +9,7 @@ export type DotRowVal = { label: string; value: string; dotStyle: string };
 export type StatVal = { label: string; value: string };
 export type SubjectVal = { name: string; pctLabel: string; barStyle: string };
 export type ChartDotVal = { x: string; y: string; r: number; sw: number };
+export type PaymentVal = { title: string; meta: string; amount: string; statusLabel: string; statusStyle: string };
 export type HomeworkVal = { title: string; meta: string; rowStyle: string; dotStyle: string; metaStyle: string };
 export type AchievementVal = { name: string; date: string; icon: string; iconText: string; medalStyle: string };
 export type ActivityVal = { when: string; what: string; dotStyle: string };
@@ -51,7 +52,7 @@ export type NotificationVal = {
   onOpen: Handler;
 };
 export type FieldVal = { label: string; value: string; name: string; readOnly: boolean };
-export type ToggleVal = { label: string; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
+export type ToggleVal = { label: string; on: boolean; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
 export type MobileNavVal = { label: string; icon: string; style: string; labelStyle: string; dotStyle: string; onGo: Handler };
 
 export interface TemplateVals {
@@ -122,6 +123,10 @@ export interface TemplateVals {
   noteTeacherRole: string;
   noteDate: string;
   homeworkActiveLabel: string;
+  hasPayments: boolean;
+  noPayments: boolean;
+  paymentsHeadline: string;
+  payments: PaymentVal[];
   hasHomework: boolean;
   noHomework: boolean;
   homework: HomeworkVal[];

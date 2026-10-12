@@ -504,6 +504,7 @@ CREATE TABLE "ScholarshipStudent" (
     "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "language" TEXT NOT NULL DEFAULT 'az',
+    "program" TEXT NOT NULL DEFAULT '',
     "finHash" TEXT NOT NULL,
     "finEncrypted" TEXT NOT NULL,
     "categoryKey" TEXT NOT NULL,
@@ -577,3 +578,140 @@ ALTER TABLE "ScholarshipCode" ADD CONSTRAINT "ScholarshipCode_studentId_fkey" FO
 -- AddForeignKey
 ALTER TABLE "ScholarshipAttempt" ADD CONSTRAINT "ScholarshipAttempt_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "ScholarshipStudent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- class management + payment cycles (same statements as prisma/patches/2026-10-05-class-management-payments.sql)
+-- Admin class management + lesson-based payment cycles. Idempotent.
+--  * ClassGroup gets a status (ACTIVE/ARCHIVED), archive time, lessons-per-cycle and timestamps
+--  * Enrollment (class membership) and Attendance (lesson participation) get unique keys
+--  * Attendance.completed marks the lessons that count towards a payment cycle
+--  * Payment gains student/class/cycle links; DUE + CANCELLED statuses
+--  * User.active / StudentProfile.active/grade/FIN for the admin student form
+DO $$ BEGIN
+  CREATE TYPE "ClassStatus" AS ENUM ('ACTIVE', 'ARCHIVED');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+ALTER TYPE "PaymentStatus" ADD VALUE IF NOT EXISTS 'DUE';
+ALTER TYPE "PaymentStatus" ADD VALUE IF NOT EXISTS 'CANCELLED';
+
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "active" BOOLEAN NOT NULL DEFAULT true;
+
+ALTER TABLE "StudentProfile" ADD COLUMN IF NOT EXISTS "active" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "StudentProfile" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "StudentProfile" ADD COLUMN IF NOT EXISTS "finEncrypted" TEXT;
+ALTER TABLE "StudentProfile" ADD COLUMN IF NOT EXISTS "finHash" TEXT;
+ALTER TABLE "StudentProfile" ADD COLUMN IF NOT EXISTS "grade" INTEGER;
+
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "archivedAt" TIMESTAMP(3);
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "lessonsPerCycle" INTEGER NOT NULL DEFAULT 8;
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "status" "ClassStatus" NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "Attendance" ADD COLUMN IF NOT EXISTS "completed" BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "classId" TEXT;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "cycle" INTEGER;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "lessonsFrom" INTEGER;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "lessonsTo" INTEGER;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "studentId" TEXT;
+
+-- one membership per (class, student) and one attendance row per (lesson, student): drop older duplicates first
+DELETE FROM "Enrollment" e USING "Enrollment" k
+  WHERE e."classId" IS NOT NULL AND e."classId" = k."classId" AND e."studentId" = k."studentId"
+    AND (e."startedAt", e."id") > (k."startedAt", k."id");
+DELETE FROM "Attendance" a USING "Attendance" k
+  WHERE a."lessonId" = k."lessonId" AND a."studentId" = k."studentId"
+    AND (a."updatedAt", a."id") < (k."updatedAt", k."id");
+
+CREATE UNIQUE INDEX IF NOT EXISTS "StudentProfile_finHash_key" ON "StudentProfile"("finHash");
+CREATE INDEX IF NOT EXISTS "Enrollment_studentId_idx" ON "Enrollment"("studentId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Enrollment_classId_studentId_key" ON "Enrollment"("classId", "studentId");
+CREATE INDEX IF NOT EXISTS "ClassGroup_teacherId_idx" ON "ClassGroup"("teacherId");
+CREATE INDEX IF NOT EXISTS "ClassGroup_status_idx" ON "ClassGroup"("status");
+CREATE INDEX IF NOT EXISTS "Attendance_studentId_idx" ON "Attendance"("studentId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Attendance_lessonId_studentId_key" ON "Attendance"("lessonId", "studentId");
+CREATE INDEX IF NOT EXISTS "Payment_status_idx" ON "Payment"("status");
+CREATE INDEX IF NOT EXISTS "Payment_studentId_idx" ON "Payment"("studentId");
+CREATE INDEX IF NOT EXISTS "Payment_classId_idx" ON "Payment"("classId");
+CREATE INDEX IF NOT EXISTS "Payment_parentId_idx" ON "Payment"("parentId");
+CREATE UNIQUE INDEX IF NOT EXISTS "Payment_studentId_classId_cycle_key" ON "Payment"("studentId", "classId", "cycle");
+CREATE INDEX IF NOT EXISTS "Notification_userId_read_idx" ON "Notification"("userId", "read");
+CREATE INDEX IF NOT EXISTS "AuditLog_createdAt_idx" ON "AuditLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "AuditLog_entityType_entityId_idx" ON "AuditLog"("entityType", "entityId");
+
+DO $$ BEGIN
+  ALTER TABLE "Payment" ADD CONSTRAINT "Payment_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "StudentProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TABLE "Payment" ADD CONSTRAINT "Payment_classId_fkey" FOREIGN KEY ("classId") REFERENCES "ClassGroup"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- admin operations (same statements as prisma/patches/2026-10-06-admin-operations.sql)
+-- Admin operations: settings, lesson status/room/duration, class capacity, course active flag,
+-- admissions (rejected + link to the created student), notification event kinds, extra indexes
+-- on hot foreign keys, and RESTRICT instead of CASCADE where a delete would erase financial
+-- or student history. Idempotent.
+DO $$ BEGIN
+  CREATE TYPE "LessonStatus" AS ENUM ('SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+ALTER TYPE "LeadStage" ADD VALUE IF NOT EXISTS 'REJECTED';
+
+ALTER TABLE "Course" ADD COLUMN IF NOT EXISTS "active" BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "capacity" INTEGER;
+ALTER TABLE "Lesson" ADD COLUMN IF NOT EXISTS "durationMinutes" INTEGER;
+ALTER TABLE "Lesson" ADD COLUMN IF NOT EXISTS "room" TEXT;
+ALTER TABLE "Lesson" ADD COLUMN IF NOT EXISTS "status" "LessonStatus" NOT NULL DEFAULT 'SCHEDULED';
+ALTER TABLE "TrialBooking" ADD COLUMN IF NOT EXISTS "adminNote" TEXT;
+ALTER TABLE "TrialBooking" ADD COLUMN IF NOT EXISTS "convertedStudentId" TEXT;
+ALTER TABLE "TrialBooking" ADD COLUMN IF NOT EXISTS "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE "Notification" ADD COLUMN IF NOT EXISTS "event" TEXT;
+
+CREATE TABLE IF NOT EXISTS "Setting" (
+    "key" TEXT NOT NULL,
+    "value" JSONB NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Setting_pkey" PRIMARY KEY ("key")
+);
+
+CREATE INDEX IF NOT EXISTS "StudentProfile_parentId_idx" ON "StudentProfile"("parentId");
+CREATE INDEX IF NOT EXISTS "Course_active_idx" ON "Course"("active");
+CREATE INDEX IF NOT EXISTS "ClassGroup_courseId_idx" ON "ClassGroup"("courseId");
+CREATE INDEX IF NOT EXISTS "Lesson_classId_date_idx" ON "Lesson"("classId", "date");
+CREATE INDEX IF NOT EXISTS "Lesson_date_idx" ON "Lesson"("date");
+CREATE INDEX IF NOT EXISTS "Homework_lessonId_idx" ON "Homework"("lessonId");
+CREATE INDEX IF NOT EXISTS "Submission_homeworkId_idx" ON "Submission"("homeworkId");
+CREATE INDEX IF NOT EXISTS "Submission_studentId_idx" ON "Submission"("studentId");
+CREATE INDEX IF NOT EXISTS "Grade_studentId_idx" ON "Grade"("studentId");
+CREATE INDEX IF NOT EXISTS "TrialBooking_stage_idx" ON "TrialBooking"("stage");
+CREATE INDEX IF NOT EXISTS "TrialBooking_createdAt_idx" ON "TrialBooking"("createdAt");
+CREATE INDEX IF NOT EXISTS "Notification_event_idx" ON "Notification"("event");
+
+DO $$ BEGIN
+  ALTER TABLE "TrialBooking" ADD CONSTRAINT "TrialBooking_convertedStudentId_fkey" FOREIGN KEY ("convertedStudentId") REFERENCES "StudentProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- history must survive a mistaken delete: refuse instead of cascading (only rewritten when still CASCADE)
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'StudentProfile_parentId_fkey' AND confdeltype <> 'r') THEN
+    ALTER TABLE "StudentProfile" DROP CONSTRAINT "StudentProfile_parentId_fkey";
+    ALTER TABLE "StudentProfile" ADD CONSTRAINT "StudentProfile_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "ParentProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Payment_parentId_fkey' AND confdeltype <> 'r') THEN
+    ALTER TABLE "Payment" DROP CONSTRAINT "Payment_parentId_fkey";
+    ALTER TABLE "Payment" ADD CONSTRAINT "Payment_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "ParentProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ClassGroup_courseId_fkey' AND confdeltype <> 'r') THEN
+    ALTER TABLE "ClassGroup" DROP CONSTRAINT "ClassGroup_courseId_fkey";
+    ALTER TABLE "ClassGroup" ADD CONSTRAINT "ClassGroup_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Enrollment_courseId_fkey' AND confdeltype <> 'r') THEN
+    ALTER TABLE "Enrollment" DROP CONSTRAINT "Enrollment_courseId_fkey";
+    ALTER TABLE "Enrollment" ADD CONSTRAINT "Enrollment_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+END $$;
+
+-- schema drift: columns declared in schema.prisma that init.sql never created (see prisma/patches/2026-10-13-schema-drift-columns.sql)
+ALTER TABLE "ClassGroup" ADD COLUMN IF NOT EXISTS "monthlyExpectedClasses" INTEGER NOT NULL DEFAULT 8;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "receiptUrl" TEXT;
+ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "receiptSubmittedAt" TIMESTAMP(3);

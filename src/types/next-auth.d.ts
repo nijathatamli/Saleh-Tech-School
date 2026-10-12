@@ -17,5 +17,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN";
+    /** set when the account was deactivated/deleted after the cookie was issued */
+    revoked?: boolean;
   }
 }

@@ -46,7 +46,7 @@
             <p style="font-size:16.5px;color:#6F6F6B;margin:12px 0 0 0;letter-spacing:-0.005em">{{ pageSub }}</p>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-            <button style="width:40px;height:40px;border-radius:14px;border:1px solid rgba(23,23,23,0.055);background:rgba(255,255,255,0.6);backdrop-filter:blur(18px) saturate(170%);-webkit-backdrop-filter:blur(18px) saturate(170%);color:#4A4A46;cursor:pointer;position:relative;transition:background 0.18s ease" style-hover="background:#fff">
+            <button aria-label="Bildirişlər" style="width:40px;height:40px;border-radius:14px;border:1px solid rgba(23,23,23,0.055);background:rgba(255,255,255,0.6);backdrop-filter:blur(18px) saturate(170%);-webkit-backdrop-filter:blur(18px) saturate(170%);color:#4A4A46;cursor:pointer;position:relative;transition:background 0.18s ease" style-hover="background:#fff">
               <i class="fa-regular fa-bell" style="font-size:14px"></i>
               <span style="{{ unreadDotStyle }}"></span>
             </button>
@@ -77,11 +77,11 @@
                 <span style="font-size:12.5px;font-weight:600;color:#6F6F6B">{{ detailRoster.length }} nəfər</span>
               </div>
               <sc-for list="{{ detailRoster }}" as="s">
-                <div sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
+                <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
                   <span style="{{ s.avatarDetail }}">{{ s.initials }}</span>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14.5px;font-weight:500;letter-spacing:-0.008em">{{ s.name }}</div>
-                    <div style="font-size:12px;color:#6F6F6B;margin-top:4px">{{ s.hw }} tapşırıq</div>
+                    <div style="font-size:12px;color:#6F6F6B;margin-top:4px">{{ s.hw }} tapşırıq · {{ s.lessonsLabel }}</div>
                   </div>
                   <span style="{{ s.attStyle }}">{{ s.att }}</span>
                   <span style="width:80px;text-align:right;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0">{{ s.grade }}</span>
@@ -245,11 +245,11 @@
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px">
                 <div>
                   <label style="display:block;font-size:12px;font-weight:600;color:#6F6F6B;margin-bottom:9px">Son tarix</label>
-                  <input type="date" name="hwDueDate" sc-camel-default-value="{{ hwDefaultDue }}" style="width:100%;padding:15px 17px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
+                  <input type="date" aria-label="Son tarix" name="hwDueDate" sc-camel-default-value="{{ hwDefaultDue }}" style="width:100%;padding:15px 17px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
                 </div>
                 <div>
                   <label style="display:block;font-size:12px;font-weight:600;color:#6F6F6B;margin-bottom:9px">Maksimal bal</label>
-                  <input type="text" name="hwMaxScore" sc-camel-default-value="100" style="width:100%;padding:15px 17px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
+                  <input type="text" aria-label="Maksimal bal" name="hwMaxScore" sc-camel-default-value="100" style="width:100%;padding:15px 17px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
                 </div>
               </div>
             </div>
@@ -295,7 +295,7 @@
                 <div style="font-size:13.5px;color:#6F6F6B;margin-top:12px">{{ queueMeta }}</div>
                 <div style="display:flex;flex-direction:column;gap:1px;border-radius:16px;overflow:hidden;background:rgba(23,23,23,0.055);margin-top:26px">
                   <sc-for list="{{ gradingQueue }}" as="g">
-                    <div sc-camel-on-click="{{ g.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8">
+                    <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ g.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#fff;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8">
                       <span style="flex:1;font-size:13.5px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ g.title }}</span>
                       <span style="{{ g.chipStyle }}">{{ g.count }}</span>
                       <i class="fa-solid fa-chevron-right" style="font-size:10px;color:#6F6F6B;flex-shrink:0"></i>
@@ -323,7 +323,7 @@
                 <span style="font-size:12.5px;font-weight:600;color:#6F6F6B">{{ scheduleCountLabel }}</span>
               </div>
               <sc-for list="{{ schedule }}" as="s">
-                <div sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
+                <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
                   <span style="{{ s.timeStyle }}">{{ s.time }}</span>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14.5px;font-weight:500;letter-spacing:-0.008em">{{ s.title }}</div>
@@ -359,7 +359,7 @@
               <div style="font-size:11px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B;margin-bottom:18px;padding-left:2px">Diqqət tələb edir</div>
               <div style="display:flex;flex-direction:column;gap:11px">
                 <sc-for list="{{ atRisk }}" as="r">
-                  <div sc-camel-on-click="{{ r.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:#fff;border:1px solid rgba(23,23,23,0.05);cursor:pointer;transition:transform 0.18s ease,box-shadow 0.18s ease" style-hover="transform:translateY(-1px);box-shadow:0 12px 28px -20px rgba(23,23,23,0.3)">
+                  <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ r.onOpen }}" style="display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:22px;background:#fff;border:1px solid rgba(23,23,23,0.05);cursor:pointer;transition:transform 0.18s ease,box-shadow 0.18s ease" style-hover="transform:translateY(-1px);box-shadow:0 12px 28px -20px rgba(23,23,23,0.3)">
                     <span style="{{ r.avatar }}">{{ r.initials }}</span>
                     <div style="flex:1;min-width:0">
                       <div style="font-size:14px;font-weight:600">{{ r.name }}</div>
@@ -378,9 +378,9 @@
             <div style="padding:30px 32px;border-radius:26px;background:#fff;border:1px solid rgba(23,23,23,0.05);box-shadow:0 1px 2px rgba(23,23,23,0.03)">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap">
                 <div style="display:flex;align-items:center;gap:14px">
-                  <button sc-camel-on-click="{{ prevMonth }}" style="width:34px;height:34px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8"><i class="fa-solid fa-chevron-left" style="font-size:11px"></i></button>
+                  <button aria-label="Əvvəlki ay" sc-camel-on-click="{{ prevMonth }}" style="width:34px;height:34px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8"><i class="fa-solid fa-chevron-left" style="font-size:11px"></i></button>
                   <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.02em;margin:0;min-width:140px;text-align:center">{{ monthLabel }}</h2>
-                  <button sc-camel-on-click="{{ nextMonth }}" style="width:34px;height:34px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8"><i class="fa-solid fa-chevron-right" style="font-size:11px"></i></button>
+                  <button aria-label="Növbəti ay" sc-camel-on-click="{{ nextMonth }}" style="width:34px;height:34px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;transition:background 0.18s ease" style-hover="background:#FAFAF8"><i class="fa-solid fa-chevron-right" style="font-size:11px"></i></button>
                 </div>
                 <div style="display:flex;gap:16px;flex-wrap:wrap">
                   <span style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:#6F6F6B"><span style="width:7px;height:7px;border-radius:2px;background:#FF6B00"></span>Dərs var</span>
@@ -454,7 +454,7 @@
                       <button sc-camel-on-click="{{ l.onRemove }}" title="Dərsi sil" style="width:40px;height:40px;border-radius:13px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;flex-shrink:0;transition:background 0.18s ease,color 0.18s ease" style-hover="background:#FAFAF8;color:#E66000"><i class="fa-regular fa-trash-can" style="font-size:12px"></i></button>
                     </div>
                     <sc-for list="{{ l.roster }}" as="s">
-                      <div sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
+                      <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
                         <span style="{{ s.avatarDay }}">{{ s.initials }}</span>
                         <div style="flex:1;min-width:0">
                           <div style="font-size:14px;font-weight:500;letter-spacing:-0.008em">{{ s.name }}</div>
@@ -518,7 +518,7 @@
             </div>
             <div style="border-radius:26px;background:#fff;border:1px solid rgba(23,23,23,0.05);box-shadow:0 1px 2px rgba(23,23,23,0.03);overflow:hidden">
               <sc-for list="{{ hwList }}" as="h">
-                <div sc-camel-on-click="{{ h.onOpen }}" style="{{ h.rowStyle }}" style-hover="background:#FAFAF8">
+                <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ h.onOpen }}" style="{{ h.rowStyle }}" style-hover="background:#FAFAF8">
                   <span style="{{ h.iconStyle }}"><i class="{{ h.icon }}" style="font-size:13px"></i></span>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:15px;font-weight:500;letter-spacing:-0.008em">{{ h.title }}</div>
@@ -555,7 +555,7 @@
                 <span style="width:96px;text-align:right">Tapşırıq</span>
               </div>
               <sc-for list="{{ students }}" as="s">
-                <div sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
+                <div role="button" sc-camel-tab-index="0" sc-camel-on-click="{{ s.onOpen }}" style="{{ s.rowStyle }}" style-hover="background:#FAFAF8">
                   <span style="{{ s.avatarList }}">{{ s.initials }}</span>
                   <div style="flex:1;min-width:0">
                     <div style="font-size:14.5px;font-weight:500;letter-spacing:-0.008em">{{ s.name }}</div>
@@ -594,7 +594,7 @@
                 <sc-for list="{{ fields }}" as="f">
                   <div>
                     <label style="display:block;font-size:12px;font-weight:600;color:#6F6F6B;margin-bottom:9px">{{ f.label }}</label>
-                    <input type="text" name="{{ f.name }}" sc-camel-default-value="{{ f.value }}" sc-camel-read-only="{{ f.readOnly }}" style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
+                    <input type="text" aria-label="{{ f.label }}" name="{{ f.name }}" sc-camel-default-value="{{ f.value }}" sc-camel-read-only="{{ f.readOnly }}" style="width:100%;padding:14px 16px;border-radius:14px;border:1px solid rgba(23,23,23,0.1);background:#FCFCFA;font-size:14px;color:#171717;outline:none;transition:border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" style-focus="border-color:#FF6B00;box-shadow:0 0 0 4px rgba(255,107,0,0.1);background:#fff">
                   </div>
                 </sc-for>
               </div>
@@ -607,7 +607,7 @@
                     <div style="font-size:14.5px;font-weight:500">{{ t.label }}</div>
                     <div style="font-size:12.5px;color:#6F6F6B;margin-top:5px">{{ t.desc }}</div>
                   </div>
-                  <button sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
+                  <button role="switch" aria-label="{{ t.label }}" aria-checked="{{ t.on }}" sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
                 </div>
               </sc-for>
             </div>
@@ -703,9 +703,9 @@
           <sc-if value="{{ mAtClasses }}">
             <div style="animation:rise-sm 0.34s ease both;padding:22px 20px;border-radius:26px;background:#fff;border:1px solid rgba(23,23,23,0.05);margin-bottom:14px">
               <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px">
-                <button sc-camel-on-click="{{ prevMonth }}" style="width:32px;height:32px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-chevron-left" style="font-size:10px"></i></button>
+                <button aria-label="Əvvəlki ay" sc-camel-on-click="{{ prevMonth }}" style="width:32px;height:32px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-chevron-left" style="font-size:10px"></i></button>
                 <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:-0.02em">{{ monthLabel }}</span>
-                <button sc-camel-on-click="{{ nextMonth }}" style="width:32px;height:32px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-chevron-right" style="font-size:10px"></i></button>
+                <button aria-label="Növbəti ay" sc-camel-on-click="{{ nextMonth }}" style="width:32px;height:32px;border-radius:11px;border:1px solid rgba(23,23,23,0.09);background:#fff;color:#6F6F6B;cursor:pointer;flex-shrink:0"><i class="fa-solid fa-chevron-right" style="font-size:10px"></i></button>
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:10px">
                 <sc-for list="{{ weekDays }}" as="w">
@@ -863,7 +863,7 @@
                       <div style="font-size:14px;font-weight:500">{{ t.label }}</div>
                       <div style="font-size:12px;color:#6F6F6B;margin-top:5px">{{ t.desc }}</div>
                     </div>
-                    <button sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
+                    <button role="switch" aria-label="{{ t.label }}" aria-checked="{{ t.on }}" sc-camel-on-click="{{ t.onToggle }}" style="{{ t.trackStyle }}"><span style="{{ t.knobStyle }}"></span></button>
                   </div>
                 </sc-for>
               </div>

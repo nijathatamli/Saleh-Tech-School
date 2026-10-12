@@ -15,7 +15,16 @@
     "db:studio": "prisma studio",
     "db:server": "node scripts/pg-dev-server.mjs",
     "scholarship:parse": "node scripts/scholarship/parse-questions.mjs",
-    "scholarship:sync": "node scripts/scholarship-sync.mjs"
+    "scholarship:sync": "node scripts/scholarship-sync.mjs",
+    "qa:up": "bash qa/infra/up.sh",
+    "qa:down": "bash qa/infra/down.sh",
+    "qa:test": "bash qa/run.sh",
+    "qa:ui": "node --test --test-concurrency=1 qa/ui/flows.test.mjs",
+    "qa:ui:smoke": "node qa/ui/smoke.mjs",
+    "qa:ui:clicks": "node qa/ui/clicks.mjs --out .qa/clicks.json",
+    "qa:perf": "node qa/perf/load.mjs && node qa/perf/vitals.mjs",
+    "audit:passwords": "node scripts/audit-default-passwords.mjs",
+    "snapshot:public": "node scripts/snapshot-public-content.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -60,6 +69,7 @@
     "dotenv": "^17.4.2",
     "jszip": "^3.10.2",
     "parse5": "^7.3.0",
+    "playwright": "1.63.0",
     "postcss": "^8.4.47",
     "prisma": "^5.20.0",
     "tailwindcss": "^3.4.13",

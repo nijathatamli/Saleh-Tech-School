@@ -1,42 +1,50 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { getAllTeachersAdmin } from "@/lib/data";
-import { AppTopbar } from "@/components/app/topbar";
-import { Avatar } from "@/components/ui/avatar";
+import Link from "next/link";
+import { listTeachers } from "@/lib/admin/teachers";
+import { AdminTopbar } from "@/components/admin/admin-topbar";
+import { CreateTeacherDialog } from "@/components/admin/teacher-dialogs";
+import { Pagination, card, th } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
+import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
+const SIZE = 20;
 
-export default async function AdminTeachersPage() {
-  const session = await getServerSession(authOptions);
-  const teachers = await getAllTeachersAdmin();
-
+export default async function AdminTeachersPage({ searchParams }: { searchParams: { q?: string; active?: string; page?: string } }) {
+  await adminGuard();
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const active = searchParams.active === "true" ? true : searchParams.active === "false" ? false : undefined;
+  const data = await listTeachers({ q: searchParams.q?.trim() || undefined, active, page, size: SIZE });
   return (
     <div>
-      <AppTopbar title="Müəllimlər" userName={session?.user?.name ?? "Admin"} userEmail={session?.user?.email ?? ""} />
-
-      <div className="p-6 md:p-10">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {teachers.map((t) => (
-            <div key={t.id} className="rounded-2xl border border-navy-100 bg-white p-6 shadow-sm shadow-navy-900/[0.03]">
-              <div className="flex items-center gap-3">
-                <Avatar name={t.user.name} src={t.photoUrl} size={44} />
-                <div>
-                  <p className="font-bold text-navy-900">{t.user.name}</p>
-                  <p className="text-xs text-navy-400">{t.position}</p>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {t.specializations.slice(0, 3).map((s) => (
-                  <Badge key={s} variant="app-electric">{s}</Badge>
+      <AdminTopbar title="Müəllimlər" subtitle="Hesablar, siniflər və yük" />
+      <div className="space-y-6 p-6 md:p-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
+            <input name="q" defaultValue={searchParams.q} placeholder="Ad, e-poçt və ya vəzifə..." className="w-64 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />
+            <select name="active" defaultValue={searchParams.active ?? ""} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Status"><option value="">Hamısı</option><option value="true">Aktiv</option><option value="false">Deaktiv</option></select>
+            <Button type="submit" variant="app-outline" size="sm">Axtar</Button>
+          </form>
+          <CreateTeacherDialog />
+        </div>
+        <div className={card}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-navy-100"><th className={th}>Müəllim</th><th className={th}>Siniflər</th><th className={th}>Tələbələr</th><th className={th}>Növbəti 7 gün</th><th className={th}>Bu ay dərs</th><th className={th}>Status</th></tr></thead>
+              <tbody>
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Müəllim tapılmadı.</td></tr>}
+                {data.items.map((t) => (
+                  <tr key={t.id} className="border-b border-navy-50 last:border-0 hover:bg-navy-50/50">
+                    <td className="px-4 py-3"><Link href={`/admin/teachers/${t.id}`} className="font-bold text-navy-900 hover:text-electric-600">{t.name}</Link><p className="text-xs text-navy-400">{t.position} · {t.email}</p></td>
+                    <td className="px-4 py-3 font-bold">{t.classes}</td><td className="px-4 py-3">{t.students}</td>
+                    <td className="px-4 py-3 text-navy-600">{t.lessonsWeek} dərs · {t.hoursWeek} saat</td><td className="px-4 py-3 text-navy-600">{t.lessonsMonth}</td>
+                    <td className="px-4 py-3"><Badge variant={t.active ? "success" : "default"}>{t.active ? "Aktiv" : "Deaktiv"}</Badge></td>
+                  </tr>
                 ))}
-              </div>
-              <div className="mt-4 flex justify-between text-xs text-navy-400">
-                <span>{t.courses.length} kurs</span>
-                <span>{t.classes.length} sinif</span>
-              </div>
-            </div>
-          ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination base="/admin/teachers" params={{ q: searchParams.q, active: searchParams.active }} page={page} total={data.total} size={SIZE} />
         </div>
       </div>
     </div>

@@ -72,6 +72,19 @@ export type LeaderboardRow = {
   avatarUrl: string | null;
 };
 
+export type StudentClass = {
+  id: string;
+  name: string;
+  courseName: string;
+  teacherName: string;
+  status: "ACTIVE" | "ARCHIVED";
+  /** completed lessons inside the current payment cycle (0..cycleSize) */
+  progress: number;
+  cycleSize: number;
+  completedLessons: number;
+  paymentDue: boolean;
+};
+
 export type StudentNoteView = { id: string; body: string; teacherName: string; createdAt: string };
 
 export type StudentDashboardData = {
@@ -88,6 +101,8 @@ export type StudentDashboardData = {
     streakDays: number;
   };
   courses: StudentCourse[];
+  /** classes the admin assigned the student to (active ones), with lesson progress */
+  classes: StudentClass[];
   subjects: { name: string; pct: number }[];
   grades: { subject: string; pct: number; createdAt: string }[];
   attendance: StudentAttendance[];

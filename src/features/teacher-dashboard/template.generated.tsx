@@ -76,7 +76,7 @@ export function renderTemplate(v: TemplateVals) {
                 </p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: "0" }}>
-                <button style={{ width: "40px", height: "40px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.055)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(18px) saturate(170%)", WebkitBackdropFilter: "blur(18px) saturate(170%)", color: "#4A4A46", cursor: "pointer", position: "relative", transition: "background 0.18s ease" }} className="td-h3">
+                <button aria-label="Bildirişlər" style={{ width: "40px", height: "40px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.055)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(18px) saturate(170%)", WebkitBackdropFilter: "blur(18px) saturate(170%)", color: "#4A4A46", cursor: "pointer", position: "relative", transition: "background 0.18s ease" }} className="td-h3">
                   <i style={{ fontSize: "14px" }} className="fa-regular fa-bell"></i>
                   {" "}
                   <span style={sx(v.unreadDotStyle)}></span>
@@ -123,11 +123,11 @@ export function renderTemplate(v: TemplateVals) {
                     </div>
                     {v.detailRoster.map((s, i2) => (
                       <Fragment key={i2}>
-                        <div onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
+                        <div role="button" tabIndex={0} onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
                           <span style={sx(s.avatarDetail)}>{s.initials}</span>
                           <div style={{ flex: "1", minWidth: "0" }}>
                             <div style={{ fontSize: "14.5px", fontWeight: "500", letterSpacing: "-0.008em" }}>{s.name}</div>
-                            <div style={{ fontSize: "12px", color: "#6F6F6B", marginTop: "4px" }}>{s.hw}{" tapşırıq"}</div>
+                            <div style={{ fontSize: "12px", color: "#6F6F6B", marginTop: "4px" }}>{s.hw}{" tapşırıq · "}{s.lessonsLabel}</div>
                           </div>
                           <span style={sx(s.attStyle)}>{s.att}</span>
                           {" "}
@@ -362,12 +362,12 @@ export function renderTemplate(v: TemplateVals) {
                       <div>
                         <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#6F6F6B", marginBottom: "9px" }}>Son tarix</label>
                         {" "}
-                        <input type="date" name="hwDueDate" defaultValue={v.hwDefaultDue} style={{ width: "100%", padding: "15px 17px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
+                        <input type="date" aria-label="Son tarix" name="hwDueDate" defaultValue={v.hwDefaultDue} style={{ width: "100%", padding: "15px 17px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
                       </div>
                       <div>
                         <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#6F6F6B", marginBottom: "9px" }}>Maksimal bal</label>
                         {" "}
-                        <input type="text" name="hwMaxScore" defaultValue="100" style={{ width: "100%", padding: "15px 17px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
+                        <input type="text" aria-label="Maksimal bal" name="hwMaxScore" defaultValue="100" style={{ width: "100%", padding: "15px 17px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
                       </div>
                     </div>
                   </div>
@@ -441,7 +441,7 @@ export function renderTemplate(v: TemplateVals) {
                       <div style={{ display: "flex", flexDirection: "column", gap: "1px", borderRadius: "16px", overflow: "hidden", background: "rgba(23,23,23,0.055)", marginTop: "26px" }}>
                         {v.gradingQueue.map((g, i13) => (
                           <Fragment key={i13}>
-                            <div onClick={g.onOpen} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "#fff", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
+                            <div role="button" tabIndex={0} onClick={g.onOpen} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "#fff", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
                               <span style={{ flex: "1", fontSize: "13.5px", fontWeight: "500", minWidth: "0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.title}</span>
                               <span style={sx(g.chipStyle)}>{g.count}</span>
                               <i style={{ fontSize: "10px", color: "#6F6F6B", flexShrink: "0" }} className="fa-solid fa-chevron-right"></i>
@@ -478,7 +478,7 @@ export function renderTemplate(v: TemplateVals) {
                     </div>
                     {v.schedule.map((s, i15) => (
                       <Fragment key={i15}>
-                        <div onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
+                        <div role="button" tabIndex={0} onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
                           <span style={sx(s.timeStyle)}>{s.time}</span>
                           <div style={{ flex: "1", minWidth: "0" }}>
                             <div style={{ fontSize: "14.5px", fontWeight: "500", letterSpacing: "-0.008em" }}>{s.title}</div>
@@ -529,7 +529,7 @@ export function renderTemplate(v: TemplateVals) {
                     <div style={{ display: "flex", flexDirection: "column", gap: "11px" }}>
                       {v.atRisk.map((r, i17) => (
                         <Fragment key={i17}>
-                          <div onClick={r.onOpen} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 20px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", cursor: "pointer", transition: "transform 0.18s ease,box-shadow 0.18s ease" }} className="td-h11">
+                          <div role="button" tabIndex={0} onClick={r.onOpen} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 20px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", cursor: "pointer", transition: "transform 0.18s ease,box-shadow 0.18s ease" }} className="td-h11">
                             <span style={sx(r.avatar)}>{r.initials}</span>
                             <div style={{ flex: "1", minWidth: "0" }}>
                               <div style={{ fontSize: "14px", fontWeight: "600" }}>{r.name}</div>
@@ -555,13 +555,13 @@ export function renderTemplate(v: TemplateVals) {
                   <div style={{ padding: "30px 32px", borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", marginBottom: "22px", flexWrap: "wrap" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                        <button onClick={v.prevMonth} style={{ width: "34px", height: "34px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
+                        <button aria-label="Əvvəlki ay" onClick={v.prevMonth} style={{ width: "34px", height: "34px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
                           <i style={{ fontSize: "11px" }} className="fa-solid fa-chevron-left"></i>
                         </button>
                         <h2 style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "19px", fontWeight: "600", letterSpacing: "-0.02em", margin: "0", minWidth: "140px", textAlign: "center" }}>
                           {v.monthLabel}
                         </h2>
-                        <button onClick={v.nextMonth} style={{ width: "34px", height: "34px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
+                        <button aria-label="Növbəti ay" onClick={v.nextMonth} style={{ width: "34px", height: "34px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", transition: "background 0.18s ease" }} className="td-h7">
                           <i style={{ fontSize: "11px" }} className="fa-solid fa-chevron-right"></i>
                         </button>
                       </div>
@@ -668,7 +668,7 @@ export function renderTemplate(v: TemplateVals) {
                               </div>
                               {l.roster.map((s, i23) => (
                                 <Fragment key={i23}>
-                                  <div onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
+                                  <div role="button" tabIndex={0} onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
                                     <span style={sx(s.avatarDay)}>{s.initials}</span>
                                     <div style={{ flex: "1", minWidth: "0" }}>
                                       <div style={{ fontSize: "14px", fontWeight: "500", letterSpacing: "-0.008em" }}>{s.name}</div>
@@ -755,7 +755,7 @@ export function renderTemplate(v: TemplateVals) {
                   <div style={{ borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)", overflow: "hidden" }}>
                     {v.hwList.map((h, i27) => (
                       <Fragment key={i27}>
-                        <div onClick={h.onOpen} style={sx(h.rowStyle)} className="td-h7">
+                        <div role="button" tabIndex={0} onClick={h.onOpen} style={sx(h.rowStyle)} className="td-h7">
                           <span style={sx(h.iconStyle)}>
                             <i style={{ fontSize: "13px" }} className={h.icon}></i>
                           </span>
@@ -805,7 +805,7 @@ export function renderTemplate(v: TemplateVals) {
                     </div>
                     {v.students.map((s, i29) => (
                       <Fragment key={i29}>
-                        <div onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
+                        <div role="button" tabIndex={0} onClick={s.onOpen} style={sx(s.rowStyle)} className="td-h7">
                           <span style={sx(s.avatarList)}>{s.initials}</span>
                           <div style={{ flex: "1", minWidth: "0" }}>
                             <div style={{ fontSize: "14.5px", fontWeight: "500", letterSpacing: "-0.008em" }}>{s.name}</div>
@@ -863,7 +863,7 @@ export function renderTemplate(v: TemplateVals) {
                           <div>
                             <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#6F6F6B", marginBottom: "9px" }}>{f.label}</label>
                             {" "}
-                            <input type="text" name={f.name} defaultValue={f.value} readOnly={f.readOnly} style={{ width: "100%", padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
+                            <input type="text" aria-label={f.label} name={f.name} defaultValue={f.value} readOnly={f.readOnly} style={{ width: "100%", padding: "14px 16px", borderRadius: "14px", border: "1px solid rgba(23,23,23,0.1)", background: "#FCFCFA", fontSize: "14px", color: "#171717", outline: "none", transition: "border-color 0.18s ease,box-shadow 0.18s ease,background 0.18s ease" }} className="td-f8" />
                           </div>
                         </Fragment>
                       ))}
@@ -878,7 +878,7 @@ export function renderTemplate(v: TemplateVals) {
                             <div style={{ fontSize: "14.5px", fontWeight: "500" }}>{t.label}</div>
                             <div style={{ fontSize: "12.5px", color: "#6F6F6B", marginTop: "5px" }}>{t.desc}</div>
                           </div>
-                          <button onClick={t.onToggle} style={sx(t.trackStyle)}>
+                          <button role="switch" aria-label={t.label} aria-checked={t.on} onClick={t.onToggle} style={sx(t.trackStyle)}>
                             <span style={sx(t.knobStyle)}></span>
                           </button>
                         </div>
@@ -1013,13 +1013,13 @@ export function renderTemplate(v: TemplateVals) {
                 <>
                   <div style={{ animation: "rise-sm 0.34s ease both", padding: "22px 20px", borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", marginBottom: "14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", marginBottom: "18px" }}>
-                      <button onClick={v.prevMonth} style={{ width: "32px", height: "32px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", flexShrink: "0" }}>
+                      <button aria-label="Əvvəlki ay" onClick={v.prevMonth} style={{ width: "32px", height: "32px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", flexShrink: "0" }}>
                         <i style={{ fontSize: "10px" }} className="fa-solid fa-chevron-left"></i>
                       </button>
                       <span style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "15px", fontWeight: "600", letterSpacing: "-0.02em" }}>
                         {v.monthLabel}
                       </span>
-                      <button onClick={v.nextMonth} style={{ width: "32px", height: "32px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", flexShrink: "0" }}>
+                      <button aria-label="Növbəti ay" onClick={v.nextMonth} style={{ width: "32px", height: "32px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", color: "#6F6F6B", cursor: "pointer", flexShrink: "0" }}>
                         <i style={{ fontSize: "10px" }} className="fa-solid fa-chevron-right"></i>
                       </button>
                     </div>
@@ -1239,7 +1239,7 @@ export function renderTemplate(v: TemplateVals) {
                               <div style={{ fontSize: "14px", fontWeight: "500" }}>{t.label}</div>
                               <div style={{ fontSize: "12px", color: "#6F6F6B", marginTop: "5px" }}>{t.desc}</div>
                             </div>
-                            <button onClick={t.onToggle} style={sx(t.trackStyle)}>
+                            <button role="switch" aria-label={t.label} aria-checked={t.on} onClick={t.onToggle} style={sx(t.trackStyle)}>
                               <span style={sx(t.knobStyle)}></span>
                             </button>
                           </div>

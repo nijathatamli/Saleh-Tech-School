@@ -2,14 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LANGS, LANG_NAMES, categoryLabelFor, type Lang } from "@/lib/scholarship/i18n";
+import { LANGS, LANG_NAMES, PROGRAMS, PROGRAM_LABELS, categoryLabelFor, type Lang } from "@/lib/scholarship/i18n";
 import { PageHeader } from "./page-header";
 import { cardClass, fieldClass, fieldErrorClass, labelClass, primaryButton } from "./styles";
 
 type Category = { key: string; label: string };
 type Fields = Record<string, string>;
 
-const initial = { name: "", surname: "", category: "", fin: "", phone: "", email: "", code: "" };
+const initial = { name: "", surname: "", category: "", program: "", fin: "", phone: "", email: "", code: "" };
 
 type FormStrings = {
   eyebrow: string;
@@ -22,6 +22,7 @@ type FormStrings = {
   surname: string;
   grade: string;
   chooseGrade: string;
+  program: string;
   fin: string;
   phone: string;
   email: string;
@@ -49,6 +50,7 @@ const STR: Record<Lang, FormStrings> = {
     surname: "Soyad",
     grade: "Oxuduğu sinif",
     chooseGrade: "Sinif seçin",
+    program: "Hansı proqramı seçirsiniz?",
     fin: "FIN nömrəsi",
     phone: "Telefon nömrəsi",
     email: "E-poçt",
@@ -74,6 +76,7 @@ const STR: Record<Lang, FormStrings> = {
     surname: "Last name",
     grade: "Grade",
     chooseGrade: "Choose your grade",
+    program: "Which program do you choose?",
     fin: "FIN number",
     phone: "Phone number",
     email: "E-mail",
@@ -99,6 +102,7 @@ const STR: Record<Lang, FormStrings> = {
     surname: "Фамилия",
     grade: "Класс",
     chooseGrade: "Выберите класс",
+    program: "Какую программу вы выбираете?",
     fin: "Номер FIN",
     phone: "Номер телефона",
     email: "Эл. почта",
@@ -135,6 +139,7 @@ function validate(v: typeof initial, t: FormStrings): Fields {
   if (!v.surname.trim()) e.surname = t.required;
   else if (!nameOk(v.surname)) e.surname = t.nameLetters(t.surname);
   if (!v.category) e.category = t.required;
+  if (!v.program) e.program = t.required;
   const fin = v.fin.replace(/\s+/g, "").toUpperCase();
   if (!fin) e.fin = t.required;
   else if (!/^[A-Z0-9]{7}$/.test(fin)) e.fin = t.finFormat;
@@ -264,6 +269,33 @@ export function RegisterForm({ categories }: { categories: Category[] }) {
           </select>
           {err("category")}
         </div>
+
+        <fieldset>
+          <legend className={labelClass}>{t.program}</legend>
+          <div role="radiogroup" aria-label={t.program} aria-describedby={errors.program ? "program-error" : undefined} className="grid gap-2 sm:grid-cols-2">
+            {PROGRAMS.map((p) => {
+              const selected = values.program === p;
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => {
+                    setValues((v) => ({ ...v, program: p }));
+                    if (errors.program) setErrors((x) => ({ ...x, program: "" }));
+                  }}
+                  className={`rounded-2xl border-2 px-4 py-3 text-left text-sm font-bold transition-all ${
+                    selected ? "border-primary bg-primary/5 text-primary" : errors.program ? "border-red-400" : "border-grey-100 hover:border-primary/60 dark:border-zinc-700"
+                  }`}
+                >
+                  {PROGRAM_LABELS[lang][p]}
+                </button>
+              );
+            })}
+          </div>
+          {err("program")}
+        </fieldset>
 
         <div>
           <label htmlFor="fin" className={labelClass}>{t.fin}</label>

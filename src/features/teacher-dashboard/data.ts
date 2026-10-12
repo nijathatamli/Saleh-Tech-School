@@ -38,10 +38,11 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
     include: {
       user: true,
       classes: {
+        where: { status: "ACTIVE" }, // archived classes keep their history but leave the dashboard
         orderBy: { name: "asc" },
         include: {
           course: true,
-          lessons: { orderBy: { date: "asc" }, include: { homeworks: true } },
+          lessons: { where: { status: { not: "CANCELLED" } }, orderBy: { date: "asc" }, include: { homeworks: true } },
           enrollments: {
             include: {
               student: {
@@ -82,6 +83,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
     studentIds: c.enrollments.map((e) => e.studentId),
   }));
 
+  const classOfLesson = new Map(teacher.classes.flatMap((c) => c.lessons.map((l) => [l.id, c.id] as const)));
   const students = new Map<string, TeacherStudent>();
   for (const c of teacher.classes) {
     for (const e of c.enrollments) {
@@ -107,6 +109,8 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
             dueDate: x.homework.dueDate.toISOString(),
           })),
         skills: s.progress.map((p) => ({ name: p.skill, pct: p.percent })),
+        completedLessons: attendance.filter((a) => a.studentId === s.id && a.completed && classOfLesson.get(a.lessonId) === c.id).length,
+        cycleSize: c.lessonsPerCycle,
       });
     }
   }

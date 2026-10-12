@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isOwnUploadUrl } from "@/lib/avatar-url";
 
 const PORTAL = "/parent";
 
@@ -50,7 +51,7 @@ export async function updateProfile(formData: FormData) {
 
 export async function updateAvatar(avatarUrl: string) {
   const session = await parentSession();
-  if (!session) return;
+  if (!session || !isOwnUploadUrl(avatarUrl)) return;
 
   await prisma.user.update({ where: { id: session.user.id }, data: { avatarUrl } });
   revalidatePath(PORTAL, "layout");

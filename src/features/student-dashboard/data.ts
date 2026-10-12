@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLeaderboard } from "@/lib/data";
 import { noteVisibilityFor } from "@/lib/access";
+import { studentClasses } from "@/lib/lessons";
 import type { StudentDashboardData } from "./types";
 
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
@@ -22,7 +23,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
     where: { userId: session.user.id },
     include: {
       user: true,
-      enrollments: { include: { course: { include: { modules: { orderBy: { order: "asc" } } } } }, orderBy: { startedAt: "asc" } },
+      enrollments: { where: { OR: [{ classId: null }, { class: { status: "ACTIVE" } }] }, include: { course: { include: { modules: { orderBy: { order: "asc" } } } } }, orderBy: { startedAt: "asc" } },
       progress: { orderBy: { percent: "desc" } },
       grades: { orderBy: { createdAt: "asc" } },
       studentBadges: { include: { badge: true } },
@@ -42,10 +43,10 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
   const now = new Date();
   const classIds = student.enrollments.map((e) => e.classId).filter((id): id is string => !!id);
 
-  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications, notes] = await Promise.all([
+  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications, notes, classes] = await Promise.all([
     classIds.length
       ? prisma.lesson.findMany({
-          where: { classId: { in: classIds }, date: { gte: now } },
+          where: { classId: { in: classIds }, date: { gte: now }, status: { not: "CANCELLED" } },
           orderBy: { date: "asc" },
           take: 5,
           include: { class: { include: { course: true, teacher: { include: { user: true } } } } },
@@ -53,9 +54,10 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
       : [],
     prisma.badge.findMany({ orderBy: { name: "asc" } }),
     getLeaderboard(8),
-    prisma.studentProfile.count({ where: { points: { gt: student.points } } }),
+    prisma.studentProfile.count({ where: { active: true, points: { gt: student.points } } }),
     student.userId ? prisma.notification.count({ where: { userId: student.userId, read: false } }) : 0,
     prisma.studentNote.findMany({ where: { studentId: student.id, ...noteVisibilityFor("STUDENT") }, include: { teacher: { include: { user: true } } }, orderBy: { createdAt: "desc" } }),
+    studentClasses(session.user.id),
   ]);
 
   const earned = new Map(student.studentBadges.map((b) => [b.badgeId, b.earnedAt]));
@@ -82,6 +84,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
       lessonMinutes: e.course.lessonMinutes,
       modules: e.course.modules.map((m) => ({ order: m.order, title: m.title })),
     })),
+    classes: classes.map((c) => ({ id: c.id, name: c.name, courseName: c.courseName, teacherName: c.teacherName, status: c.status, progress: c.progress, cycleSize: c.cycleSize, completedLessons: c.completedLessons, paymentDue: c.paymentDue })),
     subjects: student.progress.map((p) => ({ name: p.skill, pct: p.percent })),
     grades: student.grades.map((g) => ({
       subject: g.subject,

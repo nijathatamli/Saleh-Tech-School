@@ -34,3 +34,9 @@ next-env.d.ts
 /.claude
 /.hallmark
 node_modules/ 
+
+# local copies of the remote database (personal data — never commit)
+/backups
+
+# local QA environment (database files, logs)
+/.qa

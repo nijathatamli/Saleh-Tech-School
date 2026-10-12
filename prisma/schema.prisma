@@ -25,6 +25,8 @@ model User {
   role         Role
   phone        String?
   avatarUrl    String?
+  // false = the account cannot sign in (set from the admin panel); its data is kept
+  active       Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -64,19 +66,25 @@ model TeacherProfile {
 }
 
 model StudentProfile {
-  id         String        @id @default(cuid())
-  userId     String?       @unique
-  user       User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parentId   String
-  parent     ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  firstName  String
-  lastName   String
-  birthDate  DateTime
-  avatarUrl  String?
-  level      Int           @default(1)
-  xp         Int           @default(0)
-  points     Int           @default(0)
-  streakDays Int           @default(0)
+  id           String        @id @default(cuid())
+  userId       String?       @unique
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId     String
+  parent       ParentProfile @relation(fields: [parentId], references: [id], onDelete: Restrict)
+  firstName    String
+  lastName     String
+  birthDate    DateTime
+  avatarUrl    String?
+  // school grade (1-11); FIN kept like scholarship FINs: keyed hash for lookup, encrypted for admins
+  grade        Int?
+  finHash      String?       @unique
+  finEncrypted String?
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  level        Int           @default(1)
+  xp           Int           @default(0)
+  points       Int           @default(0)
+  streakDays   Int           @default(0)
 
   enrollments   Enrollment[]
   attendance    Attendance[]
@@ -86,9 +94,25 @@ model StudentProfile {
   projects      Project[]
   grades        Grade[]
   notes         StudentNote[]
+  payments      Payment[]
+  applications  TrialBooking[]
+
+  @@index([parentId])
 }
 
 // ---------- Courses / Curriculum ----------
+
+enum ClassStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum LessonStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
 
 enum Level {
   BEGINNER
@@ -113,6 +137,8 @@ model Course {
   price          Int // AZN / month
   tags           String[]
   featured       Boolean         @default(false)
+  // inactive courses disappear from the public site and from new-class pickers; classes/history stay
+  active         Boolean         @default(true)
   teacherId      String?
   teacher        TeacherProfile? @relation(fields: [teacherId], references: [id])
   createdAt      DateTime        @default(now())
@@ -122,6 +148,9 @@ model Course {
   enrollments   Enrollment[]
   classes       ClassGroup[]
   trialBookings TrialBooking[]
+
+  @@index([active])
+  @@index([teacherId])
 }
 
 model CourseModule {
@@ -131,6 +160,8 @@ model CourseModule {
   order    Int
   title    String
   summary  String
+
+  @@index([courseId])
 }
 
 model Enrollment {
@@ -138,18 +169,22 @@ model Enrollment {
   studentId String
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   courseId  String
-  course    Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course         @relation(fields: [courseId], references: [id], onDelete: Restrict)
   classId   String?
   class     ClassGroup?    @relation(fields: [classId], references: [id])
   startedAt DateTime       @default(now())
   status    String         @default("active") // active | completed | paused
+
+  @@unique([classId, studentId])
+  @@index([studentId])
+  @@index([courseId])
 }
 
 model ClassGroup {
   id                     String         @id @default(cuid())
   name                   String
   courseId               String
-  course                 Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course                 Course         @relation(fields: [courseId], references: [id], onDelete: Restrict)
   teacherId              String
   teacher                TeacherProfile @relation(fields: [teacherId], references: [id])
   schedule               String // e.g. "Ç.a - Cümə, 18:00"
@@ -157,23 +192,45 @@ model ClassGroup {
   // set by the teacher (e.g. 2 lessons/week ≈ 8/month). Used as the "y" in
   // the parent-facing "x/y classes attended this month" figure.
   monthlyExpectedClasses Int            @default(8)
+  // ACTIVE classes are what teachers/students/parents see; ARCHIVED ones keep their
+  // lessons, payments and audit trail but disappear from the dashboards.
+  status                 ClassStatus    @default(ACTIVE)
+  archivedAt             DateTime?
+  // completed lessons per payment cycle (the 8-lesson rule)
+  lessonsPerCycle        Int            @default(8)
+  // maximum number of students; null = no limit
+  capacity               Int?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now()) @updatedAt
 
   enrollments Enrollment[]
   lessons     Lesson[]
+  payments    Payment[]
+
+  @@index([teacherId])
+  @@index([status])
+  @@index([courseId])
 }
 
 model Lesson {
-  id           String     @id @default(cuid())
-  classId      String
-  class        ClassGroup @relation(fields: [classId], references: [id], onDelete: Cascade)
-  title        String
-  description  String     @db.Text
-  date         DateTime
-  materialsUrl String?
-  videoUrl     String?
+  id              String       @id @default(cuid())
+  classId         String
+  class           ClassGroup   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title           String
+  description     String       @db.Text
+  date            DateTime
+  materialsUrl    String?
+  videoUrl        String?
+  status          LessonStatus @default(SCHEDULED)
+  // null = the course's lessonMinutes; room is optional (conflicts are checked when set)
+  durationMinutes Int?
+  room            String?
 
   attendance Attendance[]
   homeworks  Homework[]
+
+  @@index([classId, date])
+  @@index([date])
 }
 
 // ---------- Attendance / Homework / Progress ----------
@@ -198,6 +255,13 @@ model Attendance {
   markedById String?
   markedBy   User?            @relation("AttendanceMarkedBy", fields: [markedById], references: [id])
   updatedAt  DateTime         @default(now()) @updatedAt
+  // the teacher confirmed the student took part in the lesson; only completed lessons count
+  // towards the payment cycle (rows from before this feature stay false)
+  completed  Boolean          @default(false)
+
+  @@unique([lessonId, studentId])
+  @@index([studentId])
+  @@index([markedById])
 }
 
 model Homework {
@@ -209,6 +273,8 @@ model Homework {
   dueDate     DateTime
 
   submissions Submission[]
+
+  @@index([lessonId])
 }
 
 enum SubmissionStatus {
@@ -230,6 +296,9 @@ model Submission {
   submittedAt DateTime?
 
   grade Grade?
+
+  @@index([homeworkId])
+  @@index([studentId])
 }
 
 model Grade {
@@ -242,6 +311,8 @@ model Grade {
   score        Int
   maxScore     Int            @default(100)
   createdAt    DateTime       @default(now())
+
+  @@index([studentId])
 }
 
 model SkillProgress {
@@ -251,6 +322,8 @@ model SkillProgress {
   skill     String
   percent   Int
   updatedAt DateTime       @updatedAt
+
+  @@index([studentId])
 }
 
 // ---------- Gamification ----------
@@ -272,6 +345,9 @@ model StudentBadge {
   badgeId   String
   badge     Badge          @relation(fields: [badgeId], references: [id], onDelete: Cascade)
   earnedAt  DateTime       @default(now())
+
+  @@index([badgeId])
+  @@index([studentId])
 }
 
 model Project {
@@ -284,6 +360,8 @@ model Project {
   technologies String[]
   courseTag    String
   createdAt    DateTime       @default(now())
+
+  @@index([studentId])
 }
 
 // ---------- Payments ----------
@@ -292,22 +370,40 @@ enum PaymentStatus {
   PAID
   PENDING
   OVERDUE
+  DUE // a payment cycle was reached and is waiting to be paid
+  CANCELLED
 }
 
 model Payment {
-  id                 String        @id @default(cuid())
+  id                 String          @id @default(cuid())
   parentId           String
-  parent             ParentProfile @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parent             ParentProfile   @relation(fields: [parentId], references: [id], onDelete: Restrict)
   title              String
   amount             Int
   status             PaymentStatus
   dueDate            DateTime
   paidAt             DateTime?
-  invoiceNo          String        @unique
+  invoiceNo          String          @unique
   // Set when a parent uploads a cheque/receipt photo; moves status to PENDING
   // pending admin confirmation.
   receiptUrl         String?
   receiptSubmittedAt DateTime?
+  // Lesson-based billing: one row per (student, class, cycle). The unique key makes the
+  // "8 lessons reached" event idempotent. Both links survive deletion of the student/class.
+  studentId          String?
+  student            StudentProfile? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  classId            String?
+  class              ClassGroup?     @relation(fields: [classId], references: [id], onDelete: SetNull)
+  cycle              Int?
+  lessonsFrom        Int?
+  lessonsTo          Int?
+  createdAt          DateTime        @default(now())
+
+  @@unique([studentId, classId, cycle])
+  @@index([status])
+  @@index([studentId])
+  @@index([classId])
+  @@index([parentId])
 }
 
 // ---------- Marketing / CRM ----------
@@ -330,20 +426,31 @@ enum LeadStage {
   TRIAL_COMPLETED
   INTERESTED
   REGISTERED
+  REJECTED
 }
 
 model TrialBooking {
-  id            String    @id @default(cuid())
-  parentName    String
-  parentPhone   String
-  studentName   String
-  studentAge    Int
-  courseId      String?
-  course        Course?   @relation(fields: [courseId], references: [id])
-  preferredDate DateTime
-  preferredTime String
-  stage         LeadStage @default(NEW)
-  createdAt     DateTime  @default(now())
+  id                 String          @id @default(cuid())
+  parentName         String
+  parentPhone        String
+  studentName        String
+  studentAge         Int
+  courseId           String?
+  course             Course?         @relation(fields: [courseId], references: [id])
+  preferredDate      DateTime
+  preferredTime      String
+  stage              LeadStage       @default(NEW)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @default(now()) @updatedAt
+  adminNote          String?
+  // set when the application was turned into a student account
+  convertedStudentId String?
+  convertedStudent   StudentProfile? @relation(fields: [convertedStudentId], references: [id], onDelete: SetNull)
+
+  @@index([stage])
+  @@index([createdAt])
+  @@index([convertedStudentId])
+  @@index([courseId])
 }
 
 model PasswordResetToken {
@@ -366,7 +473,12 @@ model Notification {
   // the record the notification is about (e.g. "attendance" + Attendance.id)
   entityType String?
   entityId   String?
+  // machine-readable kind: PAYMENT_DUE, NEW_APPLICATION, NEW_STUDENT, CLASS_ASSIGNED, TEACHER_ASSIGNED, ABSENCE ...
+  event      String?
   createdAt  DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([event])
 }
 
 // ---------- Notes / audit ----------
@@ -389,6 +501,9 @@ model StudentNote {
   visibility NoteVisibility @default(PARENT)
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @default(now()) @updatedAt
+
+  @@index([studentId])
+  @@index([teacherId])
 }
 
 // Who changed what: written in the same transaction as the change itself.
@@ -402,6 +517,10 @@ model AuditLog {
   before      Json?
   after       Json?
   createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@index([actorUserId])
 }
 
 // ---------- Scholarship exam ("Reqamsal Gələcək") ----------
@@ -466,6 +585,7 @@ model ScholarshipStudent {
   phone        String
   email        String
   language     String              @default("az") // exam language chosen at registration: az | en | ru
+  program      String              @default("") // program the candidate wants: cybersecurity | electronics | programming | robotics | ai
   finHash      String              @unique // HMAC-SHA256 of the normalised FIN (lookup + uniqueness)
   finEncrypted String // AES-256-GCM, only readable with the server key (shown to admins)
   categoryKey  String
@@ -475,6 +595,8 @@ model ScholarshipStudent {
 
   attempts ScholarshipAttempt[]
   code     ScholarshipCode?
+
+  @@index([categoryKey])
 }
 
 // A 32-character code the school hands to its own course students. Registration (and
@@ -507,4 +629,12 @@ model ScholarshipAttempt {
   timedOut           Boolean                  @default(false)
   createdAt          DateTime                 @default(now())
   updatedAt          DateTime                 @updatedAt
+}
+
+// ---------- School settings ----------
+// Key/value configuration edited from /admin/settings (defaults live in src/lib/settings.ts).
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt
 }

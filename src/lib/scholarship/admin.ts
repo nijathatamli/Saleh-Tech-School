@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { SUBJECTS, scholarshipFor, type SubjectKey } from "./config";
+import { PROGRAM_LABELS, type Program } from "./i18n";
 import { decryptFin } from "./security";
 
 export type AdminStudentRow = {
@@ -12,6 +13,7 @@ export type AdminStudentRow = {
   phone: string;
   email: string;
   language: string;
+  program: string;
   registeredAt: Date;
   status: "NOT_STARTED" | "IN_PROGRESS" | "SUBMITTED";
   score: number | null;
@@ -54,6 +56,7 @@ export async function getScholarshipAdminData() {
       phone: s.phone,
       email: s.email,
       language: s.language,
+      program: PROGRAM_LABELS.az[s.program as Program] ?? "—",
       registeredAt: s.createdAt,
       status: !a ? "NOT_STARTED" : a.status,
       score: a?.score ?? null,

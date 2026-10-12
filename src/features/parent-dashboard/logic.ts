@@ -215,7 +215,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
     if (!prev || rank[st] > rank[prev]) ATT_MAP[r.p.d] = st;
   }
   const cal: { label: string; style: string }[] = [];
-  for (let i = 0; i < blanks; i++) cal.push({ label: "", style: "height:38px" });
+  for (let i = 0; i < blanks; i++) cal.push({ label: "", style: "height:38px;visibility:hidden" });
   for (let d = 1; d <= daysInMonth; d++) {
     const st = ATT_MAP[d];
     const base = "height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-variant-numeric:tabular-nums;transition:transform 0.16s ease;";
@@ -421,6 +421,15 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
   const childCourse = child?.courseName ?? "Kurs seçilməyib";
   const enrolledYears = child?.enrolledAt ? Math.floor(dayDiff(parts(child.enrolledAt), now) / 365.25) + 1 : 1;
 
+  const payDue = (child?.payments ?? []).filter((p) => p.status === "DUE").length;
+  const payRows = (child?.payments ?? []).map((p) => ({
+    title: `${p.className} — ${p.cycle}-ci dövr`,
+    meta: p.status === "PAID" && p.paidAt ? `Dərs ${p.lessonsFrom}–${p.lessonsTo} · ödənilib: ${dayMonth(parts(new Date(p.paidAt)))}` : `Dərs ${p.lessonsFrom}–${p.lessonsTo} tamamlandı · vaxtı çatıb: ${dayMonth(parts(new Date(p.dueDate)))}`,
+    amount: `${p.amount} AZN`,
+    statusLabel: p.status === "PAID" ? "Ödənilib" : p.status === "CANCELLED" ? "Ləğv edilib" : "Gözləyir",
+    statusStyle: `display:inline-block;padding:5px 11px;border-radius:8px;font-size:11.5px;font-weight:600;white-space:nowrap;${p.status === "DUE" ? "background:rgba(255,107,0,0.12);color:#C2410C" : "background:rgba(23,23,23,0.06);color:#6F6F6B"}`,
+  }));
+
   const parentAvatar = data.parent.avatarUrl;
 
   return {
@@ -506,6 +515,10 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
     noteDate: note ? dayMonthShortYear(parts(note.at)) : "",
 
     homeworkActiveLabel: `${activeCount} aktiv`,
+    hasPayments: payRows.length > 0,
+    noPayments: payRows.length === 0,
+    paymentsHeadline: payDue > 0 ? `${payDue} ödəniş gözləyir` : "Gözləyən ödəniş yoxdur",
+    payments: payRows,
     hasHomework: activeCount > 0,
     noHomework: activeCount === 0,
     homework: HW.slice(0, 4).map((x, i) => ({
@@ -656,6 +669,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
       const on = notif[t.key];
       return {
         label: t.label,
+        on,
         desc: t.desc,
         trackStyle: [
           "position:relative;width:46px;height:28px;border-radius:999px;border:none;cursor:pointer;flex-shrink:0;padding:0",

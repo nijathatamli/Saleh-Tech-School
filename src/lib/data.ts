@@ -1,6 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import type { Course, CourseModule, Project, TeacherProfile, Testimonial } from "@prisma/client";
+import publicContent from "@/lib/public-content.json";
 
 export async function getCurrentParent() {
   const session = await getServerSession(authOptions);
@@ -100,6 +102,7 @@ export async function getCurrentStudent() {
 
 export function getLeaderboard(take = 10) {
   return prisma.studentProfile.findMany({
+    where: { active: true }, // deactivated / withdrawn students are not ranked (nor shown to other children)
     orderBy: { points: "desc" },
     take,
     include: { enrollments: { include: { course: true } } },
@@ -160,68 +163,58 @@ export function getAllTeachersAdmin() {
   });
 }
 
-export function getAllCourses() {
-  return prisma.course.findMany({
-    orderBy: { createdAt: "asc" },
-    include: { teacher: { include: { user: true } } },
-  });
+// ---------- Public landing site ----------
+// The landing site reads a frozen snapshot (src/lib/public-content.json), NOT the database, so changes made in
+// the admin panel (teachers, courses, testimonials, ...) never show up there. Refresh it on purpose with
+// scripts/snapshot-public-content.mjs. Course ids in the snapshot are slugs; createTrialBooking resolves them.
+
+type PublicTeacher = Omit<TeacherProfile, "userId"> & { user: { name: string; avatarUrl: string | null } };
+export type PublicCourse = Course & { teacher: PublicTeacher | null; modules: CourseModule[] };
+export type PublicTeacherWithCourses = PublicTeacher & { courses: Course[] };
+
+const content = publicContent as unknown as {
+  teachers: PublicTeacherWithCourses[];
+  courses: PublicCourse[];
+  testimonials: Testimonial[];
+  projects: (Omit<Project, "studentId" | "createdAt"> & { createdAt: string })[];
+};
+const withDate = <T extends { createdAt: unknown }>(row: T) => ({ ...row, createdAt: new Date(row.createdAt as string) });
+
+export async function getAllCourses(): Promise<PublicCourse[]> {
+  return content.courses.map(withDate);
 }
 
-export function getFeaturedCourses() {
-  return prisma.course.findMany({
-    where: { featured: true },
-    orderBy: { createdAt: "asc" },
-    include: { teacher: { include: { user: true } } },
-  });
+export async function getFeaturedCourses(): Promise<PublicCourse[]> {
+  return content.courses.filter((c) => c.featured).map(withDate);
 }
 
-export function getCourseBySlug(slug: string) {
-  return prisma.course.findUnique({
-    where: { slug },
-    include: {
-      modules: { orderBy: { order: "asc" } },
-      teacher: { include: { user: true } },
-    },
-  });
+export async function getCourseBySlug(slug: string): Promise<PublicCourse | null> {
+  const c = content.courses.find((x) => x.slug === slug);
+  return c ? withDate(c) : null;
 }
 
-export function getTeachers() {
-  return prisma.teacherProfile.findMany({
-    include: { user: true, courses: true },
-    orderBy: { user: { createdAt: "asc" } },
-  });
+export async function getTeachers(): Promise<PublicTeacherWithCourses[]> {
+  return content.teachers;
 }
 
-export function getTeacherById(id: string) {
-  return prisma.teacherProfile.findUnique({
-    where: { id },
-    include: { user: true, courses: true, classes: true },
-  });
+export async function getTeacherById(id: string): Promise<PublicTeacherWithCourses | null> {
+  return content.teachers.find((t) => t.id === id) ?? null;
 }
 
-export function getTestimonials() {
-  return prisma.testimonial.findMany({ where: { featured: true } });
+export async function getTestimonials(): Promise<Testimonial[]> {
+  return content.testimonials;
 }
 
-export function getStudentProjects() {
-  return prisma.project.findMany({
-    include: { student: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
+export async function getProjectsByCourseTag(courseTag: string, take = 3) {
+  return content.projects.filter((p) => p.courseTag === courseTag).slice(0, take).map(withDate);
+}
+
+export async function getStudentProjects() {
+  return content.projects.slice(0, 6).map(withDate);
 }
 
 export async function getPublicStats() {
-  const [totalStudents, totalTeachers, totalCourses, testimonials] = await Promise.all([
-    prisma.studentProfile.count(),
-    prisma.teacherProfile.count(),
-    prisma.course.count(),
-    prisma.testimonial.findMany({ select: { rating: true } }),
-  ]);
-
-  const avgRating = testimonials.length
-    ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
-    : 0;
-
-  return { totalStudents, totalTeachers, totalCourses, avgRating };
+  const { teachers, courses, testimonials } = content;
+  const avgRating = testimonials.length ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length : 0;
+  return { totalTeachers: teachers.length, totalCourses: courses.length, avgRating };
 }

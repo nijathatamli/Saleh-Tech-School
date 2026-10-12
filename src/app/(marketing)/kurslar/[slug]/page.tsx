@@ -2,8 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Clock, Calendar, Layers, CheckCircle2, ArrowRight } from "lucide-react";
-import { getCourseBySlug } from "@/lib/data";
-import { prisma } from "@/lib/prisma";
+import { getCourseBySlug, getProjectsByCourseTag } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LearningJourney } from "@/components/marketing/learning-journey";
@@ -28,10 +27,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
   const course = await getCourseBySlug(params.slug);
   if (!course) notFound();
 
-  const projects = await prisma.project.findMany({
-    where: { courseTag: course.category },
-    take: 3,
-  });
+  const projects = await getProjectsByCourseTag(course.category);
 
   const faqs = [
     { q: "Sınaq dərsi ödənişsizdir?", a: "Bəli, bu kurs üçün ilk sınaq dərsi tamamilə ödənişsizdir." },

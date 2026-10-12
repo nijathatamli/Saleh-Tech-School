@@ -14,6 +14,15 @@ import {
   GraduationCap,
   BadgeCheck,
   Award,
+  Layers,
+  Wallet,
+  Bell,
+  ScrollText,
+  CalendarDays,
+  ClipboardCheck,
+  BarChart3,
+  UserRound,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import type { NavItem } from "@/components/app/sidebar";
 import type { DashNavItem } from "@/components/dash/sidebar";
@@ -50,9 +59,18 @@ export function getTeacherNavItems(): DashNavItem[] {
 
 export const adminNav: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
-  { href: "/admin/leads", label: "CRM / Leads", icon: <KanbanSquare className="h-4 w-4 shrink-0" /> },
   { href: "/admin/students", label: "Tələbələr", icon: <GraduationCap className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/parents", label: "Valideynlər", icon: <UserRound className="h-4 w-4 shrink-0" /> },
   { href: "/admin/teachers", label: "Müəllimlər", icon: <BadgeCheck className="h-4 w-4 shrink-0" /> },
   { href: "/admin/courses", label: "Kurslar", icon: <BookOpen className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/classes", label: "Siniflər", icon: <Layers className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/schedule", label: "Cədvəl", icon: <CalendarDays className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/attendance", label: "Davamiyyət", icon: <ClipboardCheck className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/payments", label: "Ödənişlər", icon: <Wallet className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/leads", label: "Qəbul / Müraciətlər", icon: <KanbanSquare className="h-4 w-4 shrink-0" /> },
   { href: "/admin/scholarship", label: "Təqaüd imtahanı", icon: <Award className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/reports", label: "Hesabatlar", icon: <BarChart3 className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/notifications", label: "Bildirişlər", icon: <Bell className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/audit", label: "Audit jurnalı", icon: <ScrollText className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/settings", label: "Tənzimləmələr", icon: <SettingsIcon className="h-4 w-4 shrink-0" /> },
 ];

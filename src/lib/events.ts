@@ -7,9 +7,11 @@ import { prisma } from "@/lib/prisma";
 type Db = Prisma.TransactionClient | typeof prisma;
 
 export type NotifyCategory = "lessons" | "grades";
-export type EntityRef = { entityType: "attendance" | "lesson" | "homework" | "submission" | "grade" | "note" | "badge"; entityId: string };
+export type EntityRef = { entityType: "attendance" | "lesson" | "homework" | "submission" | "grade" | "note" | "badge" | "class" | "payment" | "student" | "application" | "scholarship"; entityId: string };
 
-type Payload = { title: string; body: string; type?: "info" | "success" | "warning" | "error"; category: NotifyCategory } & Partial<EntityRef>;
+export type NotifyEvent = "PAYMENT_DUE" | "PAYMENT_PAID" | "NEW_APPLICATION" | "NEW_STUDENT" | "NEW_SCHOLARSHIP_REGISTRATION" | "CLASS_ASSIGNED" | "TEACHER_ASSIGNED" | "ABSENCE" | "LESSON_COMPLETED" | "LESSON_CANCELLED" | "LESSON_SCHEDULED" | "GENERAL";
+
+type Payload = { title: string; body: string; type?: "info" | "success" | "warning" | "error"; category: NotifyCategory; event?: NotifyEvent } & Partial<EntityRef>;
 
 /** Notifies the parents of the given students, honouring each parent's preferences. */
 export async function notifyParentsOfStudents(db: Db, studentIds: string[], n: Payload) {
@@ -21,7 +23,7 @@ export async function notifyParentsOfStudents(db: Db, studentIds: string[], n: P
   const recipients = parents.filter((p) => (n.category === "lessons" ? p.notifyLessons : p.notifyGrades));
   if (!recipients.length) return 0;
   const { count } = await db.notification.createMany({
-    data: recipients.map((p) => ({ userId: p.userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId })),
+    data: recipients.map((p) => ({ userId: p.userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId, event: n.event })),
   });
   return count;
 }
@@ -33,7 +35,7 @@ export async function notifyStudents(db: Db, studentIds: string[], n: Omit<Paylo
   const userIds = students.map((s) => s.userId).filter((id): id is string => !!id);
   if (!userIds.length) return 0;
   const { count } = await db.notification.createMany({
-    data: userIds.map((userId) => ({ userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId })),
+    data: userIds.map((userId) => ({ userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId, event: n.event })),
   });
   return count;
 }
@@ -42,7 +44,7 @@ export async function notifyStudents(db: Db, studentIds: string[], n: Omit<Paylo
 export async function notifyUsers(db: Db, userIds: string[], n: Omit<Payload, "category">) {
   if (!userIds.length) return 0;
   const { count } = await db.notification.createMany({
-    data: userIds.map((userId) => ({ userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId })),
+    data: userIds.map((userId) => ({ userId, title: n.title, body: n.body, type: n.type ?? "info", entityType: n.entityType, entityId: n.entityId, event: n.event })),
   });
   return count;
 }
@@ -62,4 +64,19 @@ export function audit(
       after: entry.after === undefined ? undefined : (entry.after as Prisma.InputJsonValue),
     },
   });
+}
+
+/** Notifies every active admin (e.g. "payment due"). */
+export async function notifyAdmins(db: Db, n: Omit<Payload, "category"> & { exceptUserId?: string }) {
+  const { exceptUserId, ...payload } = n;
+  n = payload;
+  const admins = await db.user.findMany({ where: { role: "ADMIN", active: true, ...(exceptUserId ? { id: { not: exceptUserId } } : {}) }, select: { id: true } });
+  return notifyUsers(db, admins.map((a) => a.id), n);
+}
+
+/** Notifies the parent accounts of the given students without applying the lessons/grades preferences (billing). */
+export async function notifyParentsOfStudentsDirect(db: Db, studentIds: string[], n: Omit<Payload, "category">) {
+  if (!studentIds.length) return 0;
+  const parents = await db.parentProfile.findMany({ where: { children: { some: { id: { in: studentIds } } } }, select: { userId: true } });
+  return notifyUsers(db, parents.map((p) => p.userId), n);
 }

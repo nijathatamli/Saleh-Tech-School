@@ -242,7 +242,7 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
     if (!ATT[r.p.d] || rank[st] > rank[ATT[r.p.d]]) ATT[r.p.d] = st;
   }
   const attCal: { label: string; style: string }[] = [];
-  for (let i = 0; i < attBlanks; i++) attCal.push({ label: "", style: "height:38px" });
+  for (let i = 0; i < attBlanks; i++) attCal.push({ label: "", style: "height:38px;visibility:hidden" });
   for (let d = 1; d <= daysInMonth; d++) {
     const st = ATT[d];
     const base = "height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-variant-numeric:tabular-nums;";
@@ -482,6 +482,17 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
     taskXp: `+${XP_RULES.homework} XP`,
     onStartTask: () => act.startTask(todaysTask?.id ?? null),
 
+    hasClasses: data.classes.length > 0,
+    myClasses: data.classes.map((c) => ({
+      name: c.name,
+      meta: `${c.courseName} · Müəllim: ${c.teacherName}`,
+      bar: bar(Math.round((c.progress / Math.max(1, c.cycleSize)) * 100)),
+      progressLabel: `${c.progress} / ${c.cycleSize} dərs`,
+      statusLabel: c.status === "ACTIVE" ? "Aktiv" : "Arxivdə",
+      statusStyle: "font-size:12px;font-weight:600;padding:7px 14px;border-radius:999px;background:#F0EFEB;color:#171717;white-space:nowrap",
+      payLabel: c.paymentDue ? "Ödəniş vaxtıdır" : "",
+      payStyle: c.paymentDue ? "font-size:12px;font-weight:600;padding:7px 14px;border-radius:999px;background:rgba(255,107,0,0.12);color:#C2530A;white-space:nowrap" : "display:none",
+    })),
     hasCourse: !!course,
     courseName: course?.name ?? "",
     courseModuleLabel: course

@@ -1,6 +1,7 @@
 // Port of teacher-dashboard.html's `renderVals()`: the same style builders
 // (navItems, bar, seg, chip, row, smallBtn, calendar cells, medal-less rosters)
 // with the prototype's demo arrays replaced by the teacher's real snapshot.
+import { cycleProgress } from "@/lib/cycle";
 import { MONTHS, clock, dayDiff, dayMonth, initialsOf, longDate, parts, twoDigits, type Parts } from "@/features/parent-dashboard/az";
 import { WEEKDAYS_LONG } from "@/features/student-dashboard/az";
 import { AVATAR_BASES } from "./avatar-bases.generated";
@@ -181,6 +182,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       initials: initialsOf(s.name),
       grade: m.grade === null ? "—" : String(m.grade),
       hw: m.hw,
+      lessonsLabel: `${s.completedLessons} dərs tamamlanıb · ${cycleProgress(s.completedLessons, s.cycleSize)}/${s.cycleSize}`,
       att: m.hasAtt ? `${m.att}%` : "—",
       meta: cls?.code ?? "",
       rowStyle: row(i, pad) + ";cursor:pointer;transition:background 0.18s ease",
@@ -275,7 +277,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
   const dueDays = new Set(data.homeworks.map((h) => parts(h.dueDate)).filter((p) => p.y === month.y && p.m === month.m).map((p) => p.d));
   const picked = Math.min(pickedDay, daysInMonth);
   const cal = [];
-  for (let i = 0; i < blanks; i++) cal.push({ label: "", style: "height:44px;border:none;background:transparent", dotStyle: "display:none", onPick: () => {} });
+  for (let i = 0; i < blanks; i++) cal.push({ label: "", style: "height:44px;border:none;background:transparent;visibility:hidden", dotStyle: "display:none", onPick: () => {} }) /* spacer: hidden from keyboard and screen readers */;
   for (let d = 1; d <= daysInMonth; d++) {
     const has = lessonsOn(d).length > 0;
     const due = dueDays.has(d);
@@ -398,7 +400,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
             { label: "Davamiyyət", value: metrics.get(activeStudent.id)!.hasAtt ? `${metrics.get(activeStudent.id)!.att}%` : "—" },
             { label: "Orta bal", value: metrics.get(activeStudent.id)!.grade === null ? "—" : String(metrics.get(activeStudent.id)!.grade) },
             { label: "Tapşırıq", value: metrics.get(activeStudent.id)!.hw },
-            { label: "Sinif", value: classById.get(activeStudent.classId)?.code ?? "—" },
+            { label: "Tamamlanan dərs", value: `${cycleProgress(activeStudent.completedLessons, activeStudent.cycleSize)} / ${activeStudent.cycleSize}` },
           ]
         : [
             { label: "Tələbələr", value: String(rosterOrFallback.length) },
@@ -669,6 +671,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       const on = notif[t.key];
       return {
         label: t.label,
+        on,
         desc: t.desc,
         trackStyle: [
           "position:relative;width:46px;height:28px;border-radius:999px;border:none;cursor:pointer;flex-shrink:0;padding:0",

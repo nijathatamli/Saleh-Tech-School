@@ -40,6 +40,9 @@ export type PortalLesson = {
 
 export type PortalNote = { id: string; body: string; teacherName: string; teacherPosition: string; teacherPhotoUrl: string | null; createdAt: string };
 
+/** One lesson-based payment cycle of a child — status, amount and dates only; nothing internal. */
+export type PortalPayment = { id: string; className: string; cycle: number; lessonsFrom: number; lessonsTo: number; amount: number; status: string; dueDate: string; paidAt: string | null };
+
 export type PortalChild = {
   id: string;
   firstName: string;
@@ -59,6 +62,7 @@ export type PortalChild = {
   nextLesson: PortalLesson | null;
   /** teacher notes the parent may read (visibility PARENT or STUDENT), newest first */
   notes: PortalNote[];
+  payments: PortalPayment[];
 };
 
 export type PortalNotification = {

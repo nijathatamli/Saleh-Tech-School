@@ -258,6 +258,10 @@ function emitElement(node, scope, indent) {
       // never emit a bare `value` — React would make the field read-only
       throw new Error("input value= must be sc-camel-default-value");
     }
+    if (reactAttrName(name) === "tabIndex" && /^-?\d+$/.test(value.trim())) {
+      props.push(`tabIndex={${value.trim()}}`); // React types tabIndex as a number
+      continue;
+    }
     props.push(`${reactAttrName(name)}=${attrValue(value, scope)}`);
   }
 

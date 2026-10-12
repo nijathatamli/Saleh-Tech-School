@@ -1,25 +1,24 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { AppTopbar } from "@/components/app/topbar";
+import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { getScholarshipAdminData } from "@/lib/scholarship/admin";
 import { SCHOLARSHIP_NAME } from "@/lib/scholarship/config";
 import { formatCourseCode } from "@/lib/scholarship/security";
 import { GenerateCodesForm } from "./generate-form";
 
+import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
 
 const fmt = new Intl.DateTimeFormat("az-AZ", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Baku" });
 const STATUS = { NOT_STARTED: "Başlamayıb", IN_PROGRESS: "İmtahan davam edir", SUBMITTED: "Tamamlayıb" } as const;
 
 export default async function AdminScholarshipPage() {
-  const session = await getServerSession(authOptions);
+  await adminGuard();
   const { students, codes } = await getScholarshipAdminData();
   const done = students.filter((s) => s.status === "SUBMITTED");
   const unused = codes.filter((c) => !c.usedAt);
 
   return (
     <div>
-      <AppTopbar title={`${SCHOLARSHIP_NAME} — təqaüd imtahanı`} userName={session?.user?.name ?? "Admin"} userEmail={session?.user?.email ?? ""} />
+      <AdminTopbar title={`${SCHOLARSHIP_NAME} — təqaüd imtahanı`} />
 
       <div className="space-y-8 p-6 md:p-10">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -82,6 +81,7 @@ export default async function AdminScholarshipPage() {
                   <th className="px-4 py-3">FIN</th>
                   <th className="px-4 py-3">Telefon</th>
                   <th className="px-4 py-3">E-poçt</th>
+                  <th className="px-4 py-3">Proqram</th>
                   <th className="px-4 py-3">Dil</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Nəticə</th>
@@ -92,7 +92,7 @@ export default async function AdminScholarshipPage() {
               </thead>
               <tbody>
                 {students.length === 0 && (
-                  <tr><td colSpan={11} className="px-4 py-10 text-center text-navy-400">Hələ qeydiyyat yoxdur.</td></tr>
+                  <tr><td colSpan={12} className="px-4 py-10 text-center text-navy-400">Hələ qeydiyyat yoxdur.</td></tr>
                 )}
                 {students.map((s) => (
                   <tr key={s.id} className="border-b border-navy-50 align-top last:border-0">
@@ -101,6 +101,7 @@ export default async function AdminScholarshipPage() {
                     <td className="px-4 py-3 font-mono text-xs">{s.fin}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-navy-600">{s.phone}</td>
                     <td className="px-4 py-3 text-navy-600">{s.email}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-navy-600">{s.program}</td>
                     <td className="px-4 py-3 text-navy-600 uppercase">{s.language}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-navy-600">{STATUS[s.status]}{s.timedOut ? " (vaxt bitdi)" : ""}</td>
                     <td className="whitespace-nowrap px-4 py-3 font-bold">{s.status === "SUBMITTED" ? `${s.score} / ${s.total} (${s.percent}%)` : "—"}</td>

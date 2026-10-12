@@ -7,8 +7,8 @@ export type SubjectKey = "LOGIC" | "MATH" | "ENGLISH";
 export const SUBJECT_ORDER: SubjectKey[] = ["LOGIC", "MATH", "ENGLISH"];
 export const SUBJECTS: Record<SubjectKey, { label: string; blurb: string }> = {
   LOGIC: { label: "Məntiq", blurb: "Məntiqi düşüncə, ardıcıllıqlar və problem həlli." },
-  MATH: { label: "Math", blurb: "Riyaziyyat: hesablama, həndəsə və məsələ həlli." },
-  ENGLISH: { label: "English", blurb: "İngilis dilində məntiq, anlama və sözlər." },
+  MATH: { label: "Riyaziyyat", blurb: "Hesablama, həndəsə, tənliklər və məsələ həlli." },
+  ENGLISH: { label: "İngilis dili", blurb: "İngilis dilində məntiq, anlama və sözlər." },
 };
 export const subjectRank = (s: string) => SUBJECT_ORDER.indexOf(s as SubjectKey);
 

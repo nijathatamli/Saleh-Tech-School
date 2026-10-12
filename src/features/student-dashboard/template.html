@@ -46,7 +46,7 @@
             <p style="font-size:16.5px;color:#6F6F6B;margin:12px 0 0 0;letter-spacing:-0.005em">{{ pageSub }}</p>
           </div>
           <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
-            <button style="width:40px;height:40px;border-radius:14px;border:1px solid rgba(23,23,23,0.055);background:rgba(255,255,255,0.6);backdrop-filter:blur(18px) saturate(170%);-webkit-backdrop-filter:blur(18px) saturate(170%);color:#4A4A46;cursor:pointer;position:relative;transition:background 0.18s ease" style-hover="background:#fff">
+            <button aria-label="Bildirişlər" style="width:40px;height:40px;border-radius:14px;border:1px solid rgba(23,23,23,0.055);background:rgba(255,255,255,0.6);backdrop-filter:blur(18px) saturate(170%);-webkit-backdrop-filter:blur(18px) saturate(170%);color:#4A4A46;cursor:pointer;position:relative;transition:background 0.18s ease" style-hover="background:#fff">
               <i class="fa-regular fa-bell" style="font-size:14px"></i>
               <span style="{{ unreadDotStyle }}"></span>
             </button>
@@ -118,6 +118,26 @@
                 </div>
               </div>
               <button style="padding:17px 34px;border-radius:16px;border:none;background:#FF6B00;color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;box-shadow:0 14px 30px -12px rgba(255,107,0,0.6);transition:transform 0.18s ease" sc-camel-on-click="{{ onContinue }}" style-hover="transform:translateY(-1px)" style-active="transform:translateY(0)">Davam et →</button>
+            </div>
+          </section></sc-if>
+
+          <sc-if value="{{ hasClasses }}"><section style="animation:rise 0.5s ease both;animation-delay:115ms;margin-bottom:20px">
+            <div style="padding:30px 34px;border-radius:28px;background:#fff;border:1px solid rgba(23,23,23,0.05);box-shadow:0 1px 2px rgba(23,23,23,0.03)">
+              <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:600;letter-spacing:-0.025em;margin:0 0 14px 0">Mənim siniflərim</h2>
+              <sc-for list="{{ myClasses }}" as="c">
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:16px 0;border-top:1px solid rgba(23,23,23,0.055)">
+                  <div style="flex:1;min-width:220px">
+                    <div style="font-size:15px;font-weight:600;letter-spacing:-0.01em">{{ c.name }}</div>
+                    <div style="font-size:12.5px;color:#6F6F6B;margin-top:5px">{{ c.meta }}</div>
+                  </div>
+                  <div style="min-width:170px">
+                    <div style="height:6px;border-radius:999px;background:#F0EFEB;overflow:hidden"><div style="{{ c.bar }}"></div></div>
+                    <div style="font-size:12.5px;color:#6F6F6B;margin-top:8px">{{ c.progressLabel }}</div>
+                  </div>
+                  <span style="{{ c.statusStyle }}">{{ c.statusLabel }}</span>
+                  <span style="{{ c.payStyle }}">{{ c.payLabel }}</span>
+                </div>
+              </sc-for>
             </div>
           </section></sc-if>
 

@@ -28,11 +28,11 @@ export function Hero() {
           </Link>
           <div className="flex items-center space-x-3">
             <div className="flex -space-x-3">
-              {["avatar-1", "avatar-2", "avatar-3"].map((a) => (
+              {["student-1", "student-2", "student-3"].map((a) => (
                 <Image
                   key={a}
-                  className="rounded-full border-2 border-white dark:border-black"
-                  src={`https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/${a}.jpg`}
+                  className="h-10 w-10 rounded-full border-2 border-white object-cover dark:border-black"
+                  src={`/students/${a}.jpg`}
                   alt=""
                   width={40}
                   height={40}

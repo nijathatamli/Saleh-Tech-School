@@ -10,6 +10,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccessError, accessResult, requireStudent, requireStudentOwnsSubmission } from "@/lib/access";
 import { audit, notifyUsers } from "@/lib/events";
+import { isOwnUploadUrl } from "@/lib/avatar-url";
 
 type Fail = { ok: false; error: "unauthenticated" | "forbidden" | "not-found" | "invalid" | "failed" };
 type Ok = { ok: true } | Fail;
@@ -65,6 +66,7 @@ export async function submitHomework(submissionId: string): Promise<Ok> {
 
 export async function updateStudentAvatar(avatarUrl: string): Promise<Ok> {
   return run(async (userId) => {
+    if (!isOwnUploadUrl(avatarUrl)) return { ok: false, error: "invalid" };
     const student = await requireStudent(userId);
     await prisma.studentProfile.update({ where: { id: student.id }, data: { avatarUrl } });
     return { ok: true };

@@ -10,6 +10,7 @@ export type StatVal = { label: string; value: string };
 export type KvVal = { k: string; v: string };
 export type RosterVal = {
   name: string;
+  lessonsLabel: string;
   initials: string;
   grade: string;
   hw: string;
@@ -68,7 +69,7 @@ export type ClassCardVal = {
 export type HwRowVal = { title: string; meta: string; due: string; status: string; rowStyle: string; icon: string; iconStyle: string; chipStyle: string; onOpen: Handler };
 export type NoteVal = { body: string; when: string; visibilityLabel: string; rowStyle: string; chipStyle: string; onDelete: Handler };
 export type FieldVal = { label: string; value: string; name: string; readOnly: boolean };
-export type ToggleVal = { label: string; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
+export type ToggleVal = { label: string; on: boolean; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
 export type MobileNavVal = { label: string; icon: string; style: string; labelStyle: string; dotStyle: string; onGo: Handler };
 
 export interface TemplateVals {

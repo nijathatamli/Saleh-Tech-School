@@ -370,11 +370,21 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   }
 
   const state: UiState = { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftClassId, draftTime, attMarks, attSaved, scores, gradesSaved, newHwClassId, newHwStudentIds, noteVisibility };
+  // the design's clickable rows are <div role="button">: make them operable from the keyboard like real buttons
+  const activateOnKey = (e: React.KeyboardEvent) => {
+    const t = e.target as HTMLElement;
+    if ((e.key === "Enter" || e.key === " ") && t.getAttribute("role") === "button" && t.tagName !== "BUTTON") {
+      e.preventDefault();
+      t.click();
+    }
+  };
   const vals = buildVals({ ...data, now }, state, actions);
 
   return (
     <>
-      {renderTemplate(vals)}
+      <div style={{ display: "contents" }} onKeyDown={activateOnKey}>
+        {renderTemplate(vals)}
+      </div>
       <input ref={avatarInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onAvatarPicked} />
     </>
   );

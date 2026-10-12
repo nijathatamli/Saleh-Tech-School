@@ -76,7 +76,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-navy-400">
         Hesabınız yoxdur?{" "}
-        <Link href="/qeydiyyat" className="font-bold text-electric-600 hover:underline">
+        <Link href="/sinaq-dersi" className="font-bold text-electric-600 hover:underline">
           Qeydiyyatdan keçin
         </Link>
       </p>

@@ -22,6 +22,10 @@ import {
   requireTeacherOwnsStudent,
 } from "@/lib/access";
 import { audit, notifyParentsOfStudents, notifyStudents } from "@/lib/events";
+import { setParticipation } from "@/lib/billing";
+import { createLessonFor } from "@/lib/lessons";
+import { ApiError } from "@/lib/api";
+import { isOwnUploadUrl } from "@/lib/avatar-url";
 import { clock, dayMonth, fromBakuLocal, parts } from "@/features/parent-dashboard/az";
 
 type Fail = { ok: false; error: "unauthenticated" | "forbidden" | "not-found" | "invalid" | "failed" | "no-lesson" };
@@ -48,6 +52,7 @@ async function run<T extends object = Record<never, never>>(fn: (userId: string)
     return result;
   } catch (err) {
     if (err instanceof AccessError) return accessResult(err);
+    if (err instanceof ApiError) return { ok: false, error: "invalid" }; // e.g. a timetable clash
     console.error("[teacher action]", err);
     return { ok: false, error: "failed" };
   }
@@ -62,21 +67,7 @@ export async function createLesson(input: { classId: string; date: string }): Pr
   return run<{ id: string }>(async (userId) => {
     const parsed = lessonSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: "invalid" };
-    const { classId } = await requireTeacherOwnsClass(userId, parsed.data.classId);
-    const date = fromBakuLocal(parsed.data.date);
-
-    const id = await prisma.$transaction(async (tx) => {
-      const classGroup = await tx.classGroup.findUniqueOrThrow({ where: { id: classId }, include: { course: true, enrollments: true } });
-      const duplicate = await tx.lesson.findFirst({ where: { classId, date } });
-      if (duplicate) return duplicate.id;
-      const lesson = await tx.lesson.create({ data: { classId, title: classGroup.course.name, description: "", date } });
-      const studentIds = classGroup.enrollments.map((e) => e.studentId);
-      const body = `${classGroup.course.name}: ${dayMonth(parts(date))}, ${clock(parts(date))}.`;
-      await notifyParentsOfStudents(tx, studentIds, { title: "Yeni dərs planlaşdırıldı", body, category: "lessons", entityType: "lesson", entityId: lesson.id });
-      await notifyStudents(tx, studentIds, { title: "Yeni dərs planlaşdırıldı", body, entityType: "lesson", entityId: lesson.id });
-      await audit(tx, { actorUserId: userId, action: "lesson.create", entityType: "lesson", entityId: lesson.id, after: { classId, date: date.toISOString(), title: lesson.title } });
-      return lesson.id;
-    });
+    const { id } = await createLessonFor(userId, parsed.data.classId, parsed.data.date);
     return { ok: true, id };
   });
 }
@@ -84,6 +75,8 @@ export async function createLesson(input: { classId: string; date: string }): Pr
 export async function deleteLesson(lessonId: string): Promise<Ok> {
   return run<Record<never, never>>(async (userId) => {
     const { lesson } = await requireTeacherOwnsLesson(userId, lessonId);
+    // a lesson that already counts towards billing is history: it can be cancelled, never erased
+    if (await prisma.attendance.count({ where: { lessonId, completed: true } })) throw new ApiError(409, "Tamamlanmış dərs silinə bilməz.");
     await prisma.$transaction(async (tx) => {
       await audit(tx, { actorUserId: userId, action: "lesson.delete", entityType: "lesson", entityId: lesson.id, before: { classId: lesson.classId, date: lesson.date.toISOString(), title: lesson.title } });
       await tx.lesson.delete({ where: { id: lesson.id } }); // attendance + homework + submissions cascade
@@ -114,13 +107,11 @@ export async function saveAttendance(lessonId: string, marks: Record<string, "p"
       for (const [studentId, mark] of Object.entries(marks)) {
         if (!enrolled.has(studentId) || !STATUS_OF[mark]) continue;
         const status = STATUS_OF[mark];
-        const current = await tx.attendance.findFirst({ where: { lessonId, studentId } });
-        if (current && current.status === status) continue;
-        const row = current
-          ? await tx.attendance.update({ where: { id: current.id }, data: { status, markedById: userId } })
-          : await tx.attendance.create({ data: { lessonId, studentId, status, date: lesson.date, markedById: userId } });
+        // one row per (lesson, student); `completed` + the payment cycles are kept in line by setParticipation
+        const res = await setParticipation(tx, { actorUserId: userId, lesson: { id: lesson.id, classId: lesson.classId, date: lesson.date }, studentId, status });
+        if (!res.changed) continue;
+        const row = res.attendance;
         n += 1;
-        await audit(tx, { actorUserId: userId, action: "attendance.mark", entityType: "attendance", entityId: row.id, before: current ? { status: current.status } : null, after: { status, lessonId, studentId } });
         if (status !== "PRESENT") {
           const student = await tx.studentProfile.findUniqueOrThrow({ where: { id: studentId }, select: { firstName: true } });
           const ref = { entityType: "attendance" as const, entityId: row.id };
@@ -129,9 +120,10 @@ export async function saveAttendance(lessonId: string, marks: Record<string, "p"
             body: `${student.firstName} ${dateLabel} tarixli "${lesson.title}" dərsində ${STATUS_WORD[status]} kimi qeyd edildi.`,
             type: "warning",
             category: "lessons",
+            event: "ABSENCE",
             ...ref,
           });
-          await notifyStudents(tx, [studentId], { title: "Davamiyyət qeydi", body: `${dateLabel} tarixli "${lesson.title}" dərsində ${STATUS_WORD[status]} kimi qeyd edildin.`, type: "warning", ...ref });
+          await notifyStudents(tx, [studentId], { title: "Davamiyyət qeydi", body: `${dateLabel} tarixli "${lesson.title}" dərsində ${STATUS_WORD[status]} kimi qeyd edildin.`, type: "warning", event: "ABSENCE", ...ref });
         }
       }
       return n;
@@ -290,6 +282,7 @@ export async function updateTeacherProfile(formData: FormData): Promise<Ok> {
 
 export async function updateTeacherAvatar(url: string): Promise<Ok> {
   return run<Record<never, never>>(async (userId) => {
+    if (!isOwnUploadUrl(url)) return { ok: false, error: "invalid" };
     await requireTeacher(userId);
     await prisma.$transaction([
       prisma.teacherProfile.update({ where: { userId }, data: { photoUrl: url } }),
