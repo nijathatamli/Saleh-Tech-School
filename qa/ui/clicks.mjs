@@ -16,6 +16,7 @@ const ROLES = arg("--roles", "public,admin,teacher,student,parent").split(",");
 const VPS = arg("--vp", "desktop,mobile").split(",");
 const ENUM_ONLY = process.argv.includes("--enumerate-only");
 const POOL = Number(arg("--pool", 4));
+const DEEP = process.argv.includes("--deep"); // second level: click what lives INSIDE the dialog/menu/panel a button opened
 
 const MARK = () => {
   document.querySelectorAll("[data-qa-i]").forEach((e) => e.removeAttribute("data-qa-i"));
@@ -32,10 +33,28 @@ const MARK = () => {
     return { i, tag, role: el.getAttribute("role"), type: el.getAttribute("type"), text: name(el), href: tag === "a" ? el.getAttribute("href") : null, target: el.getAttribute("target"), rel: el.getAttribute("rel"), disabled: el.disabled === true || el.getAttribute("aria-disabled") === "true", field, hasLabel: field ? !!(el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") || (el.id && document.querySelector(`label[for="${el.id}"]`)) || el.closest("label") || el.getAttribute("placeholder") || el.getAttribute("title")) : null, pointer: !el.matches(SEL) };
   });
 };
+// What counts as "the click did something": the address, the VISIBLE TEXT of the page, form values, ARIA state
+// (aria-checked/pressed/selected/expanded), the theme class, dialogs. Pure style/class churn (hover colours, animation
+// re-renders) deliberately does NOT count: it made dead buttons look alive in the first version of this audit.
 const SNAP = () => {
-  let h = 5381; const s = document.body.innerHTML; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  const sig = [document.body.innerText, [...document.querySelectorAll("input,textarea,select")].map((e) => e.value).join("|"),
+    [...document.querySelectorAll("[aria-checked],[aria-pressed],[aria-selected],[aria-expanded]")].map((e) => ["aria-checked", "aria-pressed", "aria-selected", "aria-expanded"].map((a) => e.getAttribute(a)).join("")).join(","),
+    document.documentElement.className].join("\u0001");
+  let h = 5381; for (let i = 0; i < sig.length; i++) h = ((h << 5) + h + sig.charCodeAt(i)) | 0;
   return { url: location.pathname + location.search, hash: h, dialogs: document.querySelectorAll("[role=dialog], dialog[open]").length, expanded: document.querySelectorAll("[aria-expanded=true]").length, y: Math.round(scrollY) };
 };
+
+// Controls inside whatever the first click opened (dialog, dropdown menu, popover, listbox).
+const MARK_INNER = () => {
+  document.querySelectorAll("[data-qa-j]").forEach((e) => e.removeAttribute("data-qa-j"));
+  const vis = (el) => { const r = el.getBoundingClientRect(); const st = getComputedStyle(el); return r.width > 1 && r.height > 1 && st.visibility !== "hidden" && st.display !== "none" && st.opacity !== "0"; };
+  const roots = [...document.querySelectorAll("[role=dialog], dialog[open], [role=menu], [role=listbox], [data-radix-popper-content-wrapper]")];
+  const SEL = "a[href], button, [role=button], [role=tab], [role=switch], [role=menuitem], [role=option], summary";
+  const els = [...new Set(roots.flatMap((r) => [...r.querySelectorAll(SEL)]))].filter(vis);
+  const name = (el) => (el.getAttribute("aria-label") || el.getAttribute("title") || el.innerText || el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 60);
+  return els.map((el, j) => { el.setAttribute("data-qa-j", String(j)); return { j, tag: el.tagName.toLowerCase(), text: name(el), href: el.tagName === "A" ? el.getAttribute("href") : null, disabled: el.disabled === true || el.getAttribute("aria-disabled") === "true" }; });
+};
+const DESTRUCTIVE = /^(sil|silin|delete|arxivə? ?(al|et)?|deaktiv|ləğv et|bəli|təsdiq(lə)?|hə,?)\b|çıxış|logout|sign out|sıfırla/i;
 
 const LOGOUT = /çıxış|logout|sign out/i;
 const DIALOGS = [];
@@ -107,8 +126,7 @@ async function auditRoute(browser, ctxState, role, vp, path, results) {
         const effects = [];
         if (after.url !== before.url) effects.push(`navigate ${before.url} → ${after.url}`);
         if (mutating.length) effects.push(`request ${mutating[0].slice(0, 60)}`);
-        else if (net.length) effects.push(`fetch ${net[0].slice(0, 60)}`);
-        if (after.hash !== before.hash) effects.push("DOM changed");
+        if (after.hash !== before.hash) effects.push("visible content changed");
         if (after.dialogs !== before.dialogs) effects.push("dialog toggled");
         if (after.expanded !== before.expanded) effects.push("expanded toggled");
         if (dialogShown) effects.push("native confirm shown");
@@ -118,6 +136,47 @@ async function auditRoute(browser, ctxState, role, vp, path, results) {
         else if (effects.length) { rec.status = "PASS"; rec.evidence = effects.join("; "); }
         else { rec.status = "NO-EFFECT"; rec.evidence = "click produced no navigation, request, DOM or dialog change"; }
         if (mutating.length && !dialogShown && after.dialogs === before.dialogs && /sil|trash|delete|ləğv|arxiv/i.test(it.text)) rec.evidence += " [destructive action ran without confirmation]";
+        if (DEEP && !errors.length && (after.dialogs > before.dialogs || after.expanded > before.expanded || effects.some((e) => e === "visible content changed"))) {
+          const inner = await page.evaluate(MARK_INNER).catch(() => []);
+          for (const c of inner) {
+            const crec = { role, vp, route: path, i: `${it.i}>${c.j}`, kind: "inner", tag: c.tag, text: `${it.text} ▸ ${c.text}`, href: c.href, status: null, evidence: "" };
+            if (c.disabled) { crec.status = "BLOCKED"; crec.evidence = "disabled in this state"; results.push(crec); continue; }
+            if (DESTRUCTIVE.test(c.text)) { crec.status = "SKIPPED"; crec.evidence = "destructive/confirming control: not executed by the crawler"; results.push(crec); continue; }
+            try {
+              await load(page, path);
+              const m2 = await page.evaluate(MARK);
+              if (!(m2[it.i] && m2[it.i].text === it.text)) { crec.status = "BLOCKED"; crec.evidence = "parent changed between loads"; results.push(crec); continue; }
+              await page.locator(`[data-qa-i="${it.i}"]`).scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+              await page.locator(`[data-qa-i="${it.i}"]`).click({ timeout: 3000 }).catch(() => {});
+              await page.waitForTimeout(500);
+              const in2 = await page.evaluate(MARK_INNER).catch(() => []);
+              const match = in2.find((x) => x.j === c.j && x.text === c.text) ?? in2.find((x) => x.text === c.text);
+              if (!match) { crec.status = "BLOCKED"; crec.evidence = "inner control not present after reopening"; results.push(crec); continue; }
+              w.reset(); dialogShown = false;
+              const b2 = await page.evaluate(SNAP);
+              let ce = null;
+              await page.locator(`[data-qa-j="${match.j}"]`).click({ timeout: 3000 }).catch((e) => { ce = String(e.message).split("\n")[0].slice(0, 100); });
+              if (ce) { crec.status = "BLOCKED"; crec.evidence = `not clickable: ${ce}`; results.push(crec); continue; }
+              await page.waitForTimeout(700);
+              await page.waitForLoadState("networkidle", { timeout: 3000 }).catch(() => {});
+              const a2 = await page.evaluate(SNAP).catch(() => ({ url: "(navigated)", hash: 0, dialogs: 0, expanded: 0, y: 0 }));
+              const net2 = w.log.requests.filter((r) => !/^GET .*\.(png|jpe?g|svg|webp|woff2?|css|js)/.test(r)).filter((r) => /^(POST|PUT|PATCH|DELETE)/.test(r));
+              const ef = [];
+              if (a2.url !== b2.url) ef.push(`navigate ${b2.url} → ${a2.url}`);
+              if (net2.length) ef.push(`request ${net2[0].slice(0, 60)}`);
+              if (a2.hash !== b2.hash) ef.push("visible content changed");
+              if (a2.dialogs !== b2.dialogs) ef.push("dialog toggled");
+              if (a2.expanded !== b2.expanded) ef.push("expanded toggled");
+              if (dialogShown) ef.push("native confirm shown");
+              if (a2.y !== b2.y) ef.push("scrolled");
+              const er2 = [...w.log.pageerrors, ...w.log.console.filter((x) => !/Failed to load resource/.test(x)), ...w.log.failed, ...w.log.bad.filter((x) => !/^404 GET .*_rsc/.test(x))];
+              if (er2.length) { crec.status = "FAIL"; crec.evidence = `errors after click: ${er2.slice(0, 2).join(" | ").slice(0, 200)}`; }
+              else if (ef.length) { crec.status = "PASS"; crec.evidence = ef.join("; "); }
+              else { crec.status = "NO-EFFECT"; crec.evidence = "click produced no navigation, request, DOM or dialog change"; }
+            } catch (e) { crec.status = "FAIL"; crec.evidence = `script error: ${String(e.message).split("\n")[0].slice(0, 120)}`; }
+            results.push(crec);
+          }
+        }
       } catch (e) {
         rec.status = "FAIL"; rec.evidence = `script error: ${String(e.message).split("\n")[0].slice(0, 120)}`;
       }

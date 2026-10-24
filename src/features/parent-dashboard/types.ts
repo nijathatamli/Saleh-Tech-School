@@ -17,6 +17,7 @@ export type PortalSubmission = {
   id: string;
   status: SubmissionStatus;
   score: number | null;
+  maxScore: number;
   feedback: string | null;
   submittedAt: string | null;
   title: string;

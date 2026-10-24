@@ -9,7 +9,7 @@ import "@/features/teacher-dashboard/styles/base.css";
 import "@/features/teacher-dashboard/styles/template.generated.css";
 import "@/features/teacher-dashboard/styles/portal.css";
 
-export const metadata: Metadata = { title: "Müəllim paneli" };
+export const metadata: Metadata = { title: "Müəllim paneli", robots: { index: false, follow: false } };
 
 // Access control lives in middleware.ts (session + TEACHER role) and the page
 // itself re-checks the session before loading data.

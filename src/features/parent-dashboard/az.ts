@@ -161,6 +161,22 @@ export function initialsOf(name: string) {
     .toUpperCase();
 }
 
+/**
+ * Strict version of fromBakuLocal for text that comes from a person or a URL: "YYYY-MM-DD" or "YYYY-MM-DDTHH:mm" in Baku time,
+ * or null when that calendar date/time does not exist (30 February, 25:61, month 13, year 0001) — it never rolls over to another day.
+ */
+export function parseBakuLocal(value: string): Date | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::\d{2})?)?$/.exec(value);
+  if (!m) return null;
+  const [y, mo, d, h, mi] = [m[1], m[2], m[3], m[4] ?? "0", m[5] ?? "0"].map(Number);
+  const probe = new Date(Date.UTC(y, mo - 1, d, h, mi));
+  if (probe.getUTCFullYear() !== y || probe.getUTCMonth() !== mo - 1 || probe.getUTCDate() !== d || probe.getUTCHours() !== h || probe.getUTCMinutes() !== mi) return null;
+  return fromBakuLocal(m[4] === undefined ? `${value}T00:00` : value);
+}
+
+/** True for a real calendar day "YYYY-MM-DD" in 2000–2100 (outside that range a "+1 day" end bound would leave the database's date range). */
+export const isRealDay = (value: string) => value.length === 10 && parseBakuLocal(value) !== null && Number(value.slice(0, 4)) >= 2000 && Number(value.slice(0, 4)) <= 2100;
+
 /** A `datetime-local` value typed in Baku time ("2026-09-20T18:00") as an instant. Azerbaijan has no DST. */
 export function fromBakuLocal(value: string) {
   return new Date(`${value.length === 16 ? `${value}:00` : value}+04:00`);

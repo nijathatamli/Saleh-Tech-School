@@ -1,3 +1,4 @@
+import type { DashboardNotification } from "@/lib/notifications";
 // Serialisable snapshot of everything the student dashboard renders. Built on
 // the server from Prisma (see data.ts) and handed to the client component, so
 // dates travel as ISO strings / epoch millis.
@@ -16,6 +17,7 @@ export type StudentSubmission = {
   id: string;
   status: SubmissionStatus;
   score: number | null;
+  maxScore: number;
   feedback: string | null;
   submittedAt: string | null;
   title: string;
@@ -116,6 +118,8 @@ export type StudentDashboardData = {
   /** 1-based position of the signed-in student among all students by points */
   myRank: number;
   unreadNotifications: number;
+  /** latest notifications for the bell panel */
+  notifications: DashboardNotification[];
   /** Server clock at render time — the client renders "today"/"ago" from this so SSR and hydration agree. */
   now: number;
 };

@@ -148,7 +148,8 @@ test("WF-B3 attendance: saved once, persisted, idempotent, audited, and each pan
   // the absent student's family got exactly one absence notification, the present one none
   const absence = await sql(`select "userId" from "Notification" where event='ABSENCE' and "entityType"='attendance' and body like $1`, [`%Qathree%`]);
   assert.ok(absence.length >= 1);
-  const forS1 = await sql(`select count(*)::int n from "Notification" where event='ABSENCE' and body like $1`, [`%Qaone%`]);
+  // (QA students share first names across test worlds, so scope to this world's families: parent 1 has students 1 and 3, parent 2 has student 2)
+  const forS1 = await sql(`select count(*)::int n from "Notification" n join "User" u on u.id=n."userId" where n.event='ABSENCE' and n."entityType"='attendance' and lower(u.email) in (lower($2), lower($3)) and n.body like $1`, [`%Qaone%`, w.parent1.email, w.parent2.email]);
   assert.equal(forS1[0].n, 0, "no absence notice for a present student");
   // persistence in a brand-new session + what teacher/student/parent see
   const teacher = await loginAs(w.teacherA.email, w.pw);

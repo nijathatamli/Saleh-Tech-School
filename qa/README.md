@@ -26,7 +26,7 @@ npm run qa:down
 | `infra/` | `up.sh`, `down.sh`, `pg-real.sh` (fresh install **or** a rehearsal of the deploy on a copy of production data), `start-app.sh`, `rebuild.sh`, `restore-drill.sh` (dump → restore → compare) |
 
 Server actions are called over real HTTP: their ids are recovered from the production build (`tests/helpers.mjs → actionId`),
-so run `qa:up` (or `npx next build`) before `qa:test`.
+so run `qa:up` (or `qa/infra/rebuild.sh`) before `qa:test`. The QA build lives in `.next-qa` (set by the scripts via `NEXT_DIST_DIR`), so it can run next to a `next dev` on :3000 without touching its `.next` folder.
 
 ## Rehearsing a deploy on production data
 ```bash

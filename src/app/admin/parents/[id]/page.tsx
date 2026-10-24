@@ -30,7 +30,7 @@ export default async function AdminParentPage({ params }: { params: { id: string
             <p><span className="text-navy-400">Gözləyən ödənişlər:</span> <b>{p.paymentsDue}</b> {p.paymentsDue > 0 && <Link href="/admin/payments?status=DUE" className="font-bold text-electric-600 hover:underline">bax</Link>}</p>
             <Badge variant={p.active ? "success" : "default"}>{p.active ? "Aktiv" : "Deaktiv"}</Badge>
           </div>
-          <div className="flex items-center gap-3"><EditParentDialog parent={{ id: p.id, name: p.name, phone: p.phone }} /><ActiveToggle endpoint={`/api/admin/parents/${p.id}`} active={p.active} label="Valideyn" /></div>
+          <div className="flex flex-wrap items-center gap-3"><EditParentDialog parent={{ id: p.id, name: p.name, phone: p.phone }} /><ActiveToggle endpoint={`/api/admin/parents/${p.id}`} active={p.active} label="Valideyn" /></div>
         </div>
         <div className={`${card} p-6`}>
           <h2 className="mb-4 text-lg font-extrabold text-navy-900">Övladlar</h2>

@@ -5,9 +5,9 @@ import { getSettings } from "@/lib/settings";
 import { resolveRange } from "@/lib/admin/reports";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateLessonDialog, LessonRowActions } from "@/components/admin/schedule-dialogs";
-import { Pagination, card, th } from "@/components/admin/bits";
+import { Pagination, card, th, EmptyState } from "@/components/admin/bits";
 import { ScheduleCalendar, LESSON_STATUS as STATUS } from "@/components/admin/schedule-calendar";
-import { fromBakuLocal } from "@/features/parent-dashboard/az";
+import { fromBakuLocal, isRealDay } from "@/features/parent-dashboard/az";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +25,7 @@ export default async function AdminSchedulePage({ searchParams }: { searchParams
   const today = resolveRange().toDay;
 
   // calendar: ?month=YYYY-MM, ?day=YYYY-MM-DD (defaults to today when viewing the current month)
-  const pickedDay = searchParams.day && DAY_RE.test(searchParams.day) ? searchParams.day : null;
+  const pickedDay = searchParams.day && DAY_RE.test(searchParams.day) && isRealDay(searchParams.day) ? searchParams.day : null;
   const month = searchParams.month && MONTH_RE.test(searchParams.month) ? searchParams.month : (pickedDay ?? today).slice(0, 7);
   const selectedDay = pickedDay && pickedDay.startsWith(month) ? pickedDay : month === today.slice(0, 7) ? today : null;
   const [cy, cm] = month.split("-").map(Number);
@@ -63,11 +63,11 @@ export default async function AdminSchedulePage({ searchParams }: { searchParams
         <ScheduleCalendar month={month} selected={selectedDay} today={today} lessons={calendarItems}
           query={{ from: searchParams.from, to: searchParams.to, classId: searchParams.classId, teacherId: searchParams.teacherId, status: searchParams.status }} />
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Tarix</th><th className={th}>Vaxt</th><th className={th}>Sinif</th><th className={th}>Müəllim</th><th className={th}>Otaq</th><th className={th}>Status</th><th className={th}></th></tr></thead>
               <tbody>
-                {items.length === 0 && <tr><td colSpan={7} className="px-4 py-12 text-center text-navy-400">Bu aralıqda dərs yoxdur.</td></tr>}
+                {items.length === 0 && <tr><td colSpan={7} className="px-4 py-4"><EmptyState text="Bu aralıqda dərs yoxdur." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {items.map((l) => (
                   <tr key={l.id} className={`border-b border-navy-50 last:border-0 ${l.status === "CANCELLED" ? "opacity-60" : ""}`}>
                     <td className="whitespace-nowrap px-4 py-3 font-bold">{fmt(l.date, { day: "2-digit", month: "short", weekday: "short" })}</td>

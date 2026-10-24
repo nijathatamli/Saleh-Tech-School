@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { LearningJourney } from "@/components/marketing/learning-journey";
 import { TeacherPhoto } from "@/components/marketing/teacher-photo";
 import { Reveal } from "@/components/app/reveal";
+import { JsonLd } from "@/components/seo/json-ld";
+import { SITE_NAME, absoluteUrl, breadcrumbLd, clip, dynamicMetadata } from "@/lib/seo";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +22,13 @@ const levelLabel: Record<string, string> = {
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const course = await getCourseBySlug(params.slug);
-  return { title: course?.name ?? "Kurs tapılmadı" };
+  if (!course) return { title: "Kurs tapılmadı", robots: { index: false } };
+  return dynamicMetadata({
+    title: clip(`${course.name} kursu uşaqlar üçün | ${SITE_NAME}`, 60),
+    description: clip(`${course.shortDesc} ${course.longDesc} ${course.minAge}–${course.maxAge} yaş, ${course.durationMonths} ay. Pulsuz sınaq dərsinə yazılın.`, 160),
+    path: `/kurslar/${course.slug}`,
+    keywords: [`${course.name} kursu`, `uşaqlar üçün ${course.name.toLowerCase()}`, ...course.tags],
+  });
 }
 
 export default async function CourseDetailPage({ params }: { params: { slug: string } }) {
@@ -38,8 +46,32 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
     { q: "Dərslər onlayn, yoxsa oflayndır?", a: "Kursların böyük əksəriyyəti bizim mərkəzimizdə oflayn keçirilir." },
   ];
 
+  const courseUrl = absoluteUrl(`/kurslar/${course.slug}`);
+  const ld = [
+    breadcrumbLd([{ name: "Kurslar", path: "/kurslar" }, { name: course.name, path: `/kurslar/${course.slug}` }]),
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: `${course.name} kursu`,
+      description: course.longDesc,
+      url: courseUrl,
+      inLanguage: "az",
+      educationalLevel: levelLabel[course.level],
+      timeRequired: `P${course.durationMonths}M`,
+      audience: { "@type": "PeopleAudience", suggestedMinAge: course.minAge, suggestedMaxAge: course.maxAge },
+      teaches: course.skills,
+      provider: { "@type": "EducationalOrganization", name: SITE_NAME, url: absoluteUrl("/") },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    },
+  ];
+
   return (
     <div>
+      <JsonLd data={ld} />
       {/* Header */}
       <section className="border-b border-grey-100 px-6 py-16 dark:border-zinc-800 md:px-20">
         <div className="mx-auto max-w-5xl">
@@ -125,7 +157,7 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
               {projects.map((p) => (
                 <div key={p.id} className="overflow-hidden rounded-2xl bg-white dark:bg-black">
                   <div className="relative h-40">
-                    <Image src={p.imageUrl} alt={p.title} fill className="object-cover" />
+                    <Image src={p.imageUrl} alt={`${p.title} — ${course.name} kursu tələbə layihəsi`} fill className="object-cover" />
                   </div>
                   <div className="p-5">
                     <p className="font-bold text-sm">{p.title}</p>

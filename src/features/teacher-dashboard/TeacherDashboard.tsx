@@ -15,7 +15,7 @@ import { useRefreshOnReturn } from "@/lib/use-refresh-on-return";
 import { renderTemplate } from "./template.generated";
 import { buildVals, mobileKeyForSection, sectionForMobileKey, TIME_SLOTS, type Actions, type Detail, type HwFilter, type Mark, type MobileKey, type NotifPrefs, type Section, type UiState } from "./logic";
 import { parseTeacherPath, pathFor, sectionForDetail, type Screen } from "./routes";
-import { createHomework, createLesson, createStudentNote, deleteLesson, deleteStudentNote, saveAttendance, saveGrades, updateTeacherAvatar, updateTeacherProfile } from "./actions";
+import { createHomework, createLesson, createStudentNote, deleteLesson, deleteStudentNote, saveAttendance, saveGrades, markNotificationsRead, updateNotificationPrefs, updateTeacherAvatar, updateTeacherProfile } from "./actions";
 import { parts } from "@/features/parent-dashboard/az";
 import type { NoteVisibility, TeacherDashboardData } from "./types";
 
@@ -29,7 +29,6 @@ const ERROR_TEXT: Record<string, string> = {
 };
 const fail = (error: string, fallback?: string) => toast.error(fallback && error === "invalid" ? fallback : ERROR_TEXT[error] ?? ERROR_TEXT.failed);
 
-const DEFAULT_NOTIF: NotifPrefs = { submission: true, absence: true, weekly: false };
 
 async function uploadFile(file: File) {
   const formData = new FormData();
@@ -39,6 +38,8 @@ async function uploadFile(file: File) {
   if (!res.ok) throw new Error(body.error ?? "Yükləmə alınmadı");
   return body.url as string;
 }
+
+const LEAVE_UNSAVED = "Davamiyyət işarələri hələ saxlanılmayıb və çıxsanız itəcək. Çıxılsın?";
 
 export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboardData; initialScreen: Screen }) {
   const router = useRouter();
@@ -55,9 +56,10 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   const today = parts(data.now);
   const [mnav, setMnav] = useState<MobileKey>(() => mobileKeyForSection(initialScreen.section));
   const [lit, setLit] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
   const [hwFilter, setHwFilter] = useState<HwFilter>("Hamısı");
   const [classFilter, setClassFilter] = useState("Hamısı");
-  const [notif, setNotif] = useState<NotifPrefs>(DEFAULT_NOTIF);
+  const [notif, setNotif] = useState<NotifPrefs>(data.notifPrefs);
   const [month, setMonth] = useState({ y: today.y, m: today.m });
   const [pickedDay, setPickedDay] = useState(today.d);
   const [addingLesson, setAddingLesson] = useState(false);
@@ -65,6 +67,10 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   const [draftTime, setDraftTime] = useState(TIME_SLOTS[4]);
   const [attMarks, setAttMarks] = useState<Record<string, Mark>>({});
   const [attSaved, setAttSaved] = useState(false);
+  /** marks changed on screen and not saved yet: a background refresh must not wipe them, leaving the screen asks first */
+  const [attDirty, setAttDirty] = useState(false);
+  const attDirtyRef = useRef(false);
+  attDirtyRef.current = attDirty;
   const [scores, setScores] = useState<Record<string, string>>({});
   const [gradesSaved, setGradesSaved] = useState(false);
   const [newHwClassId, setNewHwClassId] = useState<string | null>(null);
@@ -100,6 +106,7 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   const attendanceLessonId = detail?.kind === "attendance" ? detail.lessonId ?? "" : null;
   useEffect(() => {
     if (attendanceLessonId === null) return;
+    if (attDirtyRef.current) return; // coming back to the tab refreshes the data: unsaved marks stay
     const next: Record<string, Mark> = {};
     if (attendanceLessonId) {
       for (const s of data.students) {
@@ -116,15 +123,6 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     const id = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(id);
   }, [data.now]);
-
-  // Notification preferences have no backend field (no migrations) — remembered per browser.
-  const notifKey = `td-notif-${data.teacher.userId}`;
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(notifKey);
-      if (stored) setNotif({ ...DEFAULT_NOTIF, ...JSON.parse(stored) });
-    } catch {}
-  }, [notifKey]);
 
   // The site's themed cursor is not part of the approved dashboard UI; its
   // component re-adds the class after ours on a full load, so keep stripping it.
@@ -145,6 +143,22 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     };
   }, []);
 
+  useEffect(() => setBellOpen(false), [pathname]); // leaving a screen closes the panel
+  useEffect(() => {
+    if (!bellOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setBellOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [bellOpen]);
+
+  // closing or reloading the tab with unsaved attendance marks asks first
+  useEffect(() => {
+    if (!attDirty) return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [attDirty]);
+
   const refresh = useCallback(() => startTransition(() => router.refresh()), [router]);
   useRefreshOnReturn();
 
@@ -156,6 +170,9 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     (next: Screen, replace = false) => {
       const url = pathFor(next);
       if (url === pathFor(screen)) return;
+      if (attDirtyRef.current && !window.confirm(LEAVE_UNSAVED)) return;
+      attDirtyRef.current = false;
+      setAttDirty(false);
       if (replace) router.replace(url);
       else router.push(url);
     },
@@ -163,6 +180,14 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   );
 
   const actions: Actions = {
+    toggleBell: () => setBellOpen((o) => !o),
+    markNotificationsRead: () => {
+      startTransition(async () => {
+        const result = await markNotificationsRead();
+        if (result.ok) router.refresh();
+        else toast.error("Bildirişlər yenilənmədi.");
+      });
+    },
     go: (href) => {
       navigate({ section: href, detail: null });
       setMnav(mobileKeyForSection(href));
@@ -174,6 +199,9 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
       light();
     },
     back: () => {
+      if (attDirtyRef.current && !window.confirm(LEAVE_UNSAVED)) return;
+      attDirtyRef.current = false;
+      setAttDirty(false);
       if (window.history.length > 1) router.back();
       else navigate({ section: nav, detail: null });
     },
@@ -181,12 +209,14 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     setHwFilter,
     setClassFilter,
     toggleNotif: (key) => {
-      setNotif((s) => {
-        const next = { ...s, [key]: !s[key] };
-        try {
-          localStorage.setItem(notifKey, JSON.stringify(next));
-        } catch {}
-        return next;
+      const next = { ...notif, [key]: !notif[key] };
+      setNotif(next); // optimistic; the server value wins on the next refresh
+      startTransition(async () => {
+        const result = await updateNotificationPrefs(next);
+        if (!result.ok) {
+          setNotif(notif);
+          toast.error("Tənzimləmə yadda saxlanmadı.");
+        }
       });
     },
     prevMonth: () => {
@@ -227,16 +257,23 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
       for (const id of studentIds) next[id] = "p";
       setAttMarks(next);
       setAttSaved(false);
+      setAttDirty(true);
     },
     setMark: (studentId, mark) => {
       setAttMarks((m) => ({ ...m, [studentId]: mark }));
       setAttSaved(false);
+      setAttDirty(true);
     },
     saveAttendance: (lessonId) => {
+      if (!Object.keys(attMarks).length) {
+        toast.error("Əvvəlcə tələbələrin iştirak vəziyyətini seçin.");
+        return;
+      }
       startTransition(async () => {
         const result = await saveAttendance(lessonId, attMarks);
         if (result.ok) {
           setAttSaved(true);
+          setAttDirty(false);
           toast.success("Davamiyyət yadda saxlanıldı.");
           router.refresh();
         } else fail(result.error);
@@ -247,16 +284,19 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
       setGradesSaved(false);
     },
     saveGrades: (rows) => {
-      const picked = rows.filter((r) => scores[r.submissionId]);
-      if (!picked.length) {
-        toast("Əvvəlcə bal seçin.");
+      // a row is saved when a new score was picked, or when the feedback of an already graded work was edited (its score stays)
+      const payload = rows.flatMap((r) => {
+        const feedback = document.querySelector<HTMLInputElement>(`.td-desktop input[name="${r.inputName}"]`)?.value ?? "";
+        const picked = scores[r.submissionId];
+        const score = picked ? Number(picked) : r.score;
+        if (score === null || score === undefined) return [];
+        if (!picked && feedback.trim() === r.feedback.trim()) return [];
+        return [{ submissionId: r.submissionId, score, feedback }];
+      });
+      if (!payload.length) {
+        toast("Əvvəlcə bal seçin və ya rəyi dəyişin.");
         return;
       }
-      const payload = picked.map((r) => ({
-        submissionId: r.submissionId,
-        score: Number(scores[r.submissionId]),
-        feedback: document.querySelector<HTMLInputElement>(`.td-desktop input[name="${r.inputName}"]`)?.value ?? "",
-      }));
       startTransition(async () => {
         const result = await saveGrades(payload);
         if (result.ok) {
@@ -287,8 +327,14 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
         toast.error("Ən azı bir tələbə seçin.");
         return;
       }
+      const rawMax = read("hwMaxScore").trim();
+      const maxScore = rawMax === "" ? 100 : Number(rawMax);
+      if (!Number.isInteger(maxScore) || maxScore < 1 || maxScore > 1000) {
+        toast.error("Maksimal bal 1 ilə 1000 arasında tam ədəd olmalıdır.");
+        return;
+      }
       startTransition(async () => {
-        const result = await createHomework({ classId, title: read("hwTitle"), description: read("hwDescription"), dueDate: read("hwDueDate"), studentIds: studentIds ?? undefined });
+        const result = await createHomework({ classId, title: read("hwTitle"), description: read("hwDescription"), dueDate: read("hwDueDate"), maxScore, studentIds: studentIds ?? undefined });
         if (result.ok) {
           toast.success("Tapşırıq təyin edildi.");
           setNewHwStudentIds(null);
@@ -369,7 +415,7 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     }
   }
 
-  const state: UiState = { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftClassId, draftTime, attMarks, attSaved, scores, gradesSaved, newHwClassId, newHwStudentIds, noteVisibility };
+  const state: UiState = { bellOpen, nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftClassId, draftTime, attMarks, attSaved, attDirty, scores, gradesSaved, newHwClassId, newHwStudentIds, noteVisibility };
   // the design's clickable rows are <div role="button">: make them operable from the keyboard like real buttons
   const activateOnKey = (e: React.KeyboardEvent) => {
     const t = e.target as HTMLElement;

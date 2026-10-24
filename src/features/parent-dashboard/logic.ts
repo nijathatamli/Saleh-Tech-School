@@ -187,16 +187,28 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
   const attendancePct = attendancePctOf(att);
   const attDated = att.map((r) => ({ ...r, p: parts(r.date) }));
 
+  // One step per month from the first recorded lesson (at least the last twelve, at most 24) to the current month — and on to
+  // a year ahead, or further when a later month already has a lesson marked.
   const monthTabKeys: { key: string; y: number; m: number }[] = [];
-  for (let back = 2; back >= 0; back--) {
+  const monthIndex = (y: number, m: number) => y * 12 + m;
+  const nowIdx = monthIndex(now.y, now.m);
+  const firstRecorded = attDated.reduce((min, r) => Math.min(min, monthIndex(r.p.y, r.p.m)), nowIdx);
+  const lastRecorded = attDated.reduce((max, r) => Math.max(max, monthIndex(r.p.y, r.p.m)), nowIdx);
+  const monthsBack = Math.min(23, Math.max(11, nowIdx - firstRecorded));
+  const monthsAhead = Math.min(24, Math.max(11, lastRecorded - nowIdx)); // a year ahead is always reachable (upcoming months are simply empty until lessons are marked)
+  for (let back = monthsBack; back >= -monthsAhead; back--) {
     const d = new Date(Date.UTC(now.y, now.m - back, 1));
     monthTabKeys.push({ key: `${d.getUTCFullYear()}-${d.getUTCMonth()}`, y: d.getUTCFullYear(), m: d.getUTCMonth() });
   }
   const currentKey = monthKey(now);
   const inMonth = (t: { y: number; m: number }) => attDated.filter((r) => r.p.y === t.y && r.p.m === t.m);
-  // default tab: the latest of the three months that has lessons recorded (else the current month)
-  const defaultTab = [...monthTabKeys].reverse().find((t) => inMonth(t).length > 0) ?? monthTabKeys[monthTabKeys.length - 1];
+  // default: the latest month up to now that has lessons recorded (else the current month) — later months are one arrow away
+  const upToNow = monthTabKeys.filter((t) => monthIndex(t.y, t.m) <= nowIdx);
+  const defaultTab = [...upToNow].reverse().find((t) => inMonth(t).length > 0) ?? upToNow[upToNow.length - 1];
   const selected = monthTabKeys.find((t) => t.key === state.month) ?? defaultTab;
+  const selectedIdx = monthTabKeys.findIndex((t) => t.key === selected.key);
+  const navBtnStyle = (on: boolean) =>
+    `width:38px;height:38px;flex-shrink:0;border-radius:12px;border:1px solid rgba(23,23,23,0.08);background:#fff;font-size:20px;line-height:1;color:#171717;display:flex;align-items:center;justify-content:center;cursor:${on ? "pointer" : "default"};opacity:${on ? 1 : 0.35}`;
   const selectedRecords = inMonth(selected);
   const currentRecords = inMonth({ y: now.y, m: now.m });
   const selCounts = attendanceCounts(selectedRecords);
@@ -249,7 +261,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
   const activeCount = submissions.filter((s) => s.status === "PENDING" || s.status === "OVERDUE").length;
   const hwDue = (s: PortalSubmission, short: boolean) => {
     const due = parts(s.dueDate);
-    if (s.status === "GRADED") return s.score !== null ? `${s.score} bal` : "Tamamlandı";
+    if (s.status === "GRADED") return s.score !== null ? (s.maxScore === 100 ? `${s.score} bal` : `${s.score}/${s.maxScore} bal`) : "Tamamlandı";
     if (s.status === "SUBMITTED") return short ? "Təhvil verilib" : "Yoxlanılır";
     if (s.status === "OVERDUE") return short ? "Gecikib" : dayMonth(due);
     const diff = dayDiff(now, due);
@@ -313,7 +325,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
       .filter((s) => s.submittedAt)
       .map((s) => ({
         at: s.submittedAt as string,
-        what: s.status === "GRADED" && s.score !== null ? `${s.title} — ${s.score} bal` : `${s.title} təhvil verildi`,
+        what: s.status === "GRADED" && s.score !== null ? `${s.title} — ${s.maxScore === 100 ? `${s.score} bal` : `${s.score}/${s.maxScore} bal`}` : `${s.title} təhvil verildi`,
       })),
     ...badges.map((b) => ({ at: b.earnedAt, what: `${b.name} nailiyyəti açıldı` })),
     ...att.map((r) => ({
@@ -380,7 +392,7 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
 
   const seg = (active: boolean) =>
     [
-      "padding:9px 16px;border-radius:11px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;letter-spacing:-0.005em",
+      "padding:9px 16px;border-radius:11px;border:none;cursor:pointer;font-size:12.5px;font-weight:600;letter-spacing:-0.005em;flex-shrink:0;white-space:nowrap",
       "transition:background 0.2s ease,color 0.2s ease,box-shadow 0.2s ease",
       active ? "background:#fff;color:#171717;box-shadow:0 2px 8px -4px rgba(23,23,23,0.3)" : "background:transparent;color:#6F6F6B",
     ].join(";");
@@ -477,6 +489,8 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
     ],
     progressSub: subjects.length ? `${first} cari fənlər üzrə sabit şəkildə irəliləyir.` : "Fənn üzrə irəliləyiş hələ qeydə alınmayıb.",
     subjects: subjects.map((s) => ({ name: s.name, pctLabel: `${s.pct}%`, barStyle: bar(s.pct) })),
+    noSubjects: subjects.length === 0,
+    hasManyChildren: data.children.length > 1,
 
     chartTitle: hasTrend ? `${countWord(TREND.length)} aylıq inkişaf` : "İnkişaf",
     chartRange: hasTrend ? `${MONTHS[trendMonths[0].m]} — ${MONTHS[trendMonths[trendMonths.length - 1].m]}` : trendMonths.length === 1 ? MONTHS[trendMonths[0].m] : "Hələ qiymət yoxdur",
@@ -580,11 +594,13 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
       };
     }),
 
-    monthTabs: monthTabKeys.map((t) => ({
-      label: t.y === now.y ? MONTHS[t.m] : `${MONTHS_SHORT[t.m]} ${t.y}`,
-      style: seg(selected.key === t.key),
-      onGo: () => act.setMonth(t.key === currentKey ? currentKey : t.key),
-    })),
+    monthTitle: `${MONTHS[selected.m]} ${selected.y}`,
+    prevMonthStyle: navBtnStyle(selectedIdx > 0),
+    nextMonthStyle: navBtnStyle(selectedIdx < monthTabKeys.length - 1),
+    onPrevMonth: () => { if (selectedIdx > 0) act.setMonth(monthTabKeys[selectedIdx - 1].key); },
+    onNextMonth: () => { if (selectedIdx < monthTabKeys.length - 1) act.setMonth(monthTabKeys[selectedIdx + 1].key); },
+    showThisMonth: selected.key !== currentKey,
+    onThisMonth: () => act.setMonth(currentKey),
     weekDays: ["B.e", "Ç.a", "Çər", "C.a", "Cüm", "Şən", "Baz"],
     calendar: cal,
     calendarMobile: cal.map((c) => ({

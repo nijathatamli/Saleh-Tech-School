@@ -26,15 +26,15 @@ Release gates and conditions are in §9–§10. All five conditions are operatio
 ## 2. What was done
 
 * Mapped the real architecture (modular monolith: Next.js app + Prisma/PostgreSQL; REST routes for admin/teacher/student, server actions for the three dashboards, a separate public exam flow, a frozen content snapshot for the landing site).
-* Built a repeatable, isolated QA environment (`npm run qa:up`, 25 s from nothing) and a suite of **135 API/integration tests, 13 browser workflows, a 106-page smoke audit, a 2,797-element interactive audit, load/Web-Vitals/SQL-count measurements, a schema-drift test, a production-data deploy rehearsal and a backup→restore drill** (`qa/`).
+* Built a repeatable, isolated QA environment (`npm run qa:up`, 25 s from nothing) and a suite of **148 API/integration tests, 32 browser workflows, a 106-page smoke audit, a 2,797-element interactive audit plus a second-level pass inside dialogs and menus on desktop and phone (about 2,500 further controls), load/Web-Vitals/SQL-count measurements, a schema-drift test, a production-data deploy rehearsal and a backup→restore drill** (`qa/`).
 * Reproduced each defect, fixed the root cause, added a regression test and re-ran the whole suite (twice, on a 5-connection and a 10-connection pool, to catch flakiness and races).
 
 ## 3. Results at a glance
 
 | Check | Result |
 |---|---|
-| API / integration / security / concurrency tests | **135 run: 134 pass, 0 fail, 1 open product decision** (BILL-16, F-17) |
-| Browser workflows (Playwright, real clicks/keys, each ends with a DB check) | **13 / 13 pass** |
+| API / integration / security / concurrency tests | **148 run: 147 pass, 0 fail, 1 open product decision** (BILL-16, F-17) |
+| Browser workflows (Playwright, real clicks/keys, each ends with a DB check) | **32 / 32 pass** |
 | Page smoke: every route of the public site and the four panels, desktop + phone | **106 page loads, 0 HTTP/JS errors, 0 broken images, 0 horizontal overflow, 0 unnamed controls, 0 unlabeled fields** |
 | Interactive elements (links, buttons, switches, fields), all 53 routes × 2 viewports | **2,797 discovered → 2,694 PASS · 67 SKIPPED (logout, covered by UI-02) · 36 BLOCKED · 0 FAIL · 0 NO-EFFECT** — see §3.1 |
 | Schema ⇄ database drift (columns, nullability, unique keys, FKs, indexes) | 7 / 7 pass on a database built from `init.sql` + patches |
@@ -43,6 +43,8 @@ Release gates and conditions are in §9–§10. All five conditions are operatio
 | Backup → restore drill (`pg_dump` → new DB → compare) | 31 tables / 2,187 rows / 37 FKs / 73 indexes identical |
 | Dependency scan (`npm audit --omit=dev`) | 1 critical, 2 high — see F-03 |
 | Load (local, 20 concurrent, 8 s each) | 0 errors on every endpoint; p95 ≤ 141 ms for all pages (§7) |
+
+**Second-level click audit (dialogs, menus, panels) after the first round of fixes** — desktop: admin 753 controls (672 PASS, 14 "FAIL" = empty create/convert forms answering HTTP 400 with visible field errors, i.e. expected), teacher 162, student 73, parent 67, public 260; phone: admin 879, teacher 175, student 51, parent 42. Every remaining NO-EFFECT was inspected: current-page navigation buttons, already-selected filter chips, disabled-by-design arrows, native file pickers and label clicks. The functional behaviour of the chips (grades, note visibility, attendance status) is proven by UI-07, UI-19, UI-20, not by the click audit, which only sees visible text.
 
 ### 3.1 Interactive-element audit (counts and how to read them)
 
@@ -85,6 +87,19 @@ Severity reflects impact in *this* product (school with minors' data), not a gen
 | F-28 | Low | Seed script would happily create the public demo accounts in *any* database (this is how F-01 most likely arose) | No guard | Refuses non-local databases (`ALLOW_REMOTE_SEED=1` to override) | OPS-05 | VERIFIED |
 | F-35 | Low | `README.md` was an empty stub; seed/backup/deploy knowledge lived only in people's heads | — | README + the documents in `docs/` + `qa/README.md` | — | DONE |
 
+| F-36 | Medium | **Uploaded profile pictures returned 404 on a production server.** `next start` serves only the files that existed in `public/` when it booted; the upload route wrote new files there | UI-23 (picture saved, then `GET /uploads/<uuid>.png` → 404 on the production build) | Pictures are served by `GET /api/uploads/[name]` (strict uuid+extension name, immutable cache) and `next.config.js` rewrites `/uploads/:name` to it | HARD-05, UI-23 | VERIFIED |
+| F-37 | Medium | The "Maksimal bal" field of the new-homework form was accepted and ignored: every grade stayed out of 100 | Reading the form code; UI-19 | Stored on `Homework.maxScore` (patch `2026-10-18-homework-max-score.sql`), 1–1000 validated, grading chips scale to it, a score above it is refused, `Grade.maxScore` follows, students/parents read "45/50 bal" | UI-19 | VERIFIED |
+| F-38 | Medium | Editing only the feedback of an already graded submission silently did nothing ("choose a score first") | UI-19 | Rows with an existing score and a changed feedback are saved | UI-19 | VERIFIED |
+| F-39 | Medium | A lesson date that does not exist was silently moved (30 Feb → 2 Mar), `25:61`/month 13/year 0001 gave HTTP 500, year 9999 was accepted | Fuzzing the lesson form and API | One strict parser (`parseBakuLocal`); dates outside −3 / +2 years refused with 422 (create and reschedule) | HARD-01, HARD-02 | VERIFIED |
+| F-40 | Low | A NUL byte in any admin search box, a huge `grade=` filter and impossible/extreme `from`/`to` dates gave HTTP 500 on 14 admin endpoints | Query-parameter fuzz of 754 requests over admin pages and APIs | `cleanQ()`/`gradeFilter()`/`isRealDay()` in `src/lib/search.ts` and `az.ts`; bad filters are ignored | HARD-03, HARD-04 | VERIFIED |
+| F-41 | Low | Parent profile accepted a name made of spaces; teacher/parent profile fields had no upper bound | UI-21 | Trimmed first; 100/30-character limits | UI-21 | VERIFIED |
+| F-42 | Low (a11y) | Admin mobile menu button did not say whether the drawer was open, the closed drawer's links stayed in the tab order, Escape did not close it | Deep click audit ("Menyu" looked inert to the audit) | `aria-expanded`/`aria-controls`, drawer `invisible` when closed, Escape closes | UI-11 | VERIFIED |
+| F-43 | Low (a11y) | The mobile teacher calendar rendered its blank leading cells as real, focusable, nameless buttons | Deep click audit (mobile) | Spacers keep `visibility:hidden` | click audit | VERIFIED |
+| F-44 | Medium | Functional gaps reported by the school and found by the strict audit: parent attendance limited to three months and student attendance to one; a lesson marked in a later month unreachable; dead bell buttons (teacher, student), dead admin account-menu items; teacher notification switches stored only in the browser | Screenshots, strict click audit | Month arrows (12+ months back, forward to marked lessons) in parent and student panels; bell panels with "mark all read"; admin menu fixed; switches stored on the teacher (patch `2026-10-13-teacher-notification-prefs.sql`) and honoured; attendance-warning notice below 75 % | UI-14, UI-15, UI-16, UI-18, NOTIF-01…04 | VERIFIED |
+| F-45 | — | New feature requested by the school: when a payment cycle is DUE the admin can mark it paid ("Ödəniş etdi") or block / unblock the student's login, audited, family notified | — | `PATCH /api/admin/payments/[id]/block`; buttons on the payments page and the student page | PBLOCK-01…04, UI-17 | DONE |
+
+| F-46 | Medium (phone) | Phone layouts at 320–390 px: on the public site the header pushed the menu button off-screen at 320 px and the headline word "texnologiyalarını" ran past the edge; admin payments and leads tables hid the amount, status and the action buttons to the right of a wide table; stat cards stacked one per row; the admin menu button was squeezed to 22 px by long titles; 14 px text fields made iOS zoom the page on focus; admin student page overflowed sideways at 320 px | Screenshots and measurements of all 53 routes at 320/360/390 px | Compact header + 44 px touch areas (look unchanged), headline size follows the width, payments and leads render as cards on phones, 2-column stat cards, non-shrinking menu button, 16 px fields on phones, scroll-shadow hints on the other wide tables, long e-mails wrap | UI-26 (and the 42-page 320 px sweep) | VERIFIED |
+| F-47 | Medium | **Unsaved attendance marks were lost silently.** Coming back to a dashboard tab after a minute refreshes the server data, and the attendance screen re-initialised its marks from it, wiping what the teacher had just clicked; "Yadda saxla" with no marks said "saved" while writing nothing; leaving the screen gave no warning. Reported as "I marked 1 November as present but the parent does not see it" (the database held no attendance for that day) | Reproduced the full flow: marking and saving works, the loss happens between the clicks and the save | Marks survive refreshes while unsaved, a banner says they are unsaved, leaving / closing the tab asks first, an empty save is refused with a message | UI-27 | VERIFIED |
 Also added without a defect behind them: `scripts/audit-default-passwords.mjs` (finds and rotates/locks accounts that use a published password, OPS-02…04).
 
 ## 5. Open items

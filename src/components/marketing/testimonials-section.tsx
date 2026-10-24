@@ -19,7 +19,7 @@ export async function TestimonialsSection() {
               <p className="whitespace-pre-line italic text-grey-500 dark:text-zinc-400">&quot;{t.quote}&quot;</p>
             </div>
             <div className="flex min-h-[6rem] items-center space-x-4 border-t border-grey-200 pt-6 dark:border-zinc-700">
-              <Image src={t.avatarUrl} alt={t.name} width={48} height={48} className="h-12 w-12 rounded-full object-cover" />
+              <Image src={t.avatarUrl} alt={`${t.name}, ${t.role.toLowerCase()}`} width={48} height={48} className="h-12 w-12 rounded-full object-cover" />
               <div>
                 <p className="text-sm font-bold text-secondary dark:text-white">{t.name}</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-500">

@@ -3,7 +3,7 @@
 Evidence for `docs/FINAL_RELEASE_AUDIT.md`. Everything below was executed on 2026-10-13 against the isolated QA environment (`npm run qa:up`):
 production build, PostgreSQL 16, synthetic data, Chromium. **Status values**: PASS = executed and behaved as expected; FAIL; BLOCKED = could not be executed;
 NOT VERIFIED = not executed; OPEN = executed, behaviour differs from the recommended rule and a product decision is needed.
-Totals (final run): API/integration **135** (134 PASS, 1 OPEN), browser workflows **13** (13 PASS), page smoke **106** page loads (0 problems),
+Totals (final run): API/integration **148** (147 PASS, 1 OPEN), browser workflows **32** (32 PASS), page smoke **106** page loads (0 problems),
 interactive elements **2,797** (2,694 PASS, 67 SKIPPED, 36 BLOCKED, 0 FAIL), schema-drift **7** (inside the 135).
 
 ## 1. Feature inventory and traceability
@@ -217,6 +217,29 @@ Prerequisites for every API test: `npm run qa:up` (fresh database, seed, product
 | UI-11 | Browser (Playwright) | per test (browser) | the mobile admin menu opens and closes; navigation works at phone width | as expected | PASS | `qa/ui/flows.test.mjs:206` |
 | UI-12 | Browser (Playwright) | per test (browser) | teacher dashboard rows work from the keyboard (Tab to a student row, Enter opens it) | as expected | PASS | `qa/ui/flows.test.mjs:217` |
 | UI-13 | Browser (Playwright) | per test (browser) | settings switches expose their state to assistive technology and flip when activated | as expected | PASS | `qa/ui/flows.test.mjs:230` |
+
+| UI-14 | Browser (Playwright) | per test (browser) | parent attendance: month arrows step 12 months back, disable at the earliest, "Bu aya qayıt" returns | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-15 | Browser (Playwright) | per test (browser) | bell panel (teacher, student): opens, "Hamısını oxundu et" clears unread, Escape closes | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-16 | Browser (Playwright) | per test (browser) | admin account menu: "Ayarlar" works, no dead "Profil" | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-17 | Browser (Playwright) | per test (browser) | admin payments: "Ödəniş etdi", "Hesabı blokla", "Blokdan çıxar" | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-18 | Browser (Playwright) | per test (browser) | a lesson dated next month and marked present is reachable with the arrows (parent, student) | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-19 | Browser (Playwright) | per test (browser) | new homework with its own maximum score, scaled grading chips, feedback-only edit, "x/max" for families | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-20 | Browser (Playwright) | per test (browser) | teacher notes: visibility chips, empty note refused, delete, who can read what | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-21 | Browser (Playwright) | per test (browser) | teacher and parent profile forms: invalid refused, valid stored, cancel restores | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-22 | Browser (Playwright) | per test (browser) | admin dialogs with real data: teacher, parent, student + new parent, course; new accounts sign in; edit; deactivate/activate | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-23 | Browser (Playwright) | per test (browser) | picture upload (teacher, student, parent): real image stored and served, fake image refused | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-24 | Browser (Playwright) | per test (browser) | admin converts a trial-lesson request into student + new parent; both sign in | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-25 | Browser (Playwright) | per test (browser) | admin settings form: invalid refused, valid stored and shown after reload | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-26 | Browser (Playwright, phone widths) | admin, visitor | no sideways scroll at 320/360/390 px, header fits, payments/leads actions on screen, fields ≥16 px | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-27 | Browser (Playwright) | teacher | attendance: unsaved marks survive a background refresh, are flagged, leaving asks, empty save refused | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-29 | Browser (Playwright) | admin | glass sidebar, pill hover glides and fades, active capsule follows the page, all 15 items visible | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-30 | Browser (Playwright, desktop + touch) | admin | contrast ≥ 4.5:1, no text under 11px, visible focus, 44px touch targets, grouped nav, helpful empty states | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-31 | Browser (Playwright) | visitor | landing navbar: floating glass header, pill capsule glides/fades, current-page capsule, scholarship header, dark mode | as expected | PASS | `qa/ui/flows.test.mjs` |
+| UI-32 | Browser (Playwright) | visitor | landing fox (outro-video frames): still first, then work / look up / watch / wink + ear flop in turn, types only while working, pauses off screen, still under reduce motion, fits a phone | as expected | PASS | `qa/ui/flows.test.mjs` |
+| SEO-01…07 | API (HTTP) | visitor / crawler | every public page: title ≤ 60, description 80–160, one h1, canonical, Open Graph, valid JSON-LD, alt on all images; Course/FAQ/Breadcrumb data on course pages; robots.txt + sitemap.xml; portals and sign-in `noindex`; landing page visible text unchanged; home heading order | as expected | see run | `qa/tests/seo.test.mjs` |
+| NOTIF-01…04 | API / integration | teacher, student | notification switches stored and honoured; attendance warning (4 lessons, <75 %, once a week, switch); mark-all-read | as expected | PASS | `qa/tests/notifications.test.mjs` |
+| PBLOCK-01…04 | API / integration | admin, student, teacher, parent | block/unblock a student from a DUE payment: login stops, audit, family told, idempotent, admin only | as expected | PASS | `qa/tests/payment-block.test.mjs` |
+| HARD-01…05 | API / integration | teacher, admin | impossible lesson dates, NUL byte in search, absurd filters, uploaded picture served at once | as expected | PASS | `qa/tests/input-hardening.test.mjs` |
 
 ## 5. Other measurements
 | Item | Command | Result |

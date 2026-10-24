@@ -730,6 +730,17 @@ async function main() {
     },
   });
 
+  // ---------- Blog author (local/demo databases only; production accounts are created in Admin → Bloq) ----------
+  await prisma.user.create({
+    data: {
+      name: "Camila Asad",
+      email: "camila.asad@salehtech.az",
+      passwordHash: await bcrypt.hash("blogger123", 10),
+      role: "BLOGGER",
+      blogAuthor: { create: { position: "Bloq müəllifi", bio: "Saleh Tech School bloqunun müəllifi: uşaqlar üçün texnologiya, proqramlaşdırma və valideynlər üçün faydalı məqalələr." } },
+    },
+  });
+
   console.log("Seed complete.");
   console.log("Demo parent login: elvin.memmedov@example.com / parent123");
 }

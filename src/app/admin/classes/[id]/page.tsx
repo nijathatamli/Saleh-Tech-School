@@ -5,7 +5,7 @@ import { listLessons } from "@/lib/schedule";
 import { ApiError } from "@/lib/api";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { AddStudentsDialog, ArchiveClassButton, ChangeTeacherDialog, EditClassDialog, RemoveStudentButton } from "@/components/admin/class-dialogs";
-import { ClassStatusBadge, PaymentBadge, card, fmtDate, th } from "@/components/admin/bits";
+import { ClassStatusBadge, PaymentBadge, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 
 import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
@@ -40,23 +40,23 @@ export default async function AdminClassDetailPage({ params }: { params: { id: s
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { l: "Tələbələr", v: c.metrics.students },
             { l: "Planlaşdırılmış dərslər", v: c.metrics.lessons },
             { l: "Tamamlanmış dərslər (cəmi)", v: c.metrics.completedLessons },
             { l: "Ödəniş vaxtı", v: c.metrics.paymentsDue },
           ].map((m) => (
-            <div key={m.l} className={`${card} p-5`}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{m.l}</p><p className="mt-2 text-3xl font-extrabold text-navy-900">{m.v}</p></div>
+            <div key={m.l} className={`${card} p-5`}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{m.l}</p><p className="mt-2 break-words text-2xl font-extrabold sm:text-3xl text-navy-900">{m.v}</p></div>
           ))}
         </div>
 
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Tələbə</th><th className={th}>Gedişat</th><th className={th}>Dərslər</th><th className={th}>Ödəniş</th><th className={th}></th></tr></thead>
               <tbody>
-                {c.students.length === 0 && <tr><td colSpan={5} className="px-4 py-12 text-center text-navy-400">Bu sinifdə hələ tələbə yoxdur.</td></tr>}
+                {c.students.length === 0 && <tr><td colSpan={5} className="px-4 py-4"><EmptyState text="Bu sinifdə hələ tələbə yoxdur." /></td></tr>}
                 {c.students.map((s) => (
                   <tr key={s.studentId} className="border-b border-navy-50 last:border-0">
                     <td className="px-4 py-3"><Link href={`/admin/students/${s.studentId}`} className="font-bold text-navy-900 hover:text-electric-600">{s.name}</Link><p className="text-xs text-navy-400">{s.grade ? `${s.grade}-ci sinif · ` : ""}{s.email ?? "giriş yoxdur"}</p></td>
@@ -78,7 +78,7 @@ export default async function AdminClassDetailPage({ params }: { params: { id: s
           <div className="flex items-center justify-between px-6 pt-5"><h2 className="text-base font-extrabold text-navy-900">Dərslər (son həftə və gələcək)</h2><Link href={`/admin/schedule?classId=${c.id}`} className="text-xs font-bold text-electric-600 hover:underline">Cədvəldə aç</Link></div>
           <table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Tarix</th><th className={th}>Otaq</th><th className={th}>Status</th></tr></thead>
             <tbody>
-              {lessons.items.length === 0 && <tr><td colSpan={3} className="px-4 py-8 text-center text-navy-400">Planlaşdırılmış dərs yoxdur.</td></tr>}
+              {lessons.items.length === 0 && <tr><td colSpan={3} className="px-4 py-4"><EmptyState text="Planlaşdırılmış dərs yoxdur." /></td></tr>}
               {lessons.items.map((l) => <tr key={l.id} className="border-b border-navy-50 last:border-0"><td className="px-4 py-3">{fmtDate(l.date)}</td><td className="px-4 py-3 text-navy-600">{l.room ?? "—"}</td><td className="px-4 py-3 text-navy-600">{LS[l.status] ?? l.status}</td></tr>)}
             </tbody></table>
         </section>

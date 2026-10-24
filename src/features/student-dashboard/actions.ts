@@ -9,6 +9,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AccessError, accessResult, requireStudent, requireStudentOwnsSubmission } from "@/lib/access";
+import { markAllNotificationsRead } from "@/lib/notifications";
 import { audit, notifyUsers } from "@/lib/events";
 import { isOwnUploadUrl } from "@/lib/avatar-url";
 
@@ -49,9 +50,9 @@ export async function submitHomework(submissionId: string): Promise<Ok> {
       const now = new Date();
       await tx.submission.update({ where: { id: submission.id }, data: { status: "SUBMITTED", submittedAt: now } });
       await audit(tx, { actorUserId: userId, action: "submission.submit", entityType: "submission", entityId: submission.id, before: { status: submission.status }, after: { status: "SUBMITTED", submittedAt: now.toISOString() } });
-      const teacher = await tx.teacherProfile.findUnique({ where: { id: submission.homework.lesson.class.teacherId }, select: { userId: true } });
+      const teacher = await tx.teacherProfile.findUnique({ where: { id: submission.homework.lesson.class.teacherId }, select: { userId: true, notifySubmissions: true } });
       const me = await tx.studentProfile.findUniqueOrThrow({ where: { id: student.id }, select: { firstName: true, lastName: true } });
-      if (teacher) {
+      if (teacher?.notifySubmissions) {
         await notifyUsers(tx, [teacher.userId], {
           title: "Yeni təhvil",
           body: `${me.firstName} ${me.lastName} "${submission.homework.title}" tapşırığını təhvil verdi.`,
@@ -69,6 +70,15 @@ export async function updateStudentAvatar(avatarUrl: string): Promise<Ok> {
     if (!isOwnUploadUrl(avatarUrl)) return { ok: false, error: "invalid" };
     const student = await requireStudent(userId);
     await prisma.studentProfile.update({ where: { id: student.id }, data: { avatarUrl } });
+    return { ok: true };
+  });
+}
+
+// ---- notifications (the bell panel) ---------------------------------------------------------------------
+
+export async function markNotificationsRead(): Promise<Ok> {
+  return run(async (userId) => {
+    await markAllNotificationsRead(userId);
     return { ok: true };
   });
 }

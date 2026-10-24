@@ -1,6 +1,6 @@
 const words = [
   { text: "ROBOTOTEXNİKA", accent: false },
-  { text: "KİBER TƏHLÜKƏSİZLİK", accent: true },
+  { text: "KİBERTƏHLÜKƏSİZLİK", accent: true },
   { text: "PROQRAMLAŞDIRMA", accent: false },
   { text: "SÜNİ İNTELLEKT", accent: true },
   { text: "OYUN YARADILMASI", accent: false },

@@ -2,10 +2,11 @@ import Link from "next/link";
 import { listClasses, listCourses, searchTeachers } from "@/lib/admin/classes";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateClassDialog } from "@/components/admin/class-dialogs";
-import { ClassStatusBadge, Pagination, card, th } from "@/components/admin/bits";
+import { ClassStatusBadge, Pagination, card, th, EmptyState } from "@/components/admin/bits";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 15;
 
@@ -16,7 +17,7 @@ export default async function AdminClassesPage({ searchParams }: { searchParams:
   const sort = searchParams.sort === "created" || searchParams.sort === "students" ? searchParams.sort : "name";
   const dir = searchParams.dir === "desc" ? "desc" : "asc";
   const [data, courses, teachers] = await Promise.all([
-    listClasses({ q: searchParams.q?.trim() || undefined, status, teacherId: searchParams.teacher || undefined, sort, dir, page, size: SIZE }),
+    listClasses({ q: cleanQ(searchParams.q), status, teacherId: searchParams.teacher || undefined, sort, dir, page, size: SIZE }),
     listCourses(),
     searchTeachers("", 50),
   ]);
@@ -48,13 +49,13 @@ export default async function AdminClassesPage({ searchParams }: { searchParams:
         </div>
 
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100">
                 <th className={th}>Sinif</th><th className={th}>Müəllim</th><th className={th}>Tələbə</th><th className={th}>Tamamlanan dərs</th><th className={th}>Ödəniş</th><th className={th}>Status</th>
               </tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Sinif tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-4"><EmptyState text="Sinif tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((c) => (
                   <tr key={c.id} className="border-b border-navy-50 last:border-0 hover:bg-navy-50/50">
                     <td className="px-4 py-3"><Link href={`/admin/classes/${c.id}`} className="font-bold text-navy-900 hover:text-electric-600">{c.name}</Link><p className="text-xs text-navy-400">{c.courseName}</p></td>

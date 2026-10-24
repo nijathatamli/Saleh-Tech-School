@@ -4,8 +4,9 @@ import { getTeachers } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { TeacherPhoto } from "@/components/marketing/teacher-photo";
 import { Reveal } from "@/components/app/reveal";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Müəllimlər" };
+export const metadata: Metadata = pageMetadata("teachers");
 export const dynamic = "force-dynamic";
 
 export default async function TeachersPage() {
@@ -15,8 +16,9 @@ export default async function TeachersPage() {
     <div className="px-6 py-20 md:px-20">
       <div className="mx-auto mb-16 max-w-2xl space-y-4 text-center">
         <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Komandamız</span>
-        <h1 className="font-display text-3xl leading-tight md:text-5xl">Peşəkar Müəllimlərimiz</h1>
+        <h1 className="font-display text-3xl leading-tight md:text-5xl">Proqramlaşdırma və robototexnika müəllimlərimiz</h1>
       </div>
+      <h2 className="sr-only">Müəllimlərin siyahısı</h2>
       <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
         {teachers.map((t, i) => (
           <Reveal key={t.id} delay={i * 75}>

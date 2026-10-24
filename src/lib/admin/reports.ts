@@ -1,7 +1,7 @@
 // Operational reports and the dashboard numbers. Everything is aggregated in the database
 // (COUNT / SUM / GROUP BY) — no table is ever loaded into memory.
 import { prisma } from "@/lib/prisma";
-import { fromBakuLocal } from "@/features/parent-dashboard/az";
+import { fromBakuLocal, isRealDay } from "@/features/parent-dashboard/az";
 import { getSettings } from "@/lib/settings";
 
 const n = (v: bigint | number | null | undefined) => Number(v ?? 0);
@@ -10,8 +10,8 @@ const day = /^\d{4}-\d{2}-\d{2}$/;
 
 export function resolveRange(from?: string, to?: string) {
   const today = new Date();
-  const toDay = to && day.test(to) ? to : new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Baku" }).format(today);
-  const fromDay = from && day.test(from) ? from : new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Baku" }).format(new Date(today.getTime() - 29 * 86_400_000));
+  const toDay = to && day.test(to) && isRealDay(to) ? to : new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Baku" }).format(today);
+  const fromDay = from && day.test(from) && isRealDay(from) ? from : new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Baku" }).format(new Date(today.getTime() - 29 * 86_400_000));
   return { fromDay, toDay, start: fromBakuLocal(`${fromDay}T00:00`), end: new Date(fromBakuLocal(`${toDay}T00:00`).getTime() + 86_400_000) };
 }
 

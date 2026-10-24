@@ -20,14 +20,16 @@ export type Detail = { kind: DetailKind; key: string; lessonId?: string } | null
 
 export type MobileKey = "home" | "classes" | "homework" | "students" | "profile";
 export type HwFilter = "Hamısı" | "Aktiv" | "Qiymətləndirilmiş";
-export type NotifPrefs = { submission: boolean; absence: boolean; weekly: boolean };
+export type NotifPrefs = { submission: boolean; absence: boolean };
 export type Mark = "p" | "l" | "a";
 
 /** The fixed time slots the design offers when adding a lesson. */
 export const TIME_SLOTS = ["11:00", "13:00", "16:00", "17:00", "18:00", "19:45"];
-const SCORE_OPTIONS = ["60", "70", "80", "90", "100"];
+/** Quick-score chips: 60–100 % of the task's maximum (60…100 for the usual 100-point task). */
+const scoreOptions = (max: number) => [...new Set([60, 70, 80, 90, 100].map((p) => String(Math.round((max * p) / 100))))];
 
 export type UiState = {
+  bellOpen: boolean;
   nav: Section;
   detail: Detail;
   mnav: MobileKey;
@@ -42,6 +44,7 @@ export type UiState = {
   draftTime: string;
   attMarks: Record<string, Mark>;
   attSaved: boolean;
+  attDirty: boolean;
   scores: Record<string, string>;
   gradesSaved: boolean;
   newHwClassId: string | null;
@@ -51,6 +54,8 @@ export type UiState = {
 };
 
 export type Actions = {
+  toggleBell: () => void;
+  markNotificationsRead: () => void;
   go: (href: Section) => void;
   goMobile: (key: MobileKey) => void;
   back: () => void;
@@ -71,7 +76,7 @@ export type Actions = {
   setMark: (studentId: string, mark: Mark) => void;
   saveAttendance: (lessonId: string) => void;
   pickScore: (submissionId: string, score: string) => void;
-  saveGrades: (rows: { submissionId: string; inputName: string }[]) => void;
+  saveGrades: (rows: { submissionId: string; inputName: string; score: number | null; feedback: string }[]) => void;
   setNewHwClass: (id: string) => void;
   toggleNewHwStudent: (id: string, all: string[]) => void;
   createHw: (classId: string | null, studentIds: string[] | null) => void;
@@ -130,7 +135,7 @@ export function studentMetrics(s: TeacherStudent, now: Parts) {
 export function buildVals(data: TeacherDashboardData, state: UiState, act: Actions): TemplateVals {
   const accent = ACCENT;
   const accentText = ACCENT_TEXT;
-  const { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftTime, attMarks, attSaved, scores, gradesSaved, noteVisibility } = state;
+  const { nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftTime, attMarks, attSaved, attDirty, scores, gradesSaved, noteVisibility } = state;
   const now = parts(data.now);
   const first = data.teacher.name.trim().split(/\s+/)[0] ?? "";
 
@@ -265,7 +270,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       ? [activeStudent.name, `${classById.get(activeStudent.classId)?.code ?? ""} · davamiyyət ${metrics.get(activeStudent.id)!.hasAtt ? `${metrics.get(activeStudent.id)!.att}%` : "—"}`]
       : null,
     attendance: activeClass ? ["Davamiyyət", `${activeClass.name} · ${rosterOrFallback.length} tələbə · ${attLesson ? relativeDay(attLesson.p, now).toLowerCase() : "dərs yoxdur"}`] : null,
-    grading: activeHw ? [activeHw.title, `${activeClass?.code ?? ""} · ${gradeRosterStudents.length} tələbə · son tarix ${dayMonth(parts(activeHw.dueDate))}`] : null,
+    grading: activeHw ? [activeHw.title, `${activeClass?.code ?? ""} · ${gradeRosterStudents.length} tələbə · son tarix ${dayMonth(parts(activeHw.dueDate))}${activeHw.maxScore === 100 ? "" : ` · maksimal bal ${activeHw.maxScore}`}`] : null,
     newhw: ["Yeni tapşırıq", "Sinif seçin və şərtləri yazın."],
   };
   const backLabels: Record<DetailKind, string> = { class: "Siniflər", student: "Geri", attendance: "Geri", grading: "Tapşırıqlar", newhw: "Geri" };
@@ -378,6 +383,17 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
     teacherName: data.teacher.name,
     teacherPosition: data.teacher.position,
     unreadDotStyle: data.unreadNotifications > 0 ? "position:absolute;top:9px;right:10px;width:6px;height:6px;border-radius:50%;background:#FF6B00;border:1.5px solid #fff" : "display:none",
+    bellOpen: state.bellOpen,
+    onBell: act.toggleBell,
+    onMarkNotifsRead: act.markNotificationsRead,
+    hasUnreadNotifs: data.unreadNotifications > 0,
+    noNotifs: data.notifications.length === 0,
+    notifItems: data.notifications.map((n) => ({
+      title: n.title,
+      body: n.body,
+      when: `${dayMonth(parts(n.createdAt))}, ${clock(parts(n.createdAt))}`,
+      dotStyle: n.read ? "width:8px;height:8px;border-radius:50%;background:transparent;flex-shrink:0;margin-top:6px" : "width:8px;height:8px;border-radius:50%;background:#FF6B00;flex-shrink:0;margin-top:6px",
+    })),
     onLogout: act.logout,
     inDetail: !!kind,
     backLabel: kind ? backLabels[kind] : "",
@@ -436,6 +452,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
 
     markedLabel: `${markedCount} / ${rosterOrFallback.length}`,
     saveLabel: attSaved ? "Yadda saxlanıldı ✓" : "Yadda saxla",
+    attUnsaved: attDirty,
     markAllPresent: () => act.markAll(rosterOrFallback.map((s) => s.id)),
     saveAttendance: () => {
       if (attLesson) act.saveAttendance(attLesson.id);
@@ -469,7 +486,8 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       .map(({ s, sub }) => {
         const x = sub!;
         const submittedP = x.submittedAt ? parts(x.submittedAt) : null;
-        const chosen = scores[x.id] ?? (x.score !== null && SCORE_OPTIONS.includes(String(x.score)) ? String(x.score) : "");
+        const options = scoreOptions(activeHw!.maxScore);
+        const chosen = scores[x.id] ?? (x.score !== null && options.includes(String(x.score)) ? String(x.score) : "");
         return {
           id: x.id,
           name: s.name,
@@ -485,12 +503,12 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
           fileStyle: "display:none", // submissions carry no attachment in this schema
           feedback: x.feedback ?? "",
           inputName: `fb-${x.id}`,
-          scores: SCORE_OPTIONS.map((label) => ({ label, style: smallBtn(chosen === label), onPick: () => act.pickScore(x.id, label) })),
+          scores: options.map((label) => ({ label, style: smallBtn(chosen === label), onPick: () => act.pickScore(x.id, label) })),
         };
       }),
     noGradeRoster: kind === "grading" && gradeRows.filter(({ sub }) => !!sub).length === 0,
     saveGradesLabel: gradesSaved ? "Yadda saxlanıldı ✓" : "Qiymətləri yadda saxla",
-    onSaveGrades: () => act.saveGrades(gradeRows.filter(({ sub }) => !!sub).map(({ sub }) => ({ submissionId: sub!.id, inputName: `fb-${sub!.id}` }))),
+    onSaveGrades: () => act.saveGrades(gradeRows.filter(({ sub }) => !!sub).map(({ sub }) => ({ submissionId: sub!.id, inputName: `fb-${sub!.id}`, score: sub!.score, feedback: sub!.feedback ?? "" }))),
 
     newHwClasses: data.classes.map((c) => ({ label: c.code, style: smallBtn(newHwClassId === c.id), onPick: () => act.setNewHwClass(c.id) })),
     newHwStudents: newHwRoster.map((s) => ({ label: s.name, style: smallBtn(newHwPicked.includes(s.id)), onPick: () => act.toggleNewHwStudent(s.id, newHwRoster.map((x) => x.id)) })),
@@ -574,7 +592,7 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       label: c.label,
       onPick: c.onPick,
       dotStyle: c.dotStyle,
-      style: c.label ? c.style.replace("height:44px", "height:38px").replace("font-size:12.5px", "font-size:11.5px").replace("gap:4px", "gap:3px") : "height:38px;border:none;background:transparent",
+      style: c.label ? c.style.replace("height:44px", "height:38px").replace("font-size:12.5px", "font-size:11.5px").replace("gap:4px", "gap:3px") : "height:38px;border:none;background:transparent;visibility:hidden", /* spacer: out of the tab order and the accessibility tree */
     })),
     dayHeading: `${picked} ${MONTHS[month.m]} · ${WEEKDAYS_LONG[pickedWd]}`,
     daySummary: pickedLessons.length ? `${pickedLessons.length} dərs · ${pickedLessons.reduce((n, l) => n + rosterOf(l.classId).length, 0)} tələbə` : "Dərs yoxdur",
@@ -665,7 +683,6 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       [
         { key: "submission", label: "Yeni təhvillər", desc: "Tələbə tapşırıq göndərdikdə bildiriş" },
         { key: "absence", label: "Davamiyyət xəbərdarlığı", desc: "Davamiyyət 75%-dən aşağı düşdükdə" },
-        { key: "weekly", label: "Həftəlik icmal", desc: "Hər bazar günü e-poçt hesabatı" },
       ] as { key: keyof NotifPrefs; label: string; desc: string }[]
     ).map((t) => {
       const on = notif[t.key];

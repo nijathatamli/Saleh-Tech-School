@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FoxMascot } from "./fox-mascot";
 
 export function Hero() {
   return (
@@ -11,7 +12,7 @@ export function Hero() {
         <div className="inline-flex items-center space-x-2 rounded-full bg-primary/10 px-4 py-2">
           <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Gələcəyi kodla 🦊</span>
         </div>
-        <h1 className="font-display text-4xl leading-tight md:text-6xl">
+        <h1 className="font-display text-[clamp(1.5rem,calc((100vw-3rem)/9.9),2.25rem)] leading-tight md:text-6xl">
           Uşağınız gələcəyin <span className="text-primary">texnologiyalarını</span> bu gündən öyrənsin.
         </h1>
         <p className="max-w-md text-lg leading-relaxed text-grey-500 dark:text-zinc-400">
@@ -45,19 +46,7 @@ export function Hero() {
       </div>
 
       <div className="relative flex w-full items-center justify-center md:w-1/2">
-        <div className="relative z-10 animate-float">
-          <Image
-            src="/assets/fox-mascot-hero.png"
-            alt="friendly orange fox mascot wearing a blue hoodie and tech glasses, sitting with a laptop, 3D charact"
-            width={500}
-            height={500}
-            priority
-            className="hero-mascot h-auto w-full max-w-md"
-          />
-        </div>
-        <div className="absolute inset-0 -z-10 flex items-center justify-center">
-          <div className="aspect-square w-full max-w-lg rounded-full bg-primary/10 opacity-50 blur-2xl" />
-        </div>
+        <FoxMascot />
       </div>
     </section>
   );

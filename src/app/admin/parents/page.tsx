@@ -2,18 +2,19 @@ import Link from "next/link";
 import { listParents } from "@/lib/admin/parents";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateParentDialog } from "@/components/admin/parent-dialogs";
-import { Pagination, card, th } from "@/components/admin/bits";
+import { Pagination, card, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 20;
 
 export default async function AdminParentsPage({ searchParams }: { searchParams: { q?: string; page?: string } }) {
   await adminGuard();
   const page = Math.max(1, Number(searchParams.page) || 1);
-  const data = await listParents({ q: searchParams.q?.trim() || undefined, page, size: SIZE });
+  const data = await listParents({ q: cleanQ(searchParams.q), page, size: SIZE });
   return (
     <div>
       <AdminTopbar title="Valideynlər" subtitle="Hesablar və bağlı övladlar" />
@@ -26,11 +27,11 @@ export default async function AdminParentsPage({ searchParams }: { searchParams:
           <CreateParentDialog />
         </div>
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Valideyn</th><th className={th}>Telefon</th><th className={th}>Övladlar</th><th className={th}>Status</th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={4} className="px-4 py-12 text-center text-navy-400">Valideyn tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={4} className="px-4 py-4"><EmptyState text="Valideyn tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((p) => (
                   <tr key={p.id} className="border-b border-navy-50 last:border-0 hover:bg-navy-50/50">
                     <td className="px-4 py-3"><Link href={`/admin/parents/${p.id}`} className="font-bold text-navy-900 hover:text-electric-600">{p.name}</Link><p className="text-xs text-navy-400">{p.email}</p></td>

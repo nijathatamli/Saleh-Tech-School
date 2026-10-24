@@ -19,6 +19,24 @@ snapshot** (`src/lib/public-content.json`) so nothing edited in the admin panel 
 | `qa/` | the repeatable test suite (`qa/README.md`) |
 | `docs/` | this document, the audit, the security review, the test matrix |
 
+### Landing mascot animation
+`src/components/marketing/fox-mascot.tsx` (+ `.fox-*` rules at the end of `globals.css`). The fox's moves come from the school's own outro video (`saleh-outro.mp4`): 51 frames of it, cut out of the video background, live in `public/assets/fox/fNNN.webp` (NNN = frame number of the 30 fps video, ~1.2 MB in total, loaded after the page's `load` event, skipped on "data saver" and under `prefers-reduced-motion`). The compressed files stay in memory and only the playing and the next segment are decoded (3 MB each as pictures), so at most ~27 decoded frames exist at once. The canvas is sized to what is shown (layout width × pixel density, at most the frames' 840 px) and every frame is scaled once with the browser's high-quality filter when decoded (`createImageBitmap` `resizeQuality: "high"`); drawing 840 px frames into a ~450 px box on 1× screens made edges jagged. It re-prepares the frames if the window grows well past that size. A `<canvas>` plays them in a small state machine: still → looks down → works (the speech bubble types code only now) → looks up → watches the viewer → squints, tilts, flops an ear and winks → watches → back to work. Parts: frames 0–36 work, 38–60 look up, 60–81 watch, 82–117 the wink/ear sequence. To change the animation, cut other frames the same way (flood-fill the light background from the frame edges, keep the largest component, crop x100–940 / y950–1860 of the 1080×1920 video — no resizing —, unsharp mask 1.45/−0.45, WebP quality 84 with alpha quality 92) and edit the frame lists at the top of the component. The still picture (`f060.webp`, the fox facing the viewer) is what first paints and what reduced-motion visitors see; `public/assets/fox-mascot-hero.png` is no longer used. Tested by UI-32.
+
+### Public navbar
+`src/components/marketing/navbar.tsx` + `pill-nav.tsx` (floating liquid-glass header, capsule that glides behind the hovered link; styles `.pill-nav-*` at the end of `globals.css`). Tested by UI-31.
+
+### On-page SEO (public site)
+- One table, `src/lib/seo.ts` (`SEO`), holds the title tag (≤ 60), meta description (≤ 160), keywords and canonical path of every indexable page; `pageMetadata("home" | "courses" | …)` turns an entry into Next metadata (absolute title, canonical, Open Graph, Twitter card). Course and teacher pages build theirs from data (`dynamicMetadata`, `clip`). Edit the copy there only.
+- Pages: `/` · `/kurslar` (+ `/kurslar/[slug]`) · `/valideyn-paneli` · `/reyler` · `/teqaud` · `/elaqe` · `/haqqimizda` · `/vakansiyalar` · `/sinaq-dersi` · `/muellimler`. `/valideyn-paneli`, `/reyler`, `/elaqe`, `/haqqimizda`, `/vakansiyalar` are new URLs. By the owner's instruction the landing page, its navbar and footer were left visually unchanged (navbar anchors, footer placeholders), so these pages are reachable only from the sitemap and in-page links until the nav/footer are allowed to link to them.
+- Structured data (`src/components/seo/json-ld.tsx`): EducationalOrganization + WebSite on every page, BreadcrumbList on inner pages, ItemList on `/kurslar`, Course + FAQPage on course pages, ContactPage on `/elaqe`. No Review/AggregateRating markup on purpose (self-served reviews are not eligible).
+- `src/app/sitemap.ts` (pages + every course + every teacher) and `src/app/robots.ts` (portals, sign-in, API, exam hidden). The portals and the `(auth)` pages are also `noindex` via their layouts. OG image: `public/og-image.png` (1200×630).
+- **Set `NEXT_PUBLIC_SITE_URL=https://<live domain>` in production** (falls back to `NEXTAUTH_URL`); canonical URLs, sitemap and JSON-LD use it. Then submit `/sitemap.xml` in Google Search Console.
+- Contact page and vacancies page show the phone / e-mail / address saved in Admin → Settings; fill them in (they also feed the structured data).
+- Tests: `qa/tests/seo.test.mjs` (SEO-01…07).
+
+### Admin panel design system
+The admin panel uses the same visual language as the teacher/student/parent dashboards: `src/components/admin/admin.css` (glass surfaces, sliding pill navigation, tokens; scoped under `.ad-root` and `html.ad-portal` so the public site and login are untouched), `admin-sidebar.tsx` (floating glass sidebar / phone drawer with the gliding pill hover), `admin-chrome.tsx`, `src/components/app/topbar.tsx` (page header) and `src/app/admin/layout.tsx`. The accessibility rules (contrast, 44px touch targets, visible focus, minimum text size, reduced motion) are at the end of `admin.css` and checked by UI-30; `.agents/skills/ui-ux-pro-max` is the design-guideline skill used for that pass (its palette and fonts were not adopted: the brand stays orange). Shared primitives carry marker classes (`ad-btn*`, `ad-badge*`, `ad-dialog`, `ad-menu`) that only take effect inside the admin panel.
+
 ## 2. Requirements
 Node.js 20 or newer (the audit ran on 26.0), npm, PostgreSQL 14+ (QA used 16.14; production reports 18.6), Chromium for the browser tests
 (`npx playwright install chromium`). Local development uses **PGlite** (PostgreSQL in WebAssembly) on port 5433 — no installation needed.
@@ -29,6 +47,7 @@ Node.js 20 or newer (the audit ran on 26.0), npm, PostgreSQL 14+ (QA used 16.14;
 | `DATABASE_URL` | yes | PostgreSQL connection string. On Render use the *internal* URL of the database in the same region; external URLs need `sslmode=require` |
 | `NEXTAUTH_SECRET` | yes | 32+ random bytes (e.g. `openssl rand -base64 32`). **Also the root of the keys that encrypt/hash the exam candidates' FIN numbers** (F-31): do not change it after go-live without first planning a re-encryption, or stored FINs become unreadable |
 | `NEXTAUTH_URL` | yes | The public address **with `https://`** — it switches the session cookie to `Secure` / `__Secure-` |
+| `NEXT_PUBLIC_SITE_URL` | recommended | Canonical origin for SEO (`https://…`, no trailing slash): canonical links, sitemap, structured data. Falls back to `NEXTAUTH_URL`. Build-time variable |
 | `DATABASE_POOL_MAX` | no | Connections per server instance. Default: 5 in production, 1 in development (the dev database accepts one client at a time). Keep it below the database plan's connection limit |
 | `NEXT_PUBLIC_SOCIAL_FACEBOOK`, `NEXT_PUBLIC_SOCIAL_INSTAGRAM`, `NEXT_PUBLIC_SOCIAL_LINKEDIN` | no | `https://` profile addresses; the footer shows an icon only when its URL is set. Build-time variables: redeploy after changing |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME` | only for `scripts/create-admin.mjs` | creates / resets an administrator without putting the password in shell history |
@@ -38,7 +57,7 @@ Node.js 20 or newer (the audit ran on 26.0), npm, PostgreSQL 14+ (QA used 16.14;
 ## 4. Database: setup, migrations, new server
 * **Fresh database**: `psql "$DATABASE_URL" -f prisma/init.sql`, then `npm run build` (it applies every `prisma/patches/*.sql` in name order, then loads the scholarship question bank, then builds). Or apply patches alone: `node scripts/db-apply-patches.mjs`.
 * **Every patch must be idempotent** (`IF NOT EXISTS`, `DO $$ … EXCEPTION`), named `YYYY-MM-DD-topic.sql`; the build re-applies all of them on each deploy. After editing `schema.prisma` always add the matching patch and run `qa/tests/schema-drift.test.mjs` — it fails when the schema and the SQL files disagree (that is how a missing-column defect was found in this audit). **Do not run `prisma db push` against production.**
-* Patches not yet applied to the Render database as of the 2026-10-12 export: `2026-10-04…06` and `2026-10-13-*` (rehearsed on a copy of the data: all 30 tables kept every row; second run changes nothing).
+* Patches not yet applied to the Render database as of the 2026-10-12 export: `2026-10-04…06`, `2026-10-13-*` and `2026-10-18-homework-max-score.sql` (the last three are additive and idempotent; rehearsed on a copy of the data: all 30 tables kept every row; second run changes nothing).
 * **Moving to a new database server** **[CLIENT: credentials]**
   1. Create the empty database and set `DATABASE_URL` (and keep the **same `NEXTAUTH_SECRET`**).
   2. `psql "$DATABASE_URL" -f prisma/init.sql` and `node scripts/db-apply-patches.mjs`.
@@ -49,9 +68,9 @@ Node.js 20 or newer (the audit ran on 26.0), npm, PostgreSQL 14+ (QA used 16.14;
   The `backups/` folder, every dump and every `data.sql` contain children's personal data: store them encrypted, never commit them (the folder is git-ignored), delete copies you no longer need.
 
 ## 5. Build, run, deploy
-* Local: see `README.md`. Production build: `npm run build` → `npm start` (listens on `$PORT`).
+* Local: see `README.md`. The QA build goes to `.next-qa` (env `NEXT_DIST_DIR`), so it can run beside `next dev` without touching its `.next`. Production build: `npm run build` → `npm start` (listens on `$PORT`).
 * Render **[CLIENT: account access]** — Build command `npm install && npm run build`, start command `npm start`, health-check path `/api/health`, one instance (rate limiting is in memory), `NODE_VERSION` ≥ 20. Pull-request previews should use a *separate* database.
-* **Uploads** are written to `public/uploads` on the instance's disk. Render's disk is ephemeral: attach a persistent disk mounted there, or move uploads to object storage, otherwise profile pictures vanish at every deploy (F-08).
+* **Uploads** are written to `public/uploads` on the instance's disk and served by `/api/uploads/[name]` (rewritten from `/uploads/<name>`; a production `next start` would otherwise 404 files added after boot). Render's disk is ephemeral: attach a persistent disk mounted there, or move uploads to object storage, otherwise profile pictures vanish at every deploy (F-08).
 * Rollback: redeploy the previous commit. All patches are additive and idempotent, so older code keeps working on the newer schema.
 * Public content (`src/lib/public-content.json`): teachers, courses, testimonials and the three hero photos are edited **in the repository** (`public/parents`, `public/students`, `public/teachers`). To rebuild the file from a database export: `npm run snapshot:public -- <folder-with-table-json>` — it would overwrite hand-added testimonials, so diff first. The landing page also loads some decorative images from `storage.googleapis.com/uxpilot-auth.appspot.com`, a bucket the school does not control (copy them into `public/` if they matter long-term).
 
@@ -62,7 +81,7 @@ Node.js 20 or newer (the audit ran on 26.0), npm, PostgreSQL 14+ (QA used 16.14;
 * New families arrive through the free trial-lesson form → *Qəbul / Müraciətlər* → convert into student + parent (+ class) in one step. Exam candidates need a single-use code generated in *Təqaüd imtahanı*.
 
 ## 7. Tests and checks
-`npm run qa:up` (isolated database + production build, ~25 s) → `npm run qa:test` (135 API/integration tests) → `npm run qa:ui` (13 browser flows) → `npm run qa:ui:smoke`, `npm run qa:ui:clicks`, `npm run qa:perf`; `npm run qa:down`. Details and the production-copy rehearsal: `qa/README.md`. Run `qa:test` after every dependency or schema change.
+`npm run qa:up` (isolated database + production build, ~25 s) → `npm run qa:test` (148 API/integration tests) → `npm run qa:ui` (32 browser flows) → `npm run qa:ui:smoke`, `npm run qa:ui:clicks`, `npm run qa:ui:clicks:deep` (also clicks inside dialogs and menus; add `--vp mobile`/`--roles x`), `npm run qa:perf`; `npm run qa:down`. Details and the production-copy rehearsal: `qa/README.md`. Run `qa:test` after every dependency or schema change.
 
 ## 8. Backup and recovery
 * **Provider backups**: whatever the Render database plan offers — **not verified here; [CLIENT] confirm the plan, retention and who can restore.**

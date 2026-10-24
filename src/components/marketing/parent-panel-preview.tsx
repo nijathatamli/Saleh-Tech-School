@@ -37,7 +37,7 @@ export function ParentPanelPreview() {
           <div className="rotate-2 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-sm">
             <Image
               src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_90e64f8db3_29b9a6071ab67562.png"
-              alt="modern mobile app dashboard UI for tracking student grades and progress, clean white theme with oran"
+              alt="Valideyn Paneli: şagirdin qiymətləri, davamiyyəti və inkişafı mobil ekranda"
               width={600}
               height={600}
               className="w-full rounded-xl shadow-lg"

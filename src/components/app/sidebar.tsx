@@ -42,6 +42,15 @@ export function AppSidebar({
     setMobileOpen(false);
   }, [pathname]);
 
+  // tell the menu button whether the drawer is open (aria-expanded) and let Escape close it
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("app-sidebar-state", { detail: mobileOpen }));
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+
   const content = (
     <>
       <div className="mb-2 flex items-center justify-between px-2">
@@ -120,9 +129,12 @@ export function AppSidebar({
         onClick={() => setMobileOpen(false)}
       />
       <aside
+        id="app-mobile-sidebar"
+        aria-label="Naviqasiya"
         className={cn(
-          "app-scrollbar fixed inset-y-0 left-0 z-50 flex w-72 flex-col overflow-y-auto border-r border-navy-800 bg-navy-950 px-4 py-6 transition-transform duration-300 ease-out md:hidden",
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
+          // closed = invisible (after the slide-out), so its links are not in the tab order or read by screen readers
+          "app-scrollbar fixed inset-y-0 left-0 z-50 flex w-72 flex-col overflow-y-auto border-r border-navy-800 bg-navy-950 px-4 py-6 transition-[transform,visibility] duration-300 ease-out md:hidden",
+          mobileOpen ? "visible translate-x-0" : "invisible -translate-x-full"
         )}
       >
         {content}
@@ -132,11 +144,20 @@ export function AppSidebar({
 }
 
 export function SidebarMobileTrigger({ className }: { className?: string }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const onState = (e: Event) => setOpen(!!(e as CustomEvent<boolean>).detail);
+    window.addEventListener("app-sidebar-state", onState);
+    return () => window.removeEventListener("app-sidebar-state", onState);
+  }, []);
   return (
     <button
+      type="button"
+      aria-expanded={open}
+      aria-controls="app-mobile-sidebar"
       onClick={() => window.dispatchEvent(new Event("toggle-app-sidebar"))}
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-full text-navy-400 transition-colors hover:bg-navy-50 hover:text-navy-900 md:hidden",
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-navy-400 transition-colors hover:bg-navy-50 hover:text-navy-900 md:hidden",
         className
       )}
       aria-label="Menyu"

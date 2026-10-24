@@ -35,7 +35,8 @@ export async function markOneAsRead(notificationId: string) {
   revalidatePath(PORTAL, "layout");
 }
 
-const profileSchema = z.object({ name: z.string().min(3), phone: z.string().min(9) });
+// trimmed first: a name of three spaces is not a name; the upper bounds keep a pasted novel out of the database
+const profileSchema = z.object({ name: z.string().trim().min(3).max(100), phone: z.string().trim().min(9).max(30) });
 
 export async function updateProfile(formData: FormData) {
   const session = await parentSession();

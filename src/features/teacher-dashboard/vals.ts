@@ -89,6 +89,12 @@ export interface TemplateVals {
   teacherName: string;
   teacherPosition: string;
   unreadDotStyle: string;
+  bellOpen: boolean;
+  onBell: Handler;
+  onMarkNotifsRead: Handler;
+  hasUnreadNotifs: boolean;
+  noNotifs: boolean;
+  notifItems: { title: string; body: string; when: string; dotStyle: string }[];
   onLogout: Handler;
   inDetail: boolean;
   backLabel: string;
@@ -122,6 +128,7 @@ export interface TemplateVals {
   // attendance
   markedLabel: string;
   saveLabel: string;
+  attUnsaved: boolean;
   markAllPresent: Handler;
   saveAttendance: Handler;
   attendanceRoster: AttendanceRowVal[];

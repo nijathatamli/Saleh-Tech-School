@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
-import { Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
@@ -32,11 +32,11 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: {
           <Button type="submit" variant="app-outline" size="sm">Filtr</Button>
         </form>
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Vaxt</th><th className={th}>İstifadəçi</th><th className={th}>Əməliyyat</th><th className={th}>Obyekt</th><th className={th}>Təfərrüat</th></tr></thead>
               <tbody>
-                {rows.length === 0 && <tr><td colSpan={5} className="px-4 py-12 text-center text-navy-400">Qeyd yoxdur.</td></tr>}
+                {rows.length === 0 && <tr><td colSpan={5} className="px-4 py-4"><EmptyState text="Qeyd yoxdur." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {rows.map((r) => (
                   <tr key={r.id} className="border-b border-navy-50 align-top last:border-0">
                     <td className="whitespace-nowrap px-4 py-3 text-xs text-navy-400">{fmtDate(r.createdAt)}</td>

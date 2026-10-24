@@ -92,6 +92,7 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           id: s.id,
           status: s.status,
           score: s.score,
+          maxScore: s.homework.maxScore,
           feedback: s.feedback,
           submittedAt: iso(s.submittedAt),
           title: s.homework.title,

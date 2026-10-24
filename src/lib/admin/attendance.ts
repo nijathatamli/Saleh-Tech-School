@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { fromBakuLocal } from "@/features/parent-dashboard/az";
+import { fromBakuLocal, isRealDay } from "@/features/parent-dashboard/az";
 
 const day = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -13,8 +13,8 @@ export async function listAttendance(p: { classId?: string; studentId?: string; 
       status: { not: "CANCELLED" },
       ...(p.classId ? { classId: p.classId } : {}),
     },
-    ...((p.from && day.test(p.from)) || (p.to && day.test(p.to))
-      ? { date: { ...(p.from && day.test(p.from) ? { gte: fromBakuLocal(`${p.from}T00:00`) } : {}), ...(p.to && day.test(p.to) ? { lt: new Date(fromBakuLocal(`${p.to}T00:00`).getTime() + 86_400_000) } : {}) } }
+    ...((p.from && day.test(p.from) && isRealDay(p.from)) || (p.to && day.test(p.to) && isRealDay(p.to))
+      ? { date: { ...(p.from && day.test(p.from) && isRealDay(p.from) ? { gte: fromBakuLocal(`${p.from}T00:00`) } : {}), ...(p.to && day.test(p.to) && isRealDay(p.to) ? { lt: new Date(fromBakuLocal(`${p.to}T00:00`).getTime() + 86_400_000) } : {}) } }
       : {}),
   };
   const [total, rows, byStatus] = await Promise.all([

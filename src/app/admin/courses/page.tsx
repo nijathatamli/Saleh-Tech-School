@@ -3,12 +3,13 @@ import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateCourseDialog, EditCourseDialog } from "@/components/admin/course-dialogs";
 import { CATEGORY_LABEL, LEVEL_LABEL } from "@/lib/admin/labels";
 import { ActiveToggle } from "@/components/admin/teacher-dialogs";
-import { Pagination, card, th } from "@/components/admin/bits";
+import { Pagination, card, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatAzn } from "@/lib/utils";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 20;
 
@@ -16,7 +17,7 @@ export default async function AdminCoursesPage({ searchParams }: { searchParams:
   await adminGuard();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const active = searchParams.active === "true" ? true : searchParams.active === "false" ? false : undefined;
-  const data = await listAdminCourses({ q: searchParams.q?.trim() || undefined, active, page, size: SIZE });
+  const data = await listAdminCourses({ q: cleanQ(searchParams.q), active, page, size: SIZE });
   const full = await Promise.all(data.items.map((c) => getCourse(c.id)));
   return (
     <div>
@@ -31,11 +32,11 @@ export default async function AdminCoursesPage({ searchParams }: { searchParams:
           <CreateCourseDialog />
         </div>
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Kurs</th><th className={th}>Yaş</th><th className={th}>Səviyyə</th><th className={th}>Qiymət</th><th className={th}>Modul</th><th className={th}>Aktiv siniflər</th><th className={th}>Status</th><th className={th}></th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={8} className="px-4 py-12 text-center text-navy-400">Kurs tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={8} className="px-4 py-4"><EmptyState text="Kurs tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((c, i) => (
                   <tr key={c.id} className="border-b border-navy-50 last:border-0">
                     <td className="px-4 py-3"><p className="font-bold text-navy-900">{c.name}</p><p className="text-xs text-navy-400">{CATEGORY_LABEL[c.category] ?? c.category}{c.featured ? " · Populyar" : ""}</p></td>

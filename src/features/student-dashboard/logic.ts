@@ -59,18 +59,24 @@ export function levelTitle(level: number) {
 const XP_RULES = { homework: 20, project: 100, quiz: 50 };
 
 export type UiState = {
+  bellOpen: boolean;
   nav: Route;
   mnav: MobileKey;
   lit: boolean;
   /** animated XP counter value (counts up to student.xp on mount) */
   xp: number;
   hwFilter: HwFilter;
+  /** selected attendance month as "y-m" (null = latest month with lessons up to now) */
+  month: string | null;
 };
 
 export type Actions = {
+  toggleBell: () => void;
+  markNotificationsRead: () => void;
   go: (href: Route) => void;
   goMobile: (key: MobileKey) => void;
   setHwFilter: (f: HwFilter) => void;
+  setMonth: (key: string | null) => void;
   logout: () => void;
   goLesson: (link: string | null) => void;
   startTask: (submissionId: string | null) => void;
@@ -183,7 +189,7 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
   const statusOf = (s: StudentSubmission, tone: Tone) =>
     s.status === "GRADED" ? "Tamamlandı" : s.status === "SUBMITTED" ? "Yoxlanılır" : s.status === "OVERDUE" ? "Gecikmiş" : tone === "due" ? "Davam edir" : "Başlanmadı";
   const dueOf = (s: StudentSubmission) => {
-    if (s.status === "GRADED") return s.score !== null ? `${s.score} bal` : `+${XP_RULES.homework} XP`;
+    if (s.status === "GRADED") return s.score !== null ? (s.maxScore === 100 ? `${s.score} bal` : `${s.score}/${s.maxScore} bal`) : `+${XP_RULES.homework} XP`;
     if (s.status === "SUBMITTED") return "Təhvil verilib";
     return relativeDay(parts(s.dueDate), now);
   };
@@ -220,14 +226,28 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
   };
   const allCounts = counts(attDated);
   const attendancePct = attDated.length ? Math.round(((allCounts.present + allCounts.late) / attDated.length) * 100) : 0;
-  const monthCandidates: { y: number; m: number }[] = [];
-  for (let back = 0; back <= 2; back++) {
+  // Month steps (like the admin calendar): from the first recorded lesson (at least the last twelve months, at most 24) to the current
+  // month, and a year ahead (more when a later month already has a marked lesson).
+  const monthIndex = (y: number, m: number) => y * 12 + m;
+  const nowIdx = monthIndex(now.y, now.m);
+  const firstRecorded = attDated.reduce((min, r) => Math.min(min, monthIndex(r.p.y, r.p.m)), nowIdx);
+  const lastRecorded = attDated.reduce((max, r) => Math.max(max, monthIndex(r.p.y, r.p.m)), nowIdx);
+  const monthsBack = Math.min(23, Math.max(11, nowIdx - firstRecorded));
+  const monthsAhead = Math.min(24, Math.max(11, lastRecorded - nowIdx)); // a year ahead is always reachable (upcoming months are simply empty until lessons are marked)
+  const monthSteps: { key: string; y: number; m: number }[] = [];
+  for (let back = monthsBack; back >= -monthsAhead; back--) {
     const d = new Date(Date.UTC(now.y, now.m - back, 1));
-    monthCandidates.push({ y: d.getUTCFullYear(), m: d.getUTCMonth() });
+    monthSteps.push({ key: `${d.getUTCFullYear()}-${d.getUTCMonth()}`, y: d.getUTCFullYear(), m: d.getUTCMonth() });
   }
+  const currentMonthKey = `${now.y}-${now.m}`;
   const inMonth = (t: { y: number; m: number }) => attDated.filter((r) => r.p.y === t.y && r.p.m === t.m);
-  // the latest of the last three months with lessons recorded (else the current month)
-  const attMonth = monthCandidates.find((t) => inMonth(t).length > 0) ?? monthCandidates[0];
+  // default: the latest month up to now that has lessons recorded (else the current month)
+  const upToNow = monthSteps.filter((t) => monthIndex(t.y, t.m) <= nowIdx);
+  const defaultMonth = [...upToNow].reverse().find((t) => inMonth(t).length > 0) ?? upToNow[upToNow.length - 1];
+  const attMonth = monthSteps.find((t) => t.key === state.month) ?? defaultMonth;
+  const monthIdx = monthSteps.findIndex((t) => t.key === attMonth.key);
+  const monthNavStyle = (on: boolean) =>
+    `width:38px;height:38px;flex-shrink:0;border-radius:12px;border:1px solid rgba(23,23,23,0.08);background:#fff;font-size:20px;line-height:1;color:#171717;display:flex;align-items:center;justify-content:center;cursor:${on ? "pointer" : "default"};opacity:${on ? 1 : 0.35}`;
   const monthRecords = inMonth(attMonth);
   const monthCounts = counts(monthRecords);
   const attended = monthCounts.present + monthCounts.late;
@@ -452,6 +472,17 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
     studentMeta,
     levelTitle: title,
     unreadDotStyle: data.unreadNotifications > 0 ? "position:absolute;top:9px;right:10px;width:6px;height:6px;border-radius:50%;background:#FF6B00;border:1.5px solid #fff" : "display:none",
+    bellOpen: state.bellOpen,
+    onBell: act.toggleBell,
+    onMarkNotifsRead: act.markNotificationsRead,
+    hasUnreadNotifs: data.unreadNotifications > 0,
+    noNotifs: data.notifications.length === 0,
+    notifItems: data.notifications.map((n) => ({
+      title: n.title,
+      body: n.body,
+      when: `${dayMonth(parts(n.createdAt))}, ${clock(parts(n.createdAt))}`,
+      dotStyle: n.read ? "width:8px;height:8px;border-radius:50%;background:transparent;flex-shrink:0;margin-top:6px" : "width:8px;height:8px;border-radius:50%;background:#FF6B00;flex-shrink:0;margin-top:6px",
+    })),
     onLogout: act.logout,
 
     atHome: nav === "/student",
@@ -569,7 +600,13 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
       ? `${MONTHS[attMonth.m]} ayında ${monthRecords.length} dərsdən ${locativePossessive(attended)} iştirak etmisən.`
       : `${MONTHS[attMonth.m]} ayında hələ dərs qeydə alınmayıb.`,
     attMonthSummaryShort: monthRecords.length ? `${monthLocative(attMonth.m)} ${monthRecords.length} dərsdən ${possessive(attended)}.` : `${monthLocative(attMonth.m)} dərs yoxdur.`,
-    attMonthName: MONTHS[attMonth.m],
+    attMonthName: `${MONTHS[attMonth.m]} ${attMonth.y}`,
+    prevMonthStyle: monthNavStyle(monthIdx > 0),
+    nextMonthStyle: monthNavStyle(monthIdx < monthSteps.length - 1),
+    onPrevMonth: () => { if (monthIdx > 0) act.setMonth(monthSteps[monthIdx - 1].key); },
+    onNextMonth: () => { if (monthIdx < monthSteps.length - 1) act.setMonth(monthSteps[monthIdx + 1].key); },
+    showThisMonth: attMonth.key !== currentMonthKey,
+    onThisMonth: () => act.setMonth(currentMonthKey),
     attTiles: [
       { v: String(monthCounts.present), k: "İştirak" },
       { v: String(monthCounts.late), k: "Gecikmə" },

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { listAttendance } from "@/lib/admin/attendance";
 import { resolveRange } from "@/lib/admin/reports";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
-import { Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -33,15 +33,15 @@ export default async function AdminAttendancePage({ searchParams }: { searchPara
           <select name="status" defaultValue={searchParams.status ?? ""} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Status"><option value="">Bütün statuslar</option>{Object.entries(L).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select>
           <Button type="submit" variant="app-outline" size="sm">Göstər</Button>
         </form>
-        <div className="grid gap-4 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-5">
           {[["Qeyd", data.total], ["İştirak", t.PRESENT ?? 0], ["Gecikib", t.LATE ?? 0], ["Qayıb", t.ABSENT ?? 0], ["Davamiyyət", `${rate}%`]].map(([l, v]) => <div key={String(l)} className={`${card} p-4`}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{l}</p><p className="mt-1 text-2xl font-extrabold text-navy-900">{v}</p></div>)}
         </div>
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Tarix</th><th className={th}>Tələbə</th><th className={th}>Sinif</th><th className={th}>Status</th><th className={th}>Qeyd edən</th><th className={th}>Qeyd</th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Qeyd tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-4"><EmptyState text="Qeyd tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((a) => (
                   <tr key={a.id} className="border-b border-navy-50 last:border-0">
                     <td className="whitespace-nowrap px-4 py-3 text-xs text-navy-400">{fmtDate(a.date)}</td>

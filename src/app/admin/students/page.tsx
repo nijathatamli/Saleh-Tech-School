@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma";
 import { listStudents } from "@/lib/admin/students";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateStudentDialog } from "@/components/admin/student-dialog";
-import { Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ, gradeFilter } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 20;
 
@@ -15,9 +16,9 @@ export default async function AdminStudentsPage({ searchParams }: { searchParams
   await adminGuard();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const active = searchParams.active === "true" ? true : searchParams.active === "false" ? false : undefined;
-  const grade = Number(searchParams.grade) || undefined;
+  const grade = gradeFilter(searchParams.grade);
   const [data, classes] = await Promise.all([
-    listStudents({ q: searchParams.q?.trim() || undefined, active, classId: searchParams.classId || undefined, grade, page, size: SIZE }),
+    listStudents({ q: cleanQ(searchParams.q), active, classId: searchParams.classId || undefined, grade, page, size: SIZE }),
     prisma.classGroup.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
@@ -38,11 +39,11 @@ export default async function AdminStudentsPage({ searchParams }: { searchParams
           <CreateStudentDialog />
         </div>
         <div className={card}>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Tələbə</th><th className={th}>FIN</th><th className={th}>Valideyn</th><th className={th}>Siniflər</th><th className={th}>Status</th><th className={th}>Yaradılıb</th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Tələbə tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-4"><EmptyState text="Tələbə tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((s) => (
                   <tr key={s.id} className="border-b border-navy-50 last:border-0 hover:bg-navy-50/50">
                     <td className="px-4 py-3"><Link href={`/admin/students/${s.id}`} className="font-bold text-navy-900 hover:text-electric-600">{s.name}</Link><p className="text-xs text-navy-400">{s.grade ? `${s.grade}-ci sinif · ` : ""}{s.email ?? "giriş yoxdur"}</p></td>

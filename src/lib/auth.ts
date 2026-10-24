@@ -57,7 +57,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" }).role;
+        token.role = (user as { role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" | "BLOGGER" }).role;
         token.id = user.id;
         token.revoked = false;
         return token;

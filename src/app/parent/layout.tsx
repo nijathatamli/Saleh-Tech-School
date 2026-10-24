@@ -7,7 +7,7 @@ import "@/features/parent-dashboard/styles/base.css";
 import "@/features/parent-dashboard/styles/template.generated.css";
 import "@/features/parent-dashboard/styles/portal.css";
 
-export const metadata: Metadata = { title: "Valideyn portalı" };
+export const metadata: Metadata = { title: "Valideyn portalı", robots: { index: false, follow: false } };
 
 // Access control lives in middleware.ts (session + PARENT role) and the page
 // itself re-checks the session before loading data.

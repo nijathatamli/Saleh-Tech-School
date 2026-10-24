@@ -6,6 +6,7 @@ const roleForPrefix: Record<string, string> = {
   "/teacher": "TEACHER",
   "/student": "STUDENT",
   "/admin": "ADMIN",
+  "/blogger": "BLOGGER",
 };
 
 export default withAuth(
@@ -30,5 +31,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/parent/:path*", "/teacher/:path*", "/student/:path*", "/admin/:path*"],
+  matcher: ["/parent/:path*", "/teacher/:path*", "/student/:path*", "/admin/:path*", "/blogger/:path*"],
 };

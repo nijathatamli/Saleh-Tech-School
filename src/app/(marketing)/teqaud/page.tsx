@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { BookOpenCheck, ClipboardList, KeyRound, UserPlus } from "lucide-react";
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { getCategories } from "@/lib/scholarship/catalog";
 import { SCHOLARSHIP_BASE, SCHOLARSHIP_NAME, SUBJECT_ORDER, SUBJECTS } from "@/lib/scholarship/config";
 import { outlineButton, primaryButton } from "@/components/scholarship/styles";
 
+export const metadata: Metadata = pageMetadata("scholarship");
 export const dynamic = "force-dynamic";
 
 const steps = [
@@ -29,7 +32,7 @@ export default async function ScholarshipAboutPage() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Saleh Tech School təqaüd proqramı</span>
           </div>
           <h1 className="font-display text-4xl leading-tight md:text-7xl">
-            Reqamsal <span className="text-primary">Gələcək</span>
+            <span className="sr-only">Təqaüd proqramı: </span>Reqamsal <span className="text-primary">Gələcək</span>
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-grey-500 dark:text-zinc-400">
             Kursumuzun tələbəsi kimi qeydiyyatdan keç, sinfinə uyğun imtahanı ver və Məntiq, Riyaziyyat və İngilis dili üzrə bacarıqlarını nümayiş etdir.

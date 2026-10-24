@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { MarkAllReadButton } from "@/components/admin/payment-actions";
-import { Pagination, card, fmtDate } from "@/components/admin/bits";
+import { Pagination, card, fmtDate, EmptyState } from "@/components/admin/bits";
 
 import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
@@ -43,7 +43,7 @@ export default async function AdminNotificationsPage({ searchParams }: { searchP
         </div>
         <div className={card}>
           <ul>
-            {items.length === 0 && <li className="px-6 py-12 text-center text-navy-400">Bildiriş yoxdur.</li>}
+            {items.length === 0 && <li className="px-6 py-6"><EmptyState text="Bildiriş yoxdur." /></li>}
             {items.map((n) => {
               const href = hrefFor(n.entityType, n.entityId);
               return (

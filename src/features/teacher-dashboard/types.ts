@@ -1,3 +1,4 @@
+import type { DashboardNotification } from "@/lib/notifications";
 // Serialisable snapshot of everything the teacher dashboard renders. Built on
 // the server from Prisma (see data.ts) and handed to the client component, so
 // dates travel as ISO strings / epoch millis.
@@ -56,6 +57,7 @@ export type TeacherHomework = {
   title: string;
   description: string;
   dueDate: string;
+  maxScore: number;
 };
 
 export type TeacherDashboardData = {
@@ -75,6 +77,10 @@ export type TeacherDashboardData = {
   /** this teacher's own notes about their students (every visibility) */
   notes: TeacherNote[];
   unreadNotifications: number;
+  /** the two notification switches of the profile screen (stored on TeacherProfile) */
+  notifPrefs: { submission: boolean; absence: boolean };
+  /** latest notifications for the bell panel */
+  notifications: DashboardNotification[];
   /** Server clock at render time — the client renders "today"/"ago" from this so SSR and hydration agree. */
   now: number;
 };

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { useRefreshOnReturn } from "@/lib/use-refresh-on-return";
 import { renderTemplate } from "./template.generated";
 import { buildVals, mobileKeyForRoute, routeForMobileKey, HOME, ROUTES, type Actions, type HwFilter, type MobileKey, type Route, type UiState } from "./logic";
-import { submitHomework, updateStudentAvatar } from "./actions";
+import { markNotificationsRead, submitHomework, updateStudentAvatar } from "./actions";
 import type { StudentDashboardData } from "./types";
 
 function isRoute(path: string): path is Route {
@@ -38,8 +38,10 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
   const nav: Route = isRoute(pathname) ? pathname : initialRoute;
   const [mnav, setMnav] = useState<MobileKey>(() => mobileKeyForRoute(initialRoute));
   const [lit, setLit] = useState(false);
+  const [bellOpen, setBellOpen] = useState(false);
   const [xp, setXp] = useState(0);
   const [hwFilter, setHwFilter] = useState<HwFilter>("Hamısı");
+  const [month, setMonth] = useState<string | null>(null);
   const [now, setNow] = useState(data.now);
 
   const avatarInput = useRef<HTMLInputElement>(null);
@@ -108,10 +110,26 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
     else window.history.pushState(null, "", href);
   }, []);
 
+  useEffect(() => setBellOpen(false), [nav]); // leaving a screen closes the panel
+  useEffect(() => {
+    if (!bellOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setBellOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [bellOpen]);
+
   const refresh = useCallback(() => startTransition(() => router.refresh()), [router]);
   useRefreshOnReturn();
 
   const actions: Actions = {
+    toggleBell: () => setBellOpen((o) => !o),
+    markNotificationsRead: () => {
+      startTransition(async () => {
+        const result = await markNotificationsRead();
+        if (result.ok) router.refresh();
+        else toast.error("Bildirişlər yenilənmədi.");
+      });
+    },
     go: (href) => {
       if (href !== nav) setUrl(href);
       setMnav(mobileKeyForRoute(href));
@@ -127,11 +145,12 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
       light();
     },
     setHwFilter,
+    setMonth,
     logout: () => {
       void signOut({ callbackUrl: "/giris" });
     },
     goLesson: (link) => {
-      if (link) window.open(link, "_blank", "noopener,noreferrer");
+      if (link && /^https?:\/\//i.test(link)) window.open(link, "_blank", "noopener,noreferrer"); // only web links (the value comes from the database)
       else actions.go("/student/attendance");
     },
     startTask: () => actions.go("/student/homework"),
@@ -168,7 +187,7 @@ export function StudentDashboard({ data, initialRoute }: { data: StudentDashboar
     }
   }
 
-  const state: UiState = { nav, mnav, lit, xp, hwFilter };
+  const state: UiState = { bellOpen, nav, mnav, lit, xp, hwFilter, month };
   const vals = buildVals({ ...data, now }, state, actions);
 
   return (

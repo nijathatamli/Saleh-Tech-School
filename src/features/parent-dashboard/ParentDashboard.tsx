@@ -149,7 +149,7 @@ export function ParentDashboard({ data, initialRoute, initialChildIndex }: { dat
       void signOut({ callbackUrl: "/giris" });
     },
     goLesson: (link) => {
-      if (link) window.open(link, "_blank", "noopener,noreferrer");
+      if (link && /^https?:\/\//i.test(link)) window.open(link, "_blank", "noopener,noreferrer"); // only web links (the value comes from the database)
       else actions.go("/parent/attendance");
     },
     markAllRead: () => {

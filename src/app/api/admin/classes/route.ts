@@ -1,5 +1,6 @@
 import { classCreateSchema, createClass, listClasses } from "@/lib/admin/classes";
 import { handle, ok, pageParams, readJson, requireRole, revalidateDashboards } from "@/lib/api";
+import { cleanQ } from "@/lib/search";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export const GET = handle(async (req) => {
   const sort = url.searchParams.get("sort");
   return ok(
     await listClasses({
-      q: url.searchParams.get("q")?.trim() || undefined,
+      q: cleanQ(url.searchParams.get("q")),
       status: status === "ARCHIVED" || status === "ALL" ? status : "ACTIVE",
       teacherId: url.searchParams.get("teacherId") || undefined,
       sort: sort === "created" || sort === "students" ? sort : "name",

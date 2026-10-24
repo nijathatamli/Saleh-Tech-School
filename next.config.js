@@ -11,6 +11,8 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // the QA tooling builds into .next-qa (NEXT_DIST_DIR) so a production build never overwrites a running `next dev`
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
   images: {
     // The optimizer only fetches from the one bucket the site's images live in (not from any bucket on storage.googleapis.com),
@@ -23,6 +25,10 @@ const nextConfig = {
   async redirects() {
     // public self-registration is closed: new families request a trial lesson and the school's admins create the accounts
     return [{ source: "/qeydiyyat", destination: "/sinaq-dersi", permanent: false }];
+  },
+  async rewrites() {
+    // pictures uploaded while the server is running are not static files for `next start`: serve them through a route
+    return { beforeFiles: [{ source: "/uploads/:name", destination: "/api/uploads/:name" }] };
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

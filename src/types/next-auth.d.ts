@@ -4,19 +4,19 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN";
+      role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" | "BLOGGER";
     } & DefaultSession["user"];
   }
 
   interface User {
-    role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN";
+    role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" | "BLOGGER";
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
-    role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN";
+    role: "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" | "BLOGGER";
     /** set when the account was deactivated/deleted after the cookie was issued */
     revoked?: boolean;
   }

@@ -125,12 +125,12 @@ export function slot(daysAgo, hour = 10, minute = 0) {
 
 // ---------------------------------------------------------------------------------------------------------------
 // Server actions over real HTTP. Next hashes action ids at build time; they are recovered from the built page chunk
-// (`<id>:()=>…then(e=>e.<exportName>)`). Requires a production build in ./.next (npx next build).
+// (`<id>:()=>…then(e=>e.<exportName>)`). Requires the QA production build in ./.next-qa (npm run qa:up / qa/infra/rebuild.sh).
 import fs from "node:fs";
 import path from "node:path";
 const actionCache = new Map();
 export function actionId(pageDir, name) {
-  const file = path.resolve(import.meta.dirname, "..", "..", ".next", "server", "app", pageDir, "page.js");
+  const file = path.resolve(import.meta.dirname, "..", "..", process.env.NEXT_DIST_DIR ?? ".next-qa", "server", "app", pageDir, "page.js");
   if (!actionCache.has(file)) {
     const src = fs.readFileSync(file, "utf8");
     const map = new Map();

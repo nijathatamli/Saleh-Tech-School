@@ -23,6 +23,9 @@ import {
   BarChart3,
   UserRound,
   Settings as SettingsIcon,
+  Newspaper,
+  PenLine,
+  FileText,
 } from "lucide-react";
 import type { NavItem } from "@/components/app/sidebar";
 import type { DashNavItem } from "@/components/dash/sidebar";
@@ -67,10 +70,18 @@ export const adminNav: NavItem[] = [
   { href: "/admin/schedule", label: "Cədvəl", icon: <CalendarDays className="h-4 w-4 shrink-0" /> },
   { href: "/admin/attendance", label: "Davamiyyət", icon: <ClipboardCheck className="h-4 w-4 shrink-0" /> },
   { href: "/admin/payments", label: "Ödənişlər", icon: <Wallet className="h-4 w-4 shrink-0" /> },
-  { href: "/admin/leads", label: "Qəbul / Müraciətlər", icon: <KanbanSquare className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/leads", label: "Müraciətlər", icon: <KanbanSquare className="h-4 w-4 shrink-0" /> },
   { href: "/admin/scholarship", label: "Təqaüd imtahanı", icon: <Award className="h-4 w-4 shrink-0" /> },
   { href: "/admin/reports", label: "Hesabatlar", icon: <BarChart3 className="h-4 w-4 shrink-0" /> },
   { href: "/admin/notifications", label: "Bildirişlər", icon: <Bell className="h-4 w-4 shrink-0" /> },
+  { href: "/admin/blog", label: "Bloq", icon: <Newspaper className="h-4 w-4 shrink-0" /> },
   { href: "/admin/audit", label: "Audit jurnalı", icon: <ScrollText className="h-4 w-4 shrink-0" /> },
   { href: "/admin/settings", label: "Tənzimləmələr", icon: <SettingsIcon className="h-4 w-4 shrink-0" /> },
+];
+
+export const bloggerNav: NavItem[] = [
+  { href: "/blogger", label: "Panel", icon: <LayoutDashboard className="h-4 w-4 shrink-0" /> },
+  { href: "/blogger/yazilar", label: "Yazılarım", icon: <FileText className="h-4 w-4 shrink-0" /> },
+  { href: "/blogger/yazilar/yeni", label: "Yeni yazı", icon: <PenLine className="h-4 w-4 shrink-0" /> },
+  { href: "/blogger/profil", label: "Profil", icon: <User className="h-4 w-4 shrink-0" /> },
 ];

@@ -1,5 +1,6 @@
 import { createTeacher, listTeachers, teacherCreateSchema } from "@/lib/admin/teachers";
 import { handle, ok, pageParams, readJson, requireRole, revalidateDashboards } from "@/lib/api";
+import { cleanQ } from "@/lib/search";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ export const GET = handle(async (req) => {
   const url = new URL(req.url);
   const { page, size } = pageParams(url);
   const a = url.searchParams.get("active");
-  return ok(await listTeachers({ q: url.searchParams.get("q")?.trim() || undefined, active: a === "true" ? true : a === "false" ? false : undefined, page, size }));
+  return ok(await listTeachers({ q: cleanQ(url.searchParams.get("q")), active: a === "true" ? true : a === "false" ? false : undefined, page, size }));
 });
 
 export const POST = handle(

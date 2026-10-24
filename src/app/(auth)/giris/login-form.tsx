@@ -41,6 +41,7 @@ export function LoginForm() {
         TEACHER: "/teacher",
         STUDENT: "/student",
         ADMIN: "/admin",
+        BLOGGER: "/blogger",
       };
       router.push(roleHome[session?.user.role ?? "PARENT"] ?? "/parent");
     }

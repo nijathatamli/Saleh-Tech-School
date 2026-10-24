@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { SITE_NAME, clip, dynamicMetadata } from "@/lib/seo";
 import { getTeacherById } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { CourseCard } from "@/components/marketing/course-card";
@@ -8,7 +9,13 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const teacher = await getTeacherById(params.id);
-  return { title: teacher?.user.name ?? "Müəllim tapılmadı" };
+  if (!teacher) return { title: "Müəllim tapılmadı", robots: { index: false } };
+  return dynamicMetadata({
+    title: clip(`${teacher.user.name} — ${teacher.position} | ${SITE_NAME}`, 60),
+    description: clip(`${teacher.user.name}, ${teacher.position}. ${teacher.bio} ${teacher.specializations.join(", ")}.`, 160),
+    path: `/muellimler/${teacher.id}`,
+    keywords: [teacher.position, ...teacher.specializations],
+  });
 }
 
 export default async function TeacherDetailPage({ params }: { params: { id: string } }) {

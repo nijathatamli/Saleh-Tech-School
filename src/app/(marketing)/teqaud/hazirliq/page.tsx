@@ -6,7 +6,11 @@ import { cardClass, primaryButton } from "@/components/scholarship/styles";
 import { getCategories } from "@/lib/scholarship/catalog";
 import { SCHOLARSHIP_BASE, SCHOLARSHIP_NAME, SUBJECT_ORDER, SUBJECTS } from "@/lib/scholarship/config";
 
-export const metadata: Metadata = { title: "Hazırlıq" };
+export const metadata: Metadata = {
+  title: "Təqaüd imtahanına hazırlıq",
+  description: "Təqaüd imtahanına hazırlıq: Məntiq, Riyaziyyat və İngilis dili mövzuları, imtahan qaydaları və vaxt. 6–18 yaşlı şagirdlər üçün təlimat.",
+  alternates: { canonical: "/teqaud/hazirliq" },
+};
 export const dynamic = "force-dynamic";
 
 const rules = [

@@ -10,7 +10,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { ApiError, MSG } from "@/lib/api";
 import { audit, notifyParentsOfStudents, notifyStudents, notifyUsers } from "@/lib/events";
-import { clock, dayMonth, fromBakuLocal, parts } from "@/features/parent-dashboard/az";
+import { clock, dayMonth, parseBakuLocal, parts } from "@/features/parent-dashboard/az";
 
 type Tx = Prisma.TransactionClient;
 const localDate = z.string({ required_error: "Tarix və vaxt tələb olunur." }).regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Tarix düzgün deyil.");
@@ -67,9 +67,17 @@ export async function assertNoConflict(tx: Tx, a: { classId: string; start: Date
   throw new ApiError(409, msg, { date: msg });
 }
 
+/** A lesson's start from the text of a form: a date that exists, no further back than 3 years and no further ahead than 2 (not 30 Feb, not year 9999). */
+function lessonStart(text: string) {
+  const start = parseBakuLocal(text);
+  const bad = !start ? "Tarix düzgün deyil." : start.getTime() < Date.now() - 3 * 365 * 86_400_000 || start.getTime() > Date.now() + 2 * 365 * 86_400_000 ? "Tarix çox uzaqdadır (3 il geriyə, 2 il irəliyə qədər)." : null;
+  if (bad || !start) throw new ApiError(422, bad ?? MSG.invalid, { date: bad ?? MSG.invalid });
+  return start;
+}
+
 /** Creates a lesson for a class (caller has already authorised the actor). Same slot twice returns the existing lesson. */
 export async function scheduleLesson(actorUserId: string, input: z.infer<typeof lessonCreateInput>) {
-  const start = fromBakuLocal(input.date);
+  const start = lessonStart(input.date);
   return prisma.$transaction(async (tx) => {
     const cls = await tx.classGroup.findUniqueOrThrow({ where: { id: input.classId }, include: { course: true, enrollments: true, teacher: { select: { userId: true } } } });
     if (cls.status !== "ACTIVE") throw new ApiError(409, "Arxivlənmiş sinif üçün dərs planlaşdırmaq olmaz.");
@@ -96,7 +104,7 @@ export async function rescheduleLesson(actorUserId: string, lessonId: string, in
     const cur = await tx.lesson.findUnique({ where: { id: lessonId }, include: { class: { include: { enrollments: true, teacher: { select: { userId: true } } } } } });
     if (!cur) throw new ApiError(404, MSG.notFound);
     if (cur.status === "CANCELLED" || cur.status === "COMPLETED") throw new ApiError(409, "Tamamlanmış və ya ləğv edilmiş dərs dəyişdirilə bilməz.");
-    const start = input.date ? fromBakuLocal(input.date) : cur.date;
+    const start = input.date ? lessonStart(input.date) : cur.date;
     const durationMinutes = input.durationMinutes === undefined ? cur.durationMinutes : input.durationMinutes;
     const room = input.room === undefined ? cur.room : input.room || null;
     await lockTimetable(tx, cur.class.teacherId, room);

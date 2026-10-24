@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { handle, ok, pageParams, readJson, requireRole, revalidateDashboards } from "@/lib/api";
 import { lessonCreateInput, listLessons, scheduleLesson } from "@/lib/schedule";
-import { fromBakuLocal } from "@/features/parent-dashboard/az";
+import { fromBakuLocal, isRealDay } from "@/features/parent-dashboard/az";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +15,8 @@ export const GET = handle(async (req) => {
   const to = url.searchParams.get("to");
   return ok(
     await listLessons({
-      from: from && day.safeParse(from).success ? fromBakuLocal(`${from}T00:00`) : undefined,
-      to: to && day.safeParse(to).success ? new Date(fromBakuLocal(`${to}T00:00`).getTime() + 86_400_000) : undefined,
+      from: from && day.safeParse(from).success && isRealDay(from) ? fromBakuLocal(`${from}T00:00`) : undefined,
+      to: to && day.safeParse(to).success && isRealDay(to) ? new Date(fromBakuLocal(`${to}T00:00`).getTime() + 86_400_000) : undefined,
       classId: url.searchParams.get("classId") || undefined,
       teacherId: url.searchParams.get("teacherId") || undefined,
       status: url.searchParams.get("status") || undefined,

@@ -4,6 +4,7 @@
 set -euo pipefail
 PORT="${1:-3100}"; DBPORT="${2:-5434}"
 export NODE_ENV=production
+export NEXT_DIST_DIR="${NEXT_DIST_DIR:-.next-qa}"
 export DATABASE_URL="postgresql://postgres@127.0.0.1:${DBPORT}/postgres?sslmode=disable"
 export NEXTAUTH_URL="http://127.0.0.1:${PORT}"
 export NEXTAUTH_SECRET="qa-only-secret-not-used-anywhere-else"

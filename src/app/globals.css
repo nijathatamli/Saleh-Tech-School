@@ -124,3 +124,198 @@
 .rich-text math { font-size: 1.3em; }
 .rich-text math[display="block"] { display: block math; }
 .rich-text sup, .rich-text sub { font-size: 0.75em; line-height: 0; }
+
+/* Phones: iOS Safari zooms the whole page when a field under 16px gets focus (and does not zoom back). Text fields of the
+   website, the admin panel and the dashboards are 12–14px, so every text field is raised to 16px on small screens only
+   (desktop sizes are untouched). */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not([type="hidden"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Wide admin tables scroll sideways on a phone: soft edge shadows show that there is more to the left/right
+   (pure CSS "scroll shadows": the white covers move with the content, the dark ends stay put). */
+.table-scroll {
+  border-radius: inherit;
+  background:
+    linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) 0 0 / 36px 100% no-repeat local,
+    linear-gradient(to left, #fff 30%, rgba(255, 255, 255, 0)) 100% 0 / 36px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(23, 23, 23, 0.16), rgba(23, 23, 23, 0)) 0 0 / 12px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(23, 23, 23, 0.16), rgba(23, 23, 23, 0)) 100% 0 / 12px 100% no-repeat scroll;
+}
+
+/* Marketing navbar: the glass capsule that glides behind the hovered link (see components/marketing/pill-nav.tsx). */
+.pill-nav-capsule {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, width, opacity;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), width 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out;
+}
+.pill-nav-capsule[data-on="true"] {
+  opacity: 1;
+}
+.pill-nav-hover {
+  background: rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+.pill-nav-hover[data-instant="true"] {
+  transition: opacity 200ms ease-out;
+}
+.pill-nav-active {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 8px 18px -10px rgba(0, 0, 0, 0.3);
+}
+.dark .pill-nav-hover {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+.dark .pill-nav-active {
+  background: rgba(255, 255, 255, 0.17);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 8px 18px -10px rgba(0, 0, 0, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill-nav-capsule {
+    transition: none;
+  }
+}
+
+/* ---- Landing mascot (see components/marketing/fox-mascot.tsx) ----------------------------------------------------
+   A canvas plays the cut-out frames of the school's outro video; the picture below it is the still shown until they load. */
+.fox { --rx: 0deg; --ry: 0deg; }
+.fox-glow {
+  position: absolute;
+  inset: 14% 4% 0 4%;
+  z-index: 0;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(255, 107, 0, 0.22), rgba(255, 107, 0, 0) 72%);
+  filter: blur(26px);
+  animation: fox-glow 4.8s ease-in-out infinite;
+}
+.fox-tilt {
+  position: relative;
+  z-index: 1;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 220ms ease-out;
+  transform-style: preserve-3d;
+}
+.fox-stage {
+  transform-origin: 50% 96%;
+  animation: fox-pop 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fox-base { transition: opacity 260ms ease-out; }
+.fox-canvas { opacity: 0; transition: opacity 260ms ease-out; pointer-events: none; }
+.fox[data-live="true"] .fox-canvas { opacity: 1; }
+.fox[data-live="true"] .fox-base { opacity: 0; }
+/* floating code */
+.fox-chip {
+  position: absolute;
+  top: 70%;
+  --fox-rise: clamp(70px, 14vw, 150px);
+  padding: 0.25em 0.6em;
+  border-radius: 9999px;
+  font: 600 clamp(9px, 1.7vw, 12px) / 1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #e66000;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  animation: fox-rise 4.5s ease-out infinite;
+}
+.dark .fox-chip { background: rgba(255, 255, 255, 0.14); color: #ffb06b; }
+/* the speech bubble: a little terminal */
+.fox-bubble {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: min(80%, 330px);
+  border-radius: 18px;
+  background: #171717;
+  color: #e8e6e1;
+  box-shadow: 0 20px 40px -22px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transform-origin: 14% 100%;
+  animation: fox-bubble-in 700ms cubic-bezier(0.22, 1, 0.36, 1) 0.9s both;
+}
+.fox-bubble::after {
+  content: "";
+  position: absolute;
+  left: 13%;
+  bottom: -7px;
+  width: 16px;
+  height: 16px;
+  background: #171717;
+  transform: rotate(45deg);
+  border-radius: 3px;
+}
+.fox-bubble-bar { display: flex; align-items: center; gap: 6px; padding: 9px 14px 0; font: 600 10.5px/1 ui-monospace, Menlo, monospace; color: #7a7a75; }
+.fox-bubble-bar i { width: 8px; height: 8px; border-radius: 50%; background: #ff5f57; }
+.fox-bubble-bar i:nth-child(2) { background: #febc2e; }
+.fox-bubble-bar i:nth-child(3) { background: #28c840; }
+.fox-bubble-bar span { margin-left: auto; }
+.fox-bubble-code { min-height: 2.9em; padding: 10px 14px 13px; font: 500 clamp(11px, 2.6vw, 13.5px) / 1.5 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-word; }
+.fox-c-prompt { color: #ff9142; font-weight: 700; }
+.fox-c-keyword { color: #ff9142; }
+.fox-c-string { color: #7dd3a8; }
+.fox-c-comment { color: #8a8a85; }
+.fox-c-number { color: #8ab4ff; }
+.fox-c-func { color: #ffd27d; }
+.fox-caret { display: inline-block; width: 0.55em; height: 1.1em; margin-left: 2px; vertical-align: -0.2em; background: #ff9142; animation: fox-caret 1s steps(1) infinite; }
+/* nothing runs while the fox is off screen */
+.fox[data-play="false"] .fox-stage,
+.fox[data-play="false"] .fox-chip,
+.fox[data-play="false"] .fox-glow,
+.fox[data-play="false"] .fox-caret { animation-play-state: paused; }
+
+@keyframes fox-pop { 0% { opacity: 0; transform: translateY(46px) scale(0.86, 0.78); } 55% { opacity: 1; transform: translateY(-10px) scale(1.03, 1.05); } 78% { transform: translateY(2px) scale(0.99, 0.985); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes fox-glow { 0%, 100% { opacity: 0.7; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1.04); } }
+@keyframes fox-rise { 0% { opacity: 0; transform: translateY(0) scale(0.7); } 15% { opacity: 1; } 100% { opacity: 0; transform: translateY(calc(-1 * var(--fox-rise, 120px))) scale(1.05); } }
+@keyframes fox-bubble-in { 0% { opacity: 0; transform: scale(0.55) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fox-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* reduced motion: the still fox, the first line of code in the bubble, nothing floats, nothing leans */
+@media (prefers-reduced-motion: reduce) {
+  .fox-glow, .fox-stage, .fox-chip, .fox-bubble, .fox-caret { animation: none !important; }
+  .fox-chip { display: none; }
+  .fox-tilt { transform: none !important; transition: none; }
+}
+
+/* ---- Blog article body (Markdown) ---- */
+.blog-prose { font-size: 1.0625rem; line-height: 1.85; color: #3f3f46; overflow-wrap: anywhere; }
+.dark .blog-prose { color: #d4d4d8; }
+.blog-prose > * + * { margin-top: 1.25em; }
+.blog-prose h2 { margin-top: 2.2em; font-family: var(--font-unbounded), sans-serif; font-size: 1.55rem; line-height: 1.3; color: #1a1a1a; scroll-margin-top: 6.5rem; }
+.blog-prose h3 { margin-top: 1.8em; font-family: var(--font-unbounded), sans-serif; font-size: 1.2rem; line-height: 1.35; color: #1a1a1a; scroll-margin-top: 6.5rem; }
+.dark .blog-prose h2, .dark .blog-prose h3, .dark .blog-prose strong { color: #fff; }
+.blog-prose strong { color: #1a1a1a; font-weight: 700; }
+.blog-prose a { color: #e66000; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.blog-prose a:hover { color: #ff6b00; }
+.blog-prose ul, .blog-prose ol { padding-left: 1.4em; }
+.blog-prose ul { list-style: disc; }
+.blog-prose ol { list-style: decimal; }
+.blog-prose li + li { margin-top: 0.4em; }
+.blog-prose li::marker { color: #ff6b00; }
+.blog-prose blockquote { border-left: 4px solid #ff6b00; background: rgba(255, 107, 0, 0.06); padding: 0.9em 1.2em; border-radius: 0 14px 14px 0; font-style: italic; }
+.blog-prose blockquote > * + * { margin-top: 0.6em; }
+.blog-prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; background: rgba(0, 0, 0, 0.06); padding: 0.15em 0.4em; border-radius: 6px; }
+.dark .blog-prose code { background: rgba(255, 255, 255, 0.1); }
+.blog-prose pre { background: #14151a; color: #e5e7eb; padding: 1.1em 1.3em; border-radius: 16px; overflow-x: auto; font-size: 0.9rem; line-height: 1.7; }
+.blog-prose pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+.blog-prose img { width: 100%; height: auto; border-radius: 18px; margin-inline: auto; }
+.blog-prose hr { border: 0; height: 1px; background: rgba(0, 0, 0, 0.1); margin-block: 2.4em; }
+.dark .blog-prose hr { background: rgba(255, 255, 255, 0.14); }
+.blog-table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid rgba(0, 0, 0, 0.08); }
+.dark .blog-table-wrap { border-color: rgba(255, 255, 255, 0.12); }
+.blog-prose table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.blog-prose th, .blog-prose td { padding: 0.65em 0.9em; text-align: left; border-bottom: 1px solid rgba(0, 0, 0, 0.07); }
+.dark .blog-prose th, .dark .blog-prose td { border-bottom-color: rgba(255, 255, 255, 0.1); }
+.blog-prose th { background: rgba(0, 0, 0, 0.04); font-weight: 700; }
+.dark .blog-prose th { background: rgba(255, 255, 255, 0.06); }
+@media (max-width: 640px) { .blog-prose { font-size: 1rem; line-height: 1.8; } .blog-prose h2 { font-size: 1.3rem; } .blog-prose h3 { font-size: 1.1rem; } }

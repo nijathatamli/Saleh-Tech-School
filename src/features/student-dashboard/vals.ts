@@ -81,6 +81,12 @@ export interface TemplateVals {
   studentMeta: string;
   levelTitle: string;
   unreadDotStyle: string;
+  bellOpen: boolean;
+  onBell: Handler;
+  onMarkNotifsRead: Handler;
+  hasUnreadNotifs: boolean;
+  noNotifs: boolean;
+  notifItems: { title: string; body: string; when: string; dotStyle: string }[];
   onLogout: Handler;
 
   // desktop screens
@@ -168,6 +174,12 @@ export interface TemplateVals {
   attMonthSummary: string;
   attMonthSummaryShort: string;
   attMonthName: string;
+  prevMonthStyle: string;
+  nextMonthStyle: string;
+  onPrevMonth: Handler;
+  onNextMonth: Handler;
+  showThisMonth: boolean;
+  onThisMonth: Handler;
   attTiles: TileVal[];
   weekDays: string[];
   attCalendar: CalendarCellVal[];

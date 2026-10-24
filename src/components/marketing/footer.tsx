@@ -26,17 +26,17 @@ export function Footer() {
         <div>
           <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Kurslar</h4>
           <ul className="space-y-4 text-sm text-grey-500 dark:text-zinc-400">
-            <li><Link href="/kurslar" className="hover:text-primary transition-colors">Kiber Təhlükəsizlik</Link></li>
-            <li><Link href="/kurslar" className="hover:text-primary transition-colors">Proqramlaşdırma</Link></li>
-            <li><Link href="/kurslar" className="hover:text-primary transition-colors">Robototexnika</Link></li>
+            <li><Link href="/kurslar" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Kibertəhlükəsizlik</Link></li>
+            <li><Link href="/kurslar" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Proqramlaşdırma</Link></li>
+            <li><Link href="/kurslar" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Robototexnika</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Şirkət</h4>
           <ul className="space-y-4 text-sm text-grey-500 dark:text-zinc-400">
-            <li><Link href="/" className="hover:text-primary transition-colors">Haqqımızda</Link></li>
-            <li><Link href="/" className="hover:text-primary transition-colors">Vakansiyalar</Link></li>
-            <li><Link href="/" className="hover:text-primary transition-colors">Əlaqə</Link></li>
+            <li><Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Haqqımızda</Link></li>
+            <li><Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Vakansiyalar</Link></li>
+            <li><Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Əlaqə</Link></li>
           </ul>
         </div>
         {social.length > 0 && (
@@ -75,8 +75,8 @@ export function Footer() {
           <span>tərəfindən yaradılıb</span>
         </a>
         <div className="flex space-x-6 font-bold uppercase tracking-widest">
-          <Link href="/" className="hover:text-primary transition-colors">Məxfilik</Link>
-          <Link href="/" className="hover:text-primary transition-colors">Şərtlər</Link>
+          <Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Məxfilik</Link>
+          <Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Şərtlər</Link>
         </div>
       </div>
     </footer>

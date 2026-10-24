@@ -1,0 +1,388 @@
+/* Admin panel look — the same visual language as the teacher / student / parent dashboards:
+   warm paper background with soft orange glows, "liquid glass" surfaces (blur + saturate + inner highlight),
+   26-30px radii, Plus Jakarta Sans headings, orange accent #FF6B00.
+   Everything is scoped under `.ad-root` (the page) or `html.ad-portal` (also reaches dialogs and menus,
+   which Radix renders in a portal outside the page), so the public site and the login pages are untouched. */
+
+.ad-root {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: #f7f7f5;
+  color: #171717;
+  font-family: var(--font-inter), "Inter", sans-serif;
+  letter-spacing: -0.005em;
+}
+
+/* ---- ambient glows ---------------------------------------------------------------------------------------- */
+.ad-glow-a,
+.ad-glow-c {
+  position: fixed;
+  left: -140px;
+  top: 40px;
+  width: 560px;
+  height: 640px;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(closest-side at 40% 30%, rgba(255, 107, 0, 0.2), rgba(255, 107, 0, 0) 74%),
+    radial-gradient(closest-side at 60% 78%, rgba(255, 179, 107, 0.2), rgba(255, 179, 107, 0) 72%);
+  filter: blur(26px);
+}
+.ad-glow-b {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+.ad-glow-a {
+  top: -340px;
+  right: -220px;
+  width: 1000px;
+  height: 820px;
+  background: radial-gradient(closest-side, rgba(255, 107, 0, 0.13), rgba(255, 107, 0, 0) 78%);
+  filter: blur(30px);
+  animation: ad-glow-drift 26s ease-in-out infinite;
+}
+.ad-glow-b {
+  bottom: -360px;
+  left: -200px;
+  width: 820px;
+  height: 720px;
+  background: radial-gradient(closest-side, rgba(255, 107, 0, 0.075), rgba(255, 107, 0, 0) 76%);
+  filter: blur(34px);
+}
+@keyframes ad-glow-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-60px, 40px, 0); }
+}
+
+/* ---- liquid glass ------------------------------------------------------------------------------------------ */
+.ad-glass {
+  /* a specular band along the top edge over a translucent gradient: reads as glass, not as a white panel */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.4));
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85) inset,
+    0 -1px 0 rgba(23, 23, 23, 0.04) inset,
+    0 26px 56px -30px rgba(23, 23, 23, 0.34);
+}
+.ad-glass-chip {
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(23, 23, 23, 0.055);
+  box-shadow: 0 10px 26px -18px rgba(23, 23, 23, 0.3);
+}
+
+/* ---- sidebar navigation: pill hover that glides between items -------------------------------------------- */
+.ad-navlist {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ad-pill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  will-change: transform, height, opacity;
+}
+/* hairline between groups of pages (the capsules measure the links, not these) */
+.ad-sep {
+  display: block;
+  height: 1px;
+  margin: 6px 12px;
+  background: rgba(23, 23, 23, 0.06);
+}
+.ad-navbadge {
+  min-width: 19px;
+  height: 19px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff6b00;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 19px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the capsule that follows the cursor: soft, neutral, fades in/out */
+.ad-pill-hover {
+  background: rgba(23, 23, 23, 0.055);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55) inset;
+  opacity: 0;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), height 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out;
+}
+.ad-pill-hover[data-instant="true"] {
+  transition: opacity 200ms ease-out;
+}
+.ad-pill-hover[data-on="true"] {
+  opacity: 1;
+}
+/* the orange capsule that marks the current page and slides when the page changes */
+.ad-pill-active {
+  background: rgba(255, 107, 0, 0.09);
+  border: 1px solid rgba(255, 107, 0, 0.18);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 10px 22px -16px rgba(255, 107, 0, 0.55);
+  opacity: 0;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), height 320ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease-out;
+}
+.ad-pill-active[data-on="true"] {
+  opacity: 1;
+}
+.ad-navlink {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: #6f6f6b;
+  transition: color 200ms ease-out;
+  outline: none;
+}
+.ad-navlink:hover,
+.ad-navlink:focus-visible {
+  color: #171717;
+}
+.ad-navlink:focus-visible {
+  outline: 2px solid rgba(255, 107, 0, 0.55);
+  outline-offset: 1px;
+}
+.ad-navlink[aria-current="page"] {
+  color: #171717;
+  font-weight: 600;
+}
+.ad-navlink[aria-current="page"] svg {
+  color: #e66000;
+}
+.ad-navlink svg {
+  opacity: 0.9;
+  transition: color 200ms ease-out, transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ad-navlink:hover svg {
+  transform: translateX(1px) scale(1.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-pill-hover,
+  .ad-pill-active,
+  .ad-glow-a,
+  .ad-navlink svg {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* ---- text and surface tokens (admin only) ------------------------------------------------------------------ */
+html.ad-portal .text-navy-900 { color: #171717; }
+html.ad-portal .text-navy-600 { color: #4a4a46; }
+html.ad-portal .text-navy-400 { color: #6f6f6b; }
+html.ad-portal .border-navy-100 { border-color: rgba(23, 23, 23, 0.075); }
+html.ad-portal .border-navy-50 { border-color: rgba(23, 23, 23, 0.04); }
+html.ad-portal .bg-navy-50 { background-color: rgba(23, 23, 23, 0.035); }
+html.ad-portal .hover\:bg-navy-50:hover { background-color: rgba(23, 23, 23, 0.05); }
+html.ad-portal .tracking-widest { letter-spacing: 0.09em; }
+.ad-root .font-display,
+html.ad-portal [role="dialog"] .font-display {
+  font-family: "Plus Jakarta Sans", var(--font-inter), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* ---- buttons ------------------------------------------------------------------------------------------------ */
+html.ad-portal .ad-btn {
+  border-radius: 14px;
+  text-transform: none;
+  letter-spacing: -0.005em;
+  font-size: 13px;
+  font-weight: 600;
+}
+html.ad-portal .ad-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+html.ad-portal .ad-btn:not(:disabled):active {
+  transform: translateY(0) scale(0.985);
+}
+html.ad-portal .ad-btn-app {
+  background: #ff6b00;
+  color: #fff;
+  box-shadow: 0 12px 26px -12px rgba(255, 107, 0, 0.6);
+}
+html.ad-portal .ad-btn-app:hover {
+  background: #ff7a1a;
+}
+html.ad-portal .ad-btn-outline {
+  background: #fff;
+  color: #171717;
+  border: 1px solid rgba(23, 23, 23, 0.09);
+}
+html.ad-portal .ad-btn-outline:hover {
+  background: #fafaf8;
+}
+html.ad-portal .ad-btn-ghost {
+  color: #6f6f6b;
+}
+html.ad-portal .ad-btn-ghost:hover {
+  background: rgba(23, 23, 23, 0.05);
+  color: #171717;
+}
+
+/* ---- badges ------------------------------------------------------------------------------------------------- */
+html.ad-portal .ad-badge {
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+}
+html.ad-portal .ad-badge-default { background: rgba(23, 23, 23, 0.06); color: #4a4a46; }
+html.ad-portal .ad-badge-success { background: rgba(22, 163, 74, 0.11); color: #15803d; }
+html.ad-portal .ad-badge-warning { background: rgba(255, 107, 0, 0.12); color: #c2570a; }
+html.ad-portal .ad-badge-danger { background: rgba(220, 38, 38, 0.1); color: #b91c1c; }
+html.ad-portal .ad-badge-primary { background: rgba(255, 107, 0, 0.1); color: #e66000; }
+
+/* ---- fields ------------------------------------------------------------------------------------------------- */
+.ad-root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.ad-root select,
+.ad-root textarea,
+html.ad-portal [role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+html.ad-portal [role="dialog"] select,
+html.ad-portal [role="dialog"] textarea {
+  border-radius: 14px;
+  border: 1px solid rgba(23, 23, 23, 0.1);
+  background-color: #fcfcfa;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.ad-root input:focus,
+.ad-root select:focus,
+.ad-root textarea:focus,
+html.ad-portal [role="dialog"] input:focus,
+html.ad-portal [role="dialog"] select:focus,
+html.ad-portal [role="dialog"] textarea:focus {
+  border-color: #ff6b00;
+  box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.1);
+  background-color: #fff;
+}
+
+/* ---- tables ------------------------------------------------------------------------------------------------- */
+.ad-root tbody tr {
+  transition: background-color 0.18s ease;
+}
+.ad-root tbody tr:hover {
+  background: rgba(255, 107, 0, 0.03);
+}
+
+/* ---- dialogs, menus: glass ----------------------------------------------------------------------------------- */
+html.ad-portal .ad-overlay {
+  background: rgba(23, 23, 23, 0.32);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+}
+html.ad-portal .ad-dialog {
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 40px 80px -36px rgba(23, 23, 23, 0.45);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+html.ad-portal .ad-menu {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.82);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(23, 23, 23, 0.06);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 28px 56px -28px rgba(23, 23, 23, 0.4);
+}
+html.ad-portal .ad-menu-item {
+  border-radius: 12px;
+}
+
+/* ---- accessibility and comfort (WCAG 2.2 AA oriented) -------------------------------------------------------- */
+.ad-root {
+  line-height: 1.5;
+}
+.ad-root h1,
+.ad-root h2,
+.ad-root h3 {
+  text-wrap: balance; /* no single-word last lines in headings */
+}
+/* orange TEXT on white needs a darker orange than the brand fill to reach 4.5:1 */
+html.ad-portal .text-electric-600,
+html.ad-portal .hover\:text-electric-600:hover,
+html.ad-portal .text-electric-500 {
+  color: #b84f00;
+}
+html.ad-portal input::placeholder,
+html.ad-portal textarea::placeholder {
+  color: #757570;
+  opacity: 1;
+}
+html.ad-portal .text-\[10px\] {
+  font-size: 11px; /* nothing smaller than 11px in the admin panel */
+}
+/* a visible keyboard focus on every operable thing */
+html.ad-portal :where(a, button, summary, [role="button"], [role="menuitem"], [tabindex]):focus-visible {
+  outline: 2px solid rgba(255, 107, 0, 0.75);
+  outline-offset: 2px;
+}
+/* touch screens: 44px targets */
+@media (pointer: coarse) {
+  .ad-root :where(button, select, a.ad-navlink, input:not([type="checkbox"]):not([type="radio"])),
+  html.ad-portal [role="dialog"] :where(button, select, input:not([type="checkbox"]):not([type="radio"])) {
+    min-height: 44px;
+  }
+  html.ad-portal .ad-dialog > button:last-child {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.ad-portal .ad-btn,
+  html.ad-portal .ad-btn:not(:disabled):hover,
+  html.ad-portal .ad-btn:not(:disabled):active,
+  .ad-root tbody tr {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ---- loading skeleton in the same language ------------------------------------------------------------------- */
+.ad-skeleton {
+  border-radius: 26px;
+  background: linear-gradient(100deg, rgba(23, 23, 23, 0.045) 30%, rgba(255, 255, 255, 0.75) 50%, rgba(23, 23, 23, 0.045) 70%);
+  background-size: 220% 100%;
+  animation: ad-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes ad-shimmer {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-skeleton { animation: none; }
+}
+
+/* phone drawer: the list scrolls, so its bottom edge fades out to say there is more below */
+.ad-fade-bottom {
+  padding-bottom: 24px;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent);
+}

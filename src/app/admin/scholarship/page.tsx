@@ -5,6 +5,7 @@ import { formatCourseCode } from "@/lib/scholarship/security";
 import { GenerateCodesForm } from "./generate-form";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { EmptyState } from "@/components/admin/bits";
 export const dynamic = "force-dynamic";
 
 const fmt = new Intl.DateTimeFormat("az-AZ", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Baku" });
@@ -21,7 +22,7 @@ export default async function AdminScholarshipPage() {
       <AdminTopbar title={`${SCHOLARSHIP_NAME} — təqaüd imtahanı`} />
 
       <div className="space-y-8 p-6 md:p-10">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { l: "Qeydiyyatdan keçən", v: students.length },
             { l: "İmtahanı bitirən", v: done.length },
@@ -30,7 +31,7 @@ export default async function AdminScholarshipPage() {
           ].map((c) => (
             <div key={c.l} className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm shadow-navy-900/[0.03]">
               <p className="text-xs font-bold uppercase tracking-widest text-navy-400">{c.l}</p>
-              <p className="mt-2 text-3xl font-extrabold">{c.v}</p>
+              <p className="mt-2 break-words text-2xl font-extrabold sm:text-3xl">{c.v}</p>
             </div>
           ))}
         </div>
@@ -72,7 +73,7 @@ export default async function AdminScholarshipPage() {
             <h2 className="text-lg font-extrabold">Tələbələr və nəticələr</h2>
             <p className="mt-1 text-sm text-navy-400">İmtahanı bitirən hər tələbəyə minimum 60% təqaüd verilir; yüksək nəticə daha çox qazandırır (cədvəl <code>SCHOLARSHIP_TIERS</code>, src/lib/scholarship/config.ts).</p>
           </div>
-          <div className="overflow-x-auto">
+          <div className="table-scroll overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-navy-100 text-left text-xs font-bold uppercase tracking-widest text-navy-400">
@@ -92,7 +93,7 @@ export default async function AdminScholarshipPage() {
               </thead>
               <tbody>
                 {students.length === 0 && (
-                  <tr><td colSpan={12} className="px-4 py-10 text-center text-navy-400">Hələ qeydiyyat yoxdur.</td></tr>
+                  <tr><td colSpan={12} className="px-4 py-4"><EmptyState text="Hələ qeydiyyat yoxdur." /></td></tr>
                 )}
                 {students.map((s) => (
                   <tr key={s.id} className="border-b border-navy-50 align-top last:border-0">

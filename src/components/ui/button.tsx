@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold uppercase tracking-widest text-xs transition-all duration-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100",
+  "ad-btn inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full font-bold uppercase tracking-widest text-xs transition-all duration-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:active:scale-100",
   {
     variants: {
       variant: {
@@ -12,9 +12,9 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-white hover:bg-black",
         outline: "border border-grey-200 text-secondary hover:bg-secondary hover:text-white",
         ghost: "text-secondary hover:bg-grey-100",
-        app: "bg-electric-500 text-white hover:bg-electric-600 shadow-lg shadow-electric-500/20",
-        "app-outline": "border border-navy-100 text-navy-900 hover:bg-navy-50",
-        "app-ghost": "text-navy-400 hover:bg-navy-50",
+        app: "ad-btn-app bg-electric-500 text-white hover:bg-electric-600 shadow-lg shadow-electric-500/20",
+        "app-outline": "ad-btn-outline border border-navy-100 text-navy-900 hover:bg-navy-50",
+        "app-ghost": "ad-btn-ghost text-navy-400 hover:bg-navy-50",
         destructive: "bg-red-500 text-white hover:bg-red-600",
       },
       size: {

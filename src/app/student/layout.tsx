@@ -9,7 +9,7 @@ import "@/features/student-dashboard/styles/base.css";
 import "@/features/student-dashboard/styles/template.generated.css";
 import "@/features/student-dashboard/styles/portal.css";
 
-export const metadata: Metadata = { title: "Tələbə paneli" };
+export const metadata: Metadata = { title: "Tələbə paneli", robots: { index: false, follow: false } };
 
 // Access control lives in middleware.ts (session + STUDENT role) and the page
 // itself re-checks the session before loading data.

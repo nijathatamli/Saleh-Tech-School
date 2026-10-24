@@ -1,5 +1,6 @@
 import { courseCreateSchema, createCourse, listAdminCourses } from "@/lib/admin/courses";
 import { handle, ok, pageParams, readJson, requireRole, revalidateDashboards } from "@/lib/api";
+import { cleanQ } from "@/lib/search";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,7 @@ export const GET = handle(async (req) => {
   const url = new URL(req.url);
   const { page, size } = pageParams(url, { size: 50, max: 200 });
   const a = url.searchParams.get("active");
-  return ok(await listAdminCourses({ q: url.searchParams.get("q")?.trim() || undefined, active: a === "all" ? undefined : a === "false" ? false : true, page, size }));
+  return ok(await listAdminCourses({ q: cleanQ(url.searchParams.get("q")), active: a === "all" ? undefined : a === "false" ? false : true, page, size }));
 });
 
 export const POST = handle(

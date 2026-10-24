@@ -1,5 +1,6 @@
 import { listPayments } from "@/lib/admin/payments";
 import { handle, ok, pageParams, requireRole } from "@/lib/api";
+import { cleanQ } from "@/lib/search";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ export const GET = handle(async (req) => {
   return ok(
     await listPayments({
       status: url.searchParams.get("status") || undefined,
-      q: url.searchParams.get("q")?.trim() || undefined,
+      q: cleanQ(url.searchParams.get("q")),
       studentId: url.searchParams.get("studentId") || undefined,
       classId: url.searchParams.get("classId") || undefined,
       page,

@@ -5,11 +5,13 @@ import { ApiError, MSG } from "@/lib/api";
 import { audit, notifyParentsOfStudentsDirect } from "@/lib/events";
 import { getSettings } from "@/lib/settings";
 
+export const paymentBlockSchema = z.object({ blocked: z.boolean({ errorMap: () => ({ message: MSG.invalid }) }) });
+
 export const paymentStatusSchema = z.object({ status: z.enum(["PAID", "DUE", "CANCELLED"], { errorMap: () => ({ message: MSG.invalid }) }) });
 
 const select = {
   id: true, title: true, amount: true, status: true, cycle: true, lessonsFrom: true, lessonsTo: true, dueDate: true, paidAt: true, createdAt: true, invoiceNo: true,
-  student: { select: { id: true, firstName: true, lastName: true } },
+  student: { select: { id: true, firstName: true, lastName: true, active: true } },
   class: { select: { id: true, name: true } },
 } satisfies Prisma.PaymentSelect;
 
@@ -18,7 +20,7 @@ const present = (p: Prisma.PaymentGetPayload<{ select: typeof select }>, overdue
   overdue: p.status === "DUE" && !!overdueBefore && p.dueDate < overdueBefore,
   id: p.id, title: p.title, amount: p.amount, status: p.status, cycle: p.cycle, lessonsFrom: p.lessonsFrom, lessonsTo: p.lessonsTo, invoiceNo: p.invoiceNo,
   dueAt: p.dueDate.toISOString(), paidAt: p.paidAt?.toISOString() ?? null, createdAt: p.createdAt.toISOString(),
-  studentId: p.student?.id ?? null, studentName: p.student ? `${p.student.firstName} ${p.student.lastName}` : "—",
+  studentId: p.student?.id ?? null, studentActive: p.student?.active ?? null, studentName: p.student ? `${p.student.firstName} ${p.student.lastName}` : "—",
   classId: p.class?.id ?? null, className: p.class?.name ?? "—",
 });
 
@@ -60,5 +62,28 @@ export async function setPaymentStatus(actorUserId: string, id: string, status: 
   });
   void row;
   const fresh = await prisma.payment.findUniqueOrThrow({ where: { id }, select });
+  return present(fresh);
+}
+
+/**
+ * "Hesabı blokla / Blokdan çıxar" next to an unpaid cycle: switches the student's login off (or back on) — the same switch as
+ * deactivating the student, so open sessions stop at once and nothing is deleted. Audited; the family is told why.
+ */
+export async function setStudentBlockedForPayment(actorUserId: string, paymentId: string, blocked: boolean) {
+  await prisma.$transaction(async (tx) => {
+    const pay = await tx.payment.findUnique({ where: { id: paymentId }, select: { id: true, cycle: true, title: true, studentId: true } });
+    if (!pay || pay.cycle === null || !pay.studentId) throw new ApiError(404, MSG.notFound);
+    await tx.$queryRaw`SELECT "id" FROM "StudentProfile" WHERE "id" = ${pay.studentId} FOR UPDATE`;
+    const st = await tx.studentProfile.findUnique({ where: { id: pay.studentId }, select: { id: true, userId: true, active: true, firstName: true, lastName: true } });
+    if (!st) throw new ApiError(404, MSG.studentNotFound);
+    if (st.active === !blocked) return; // idempotent: already in the requested state
+    await tx.studentProfile.update({ where: { id: st.id }, data: { active: !blocked } });
+    if (st.userId) await tx.user.update({ where: { id: st.userId }, data: { active: !blocked } });
+    await audit(tx, { actorUserId, action: blocked ? "student.block" : "student.unblock", entityType: "student", entityId: st.id, before: { active: st.active }, after: { active: !blocked, paymentId, reason: "payment" } });
+    await notifyParentsOfStudentsDirect(tx, [st.id], blocked
+      ? { title: "Hesab bloklandı", body: `${st.firstName} ${st.lastName} üçün hesab ödəniş (${pay.title}) gözlənildiyindən müvəqqəti bloklandı. Ödəniş təsdiqləndikdən sonra yenidən açılacaq.`, type: "warning", event: "PAYMENT_DUE", entityType: "payment", entityId: paymentId }
+      : { title: "Hesab yenidən açıldı", body: `${st.firstName} ${st.lastName} üçün hesab yenidən aktivdir.`, type: "success", event: "GENERAL", entityType: "payment", entityId: paymentId });
+  });
+  const fresh = await prisma.payment.findUniqueOrThrow({ where: { id: paymentId }, select });
   return present(fresh);
 }

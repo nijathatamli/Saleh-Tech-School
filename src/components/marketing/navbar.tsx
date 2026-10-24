@@ -6,6 +6,7 @@ import { Logo } from "@/components/app/logo";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { PillLinks } from "./pill-nav";
 import { Button } from "@/components/ui/button";
 import { SCHOLARSHIP_BASE, SCHOLARSHIP_NAME } from "@/lib/scholarship/config";
 
@@ -14,6 +15,7 @@ const links = [
   { href: "/#courses", label: "Kurslar", active: false },
   { href: "/#parents", label: "Valideyn Paneli", active: false },
   { href: "/#testimonials", label: "Rəylər", active: false },
+  { href: "/bloq", label: "Bloq", active: false },
 ];
 
 // Inside the scholarship section the same header switches to the scholarship navigation.
@@ -31,7 +33,7 @@ export function Navbar() {
   if (inScholarship) {
     const isActive = (href: string) => (href === SCHOLARSHIP_BASE ? pathname === href : pathname.startsWith(href));
     return (
-      <header className="fixed top-0 left-0 z-50 w-full border-b border-grey-100 bg-white/90 px-6 py-4 backdrop-blur-md dark:border-zinc-800 dark:bg-black/80">
+      <header className="fixed inset-x-3 top-3 z-50 mx-auto max-w-7xl rounded-[28px] border border-white/60 bg-white/55 px-3 py-2.5 min-[380px]:px-4 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_18px_44px_-24px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-[1.8] sm:px-6 dark:border-white/10 dark:bg-black/45 dark:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_18px_44px_-24px_rgba(0,0,0,0.8)]">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center" aria-label="Saleh Tech School — ana səhifə">
@@ -41,24 +43,13 @@ export function Navbar() {
               {SCHOLARSHIP_NAME}
             </Link>
           </div>
-          <nav className="hidden space-x-6 whitespace-nowrap text-sm font-semibold text-grey-500 dark:text-zinc-400 md:flex lg:space-x-8" aria-label="Təqaüd naviqasiyası">
-            {scholarshipLinks.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                aria-current={isActive(l.href) ? "page" : undefined}
-                className={`nav-link-hover ${isActive(l.href) ? "text-secondary dark:text-white" : ""}`}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </nav>
+          <PillLinks label="Təqaüd naviqasiyası" items={scholarshipLinks.map((l) => ({ href: l.href, label: l.label, active: isActive(l.href) }))} />
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <Button asChild size="md" className="hidden lg:inline-flex">
               <Link href={`${SCHOLARSHIP_BASE}/qeydiyyat`}>İmtahana başla</Link>
             </Button>
-            <button className="text-2xl md:hidden" onClick={() => setOpen((o) => !o)} aria-label="Menyu" aria-expanded={open}>
+            <button className="-mr-2 flex h-11 w-11 items-center justify-center text-2xl md:hidden" onClick={() => setOpen((o) => !o)} aria-label="Menyu" aria-expanded={open}>
               {open ? <X /> : <Menu />}
             </button>
           </div>
@@ -85,39 +76,33 @@ export function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full border-b border-grey-100 bg-white/90 px-6 py-4 backdrop-blur-md dark:border-zinc-800 dark:bg-black/80">
+    <header className="fixed inset-x-3 top-3 z-50 mx-auto max-w-7xl rounded-[28px] border border-white/60 bg-white/55 px-3 py-2.5 min-[380px]:px-4 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_18px_44px_-24px_rgba(0,0,0,0.35)] backdrop-blur-2xl backdrop-saturate-[1.8] sm:px-6 dark:border-white/10 dark:bg-black/45 dark:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_18px_44px_-24px_rgba(0,0,0,0.8)]">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center space-x-8">
           <Link href="/" className="flex items-center">
             <Logo size={20} />
           </Link>
-          <nav className="hidden space-x-8 text-sm font-semibold text-grey-500 dark:text-zinc-400 md:flex">
-            {links.map((l) => (
-              <Link
-                key={l.label}
-                href={l.href}
-                className={`nav-link-hover ${l.active ? "text-secondary dark:text-white" : ""}`}
-              >
-                {l.label}
-              </Link>
-            ))}
-            <Link href={SCHOLARSHIP_BASE} className="nav-link-hover text-primary">
-              Təqaüd Proqramı
-            </Link>
-          </nav>
+          <PillLinks
+            label="Əsas naviqasiya"
+            items={[
+              ...links.map((l) => ({ href: l.href, label: l.label, active: l.href === "/" ? pathname === "/" : l.href === "/bloq" && (pathname === "/bloq" || pathname.startsWith("/bloq/")) })),
+              { href: SCHOLARSHIP_BASE, label: "Təqaüd Proqramı", className: "text-primary hover:text-primary" },
+            ]}
+          />
         </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
+        <div className="flex items-center gap-1 min-[380px]:gap-2 sm:gap-4">
+          {/* under 340px there is no room for it next to the sign-up button: it moves into the menu */}
+          <span className="max-[339px]:hidden"><ThemeToggle /></span>
           <Link
             href="/giris"
             className="hidden text-sm font-bold text-secondary transition-colors hover:text-primary dark:text-white md:inline-block"
           >
             Giriş
           </Link>
-          <Button asChild size="md">
+          <Button asChild size="md" className="px-3 min-[380px]:px-4 sm:px-6">
             <Link href="/sinaq-dersi">Qeydiyyat</Link>
           </Button>
-          <button className="text-2xl md:hidden" onClick={() => setOpen((o) => !o)} aria-label="Menyu">
+          <button className="-mr-2 flex h-11 w-11 items-center justify-center text-2xl md:hidden" onClick={() => setOpen((o) => !o)} aria-label="Menyu" aria-expanded={open}>
             {open ? <X /> : <Menu />}
           </button>
         </div>
@@ -135,6 +120,7 @@ export function Navbar() {
           <Link href="/giris" onClick={() => setOpen(false)}>
             Giriş
           </Link>
+          <div className="min-[340px]:hidden"><ThemeToggle /></div>
         </nav>
       )}
     </header>

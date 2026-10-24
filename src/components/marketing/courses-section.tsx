@@ -5,22 +5,22 @@ import { ArrowRight } from "lucide-react";
 const courses = [
   {
     image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_4d78f13579_72fa6a1d65880b79.png",
-    alt: "modern cybersecurity visualization with shields and locks, neon orange and white theme, digital tech",
+    alt: "Uşaqlar üçün kibertəhlükəsizlik kursu: qalxan və kilid təsviri",
     badge: "Yeni",
-    title: "Kiber Təhlükəsizlik Əsasları",
+    title: "Kibertəhlükəsizlik Əsasları",
     desc: "Uşaqlar rəqəmsal dünyanı necə qorumağı və etik hakerlik prinsiplərini öyrənirlər.",
     duration: "8 Ay",
   },
   {
     image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_96dae3585e_7e155be2988d8706.png",
-    alt: "child hands coding python on a laptop, friendly bright workspace, orange accents, educational photog",
+    alt: "Uşaq noutbukda Python ilə proqramlaşdırma kursunda kod yazır",
     title: "Python ilə Proqramlaşdırma",
     desc: "Dünyanın ən populyar proqramlaşdırma dilini əyləncəli layihələrlə mənimsəyin.",
     duration: "6 Ay",
   },
   {
     image: "https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_55f76a70f6_e6f3256ef5c6b526.png",
-    alt: "robotics workshop for teenagers, assembling futuristic robot arm, bright clean laboratory, orange li",
+    alt: "Yeniyetmələr robototexnika dərsində robot qolu yığır",
     title: "Robototexnika və IoT",
     desc: "Öz robotlarınızı yaradın və onları kod vasitəsilə canlandırın.",
     duration: "9 Ay",

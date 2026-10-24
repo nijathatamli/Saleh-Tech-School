@@ -38,11 +38,11 @@ export const fail = (status: number, error: string, fields?: Record<string, stri
 export async function sessionUser() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new AccessError("unauthenticated");
-  return { id: session.user.id as string, role: session.user.role as "PARENT" | "TEACHER" | "STUDENT" | "ADMIN", name: session.user.name ?? "" };
+  return { id: session.user.id as string, role: session.user.role as "PARENT" | "TEACHER" | "STUDENT" | "ADMIN" | "BLOGGER", name: session.user.name ?? "" };
 }
 
 /** Requires the role AND that the account is still active in the database (a deactivated user's old cookie stops working). */
-export async function requireRole(role: "ADMIN" | "TEACHER" | "STUDENT") {
+export async function requireRole(role: "ADMIN" | "TEACHER" | "STUDENT" | "BLOGGER") {
   const u = await sessionUser();
   if (u.role !== role) throw new AccessError("forbidden");
   const row = await prisma.user.findUnique({ where: { id: u.id }, select: { active: true, role: true } });

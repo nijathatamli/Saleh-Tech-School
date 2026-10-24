@@ -4,7 +4,7 @@ import { getStudent } from "@/lib/admin/students";
 import { ApiError } from "@/lib/api";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { PaymentActions } from "@/components/admin/payment-actions";
-import { PaymentBadge, card, fmtDate, th } from "@/components/admin/bits";
+import { PaymentBadge, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { EditStudentDialog } from "@/components/admin/student-dialog";
 import { ChangeParentDialog } from "@/components/admin/parent-dialogs";
 import { ActiveToggle } from "@/components/admin/teacher-dialogs";
@@ -30,9 +30,9 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
         <div className={`${card} p-6`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <Badge variant={s.active ? "success" : "default"}>{s.active ? "Aktiv" : "Deaktiv"}</Badge>
-            <div className="flex items-center gap-3"><EditStudentDialog student={{ id: s.id, firstName: s.firstName, lastName: s.lastName, grade: s.grade, fin: s.fin, birthDate: s.birthDate }} /><ActiveToggle endpoint={`/api/admin/students/${s.id}`} active={s.active} label="Tələbə" /></div>
+            <div className="flex flex-wrap items-center gap-3"><EditStudentDialog student={{ id: s.id, firstName: s.firstName, lastName: s.lastName, grade: s.grade, fin: s.fin, birthDate: s.birthDate }} /><ActiveToggle endpoint={`/api/admin/students/${s.id}`} active={s.active} label="Tələbə" /></div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 [overflow-wrap:anywhere] sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[["Sinif", s.grade ? `${s.grade}-ci` : "—"], ["FIN", s.fin ?? "—"], ["Doğum tarixi", s.birthDate]].map(([l, v]) => (
               <div key={l}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{l}</p><p className="mt-1 text-sm font-bold text-navy-900">{v}</p></div>
             ))}
@@ -41,17 +41,17 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
         </div>
         <section className={card}>
           <h2 className="px-6 pt-5 text-base font-extrabold text-navy-900">Siniflər</h2>
-          <div className="overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Sinif</th><th className={th}>Müəllim</th><th className={th}>Status</th><th className={th}>Tamamlanan dərs</th><th className={th}>Qoşulub</th></tr></thead>
+          <div className="table-scroll overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Sinif</th><th className={th}>Müəllim</th><th className={th}>Status</th><th className={th}>Tamamlanan dərs</th><th className={th}>Qoşulub</th></tr></thead>
             <tbody>
-              {s.classes.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-navy-400">Heç bir sinifdə deyil.</td></tr>}
+              {s.classes.length === 0 && <tr><td colSpan={5} className="px-4 py-4"><EmptyState text="Heç bir sinifdə deyil." /></td></tr>}
               {s.classes.map((c) => <tr key={c.id} className="border-b border-navy-50 last:border-0"><td className="px-4 py-3"><Link className="font-bold hover:text-electric-600" href={`/admin/classes/${c.id}`}>{c.name}</Link></td><td className="px-4 py-3 text-navy-600">{c.teacher}</td><td className="px-4 py-3 text-navy-600">{c.status === "ACTIVE" ? "Aktiv" : "Arxivdə"}</td><td className="px-4 py-3 font-bold">{c.completedLessons}</td><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(c.joinedAt)}</td></tr>)}
             </tbody></table></div>
         </section>
         <section className={card}>
           <h2 className="px-6 pt-5 text-base font-extrabold text-navy-900">Davamiyyət (son 40)</h2>
-          <div className="overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Tarix</th><th className={th}>Sinif</th><th className={th}>Status</th><th className={th}>Qeyd</th></tr></thead>
+          <div className="table-scroll overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Tarix</th><th className={th}>Sinif</th><th className={th}>Status</th><th className={th}>Qeyd</th></tr></thead>
             <tbody>
-              {s.attendance.length === 0 && <tr><td colSpan={4} className="px-4 py-8 text-center text-navy-400">Davamiyyət qeydi yoxdur.</td></tr>}
+              {s.attendance.length === 0 && <tr><td colSpan={4} className="px-4 py-4"><EmptyState text="Davamiyyət qeydi yoxdur." /></td></tr>}
               {s.attendance.map((a) => <tr key={a.id} className="border-b border-navy-50 last:border-0"><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(a.date)}</td><td className="px-4 py-3">{a.className}</td><td className="px-4 py-3"><Badge variant={ATT[a.status].v}>{ATT[a.status].label}</Badge></td><td className="px-4 py-3 text-navy-600">{a.note ?? ""}</td></tr>)}
             </tbody></table></div>
         </section>
@@ -64,10 +64,10 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
         </section>
         <section className={card}>
           <h2 className="px-6 pt-5 text-base font-extrabold text-navy-900">Ödəniş tarixçəsi</h2>
-          <div className="overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Sinif</th><th className={th}>Dövr</th><th className={th}>Məbləğ</th><th className={th}>Status</th><th className={th}>Vaxtı çatıb</th><th className={th}>Ödənilib</th><th className={th}></th></tr></thead>
+          <div className="table-scroll overflow-x-auto"><table className="mt-2 w-full text-sm"><thead><tr className="border-b border-navy-100"><th className={th}>Sinif</th><th className={th}>Dövr</th><th className={th}>Məbləğ</th><th className={th}>Status</th><th className={th}>Vaxtı çatıb</th><th className={th}>Ödənilib</th><th className={th}></th></tr></thead>
             <tbody>
-              {s.payments.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-navy-400">Ödəniş qeydi yoxdur.</td></tr>}
-              {s.payments.map((p) => <tr key={p.id} className="border-b border-navy-50 last:border-0"><td className="px-4 py-3">{p.className ?? "—"}</td><td className="px-4 py-3">{p.cycle ?? "—"}</td><td className="px-4 py-3">{p.amount} AZN</td><td className="px-4 py-3"><PaymentBadge status={p.status} /></td><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.dueDate)}</td><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.paidAt)}</td><td className="px-4 py-3">{p.cycle !== null && <PaymentActions id={p.id} status={p.status} />}</td></tr>)}
+              {s.payments.length === 0 && <tr><td colSpan={7} className="px-4 py-4"><EmptyState text="Ödəniş qeydi yoxdur." /></td></tr>}
+              {s.payments.map((p) => <tr key={p.id} className="border-b border-navy-50 last:border-0"><td className="px-4 py-3">{p.className ?? "—"}</td><td className="px-4 py-3">{p.cycle ?? "—"}</td><td className="px-4 py-3">{p.amount} AZN</td><td className="px-4 py-3"><PaymentBadge status={p.status} /></td><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.dueDate)}</td><td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.paidAt)}</td><td className="px-4 py-3">{p.cycle !== null && <PaymentActions id={p.id} status={p.status} studentId={s.id} studentActive={s.active} />}</td></tr>)}
             </tbody></table></div>
         </section>
       </div>

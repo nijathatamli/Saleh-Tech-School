@@ -9,7 +9,7 @@
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
-import type { NoteVisibility } from "@prisma/client";
+import type { NoteVisibility, Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -21,7 +21,8 @@ import {
   requireTeacherOwnsLesson,
   requireTeacherOwnsStudent,
 } from "@/lib/access";
-import { audit, notifyParentsOfStudents, notifyStudents } from "@/lib/events";
+import { markAllNotificationsRead } from "@/lib/notifications";
+import { audit, notifyParentsOfStudents, notifyStudents, notifyUsers } from "@/lib/events";
 import { setParticipation } from "@/lib/billing";
 import { createLessonFor } from "@/lib/lessons";
 import { ApiError } from "@/lib/api";
@@ -103,6 +104,7 @@ export async function saveAttendance(lessonId: string, marks: Record<string, "p"
 
     const changed = await prisma.$transaction(async (tx) => {
       let n = 0;
+      const absent: { studentId: string; name: string }[] = [];
       const dateLabel = dayMonth(parts(lesson.date));
       for (const [studentId, mark] of Object.entries(marks)) {
         if (!enrolled.has(studentId) || !STATUS_OF[mark]) continue;
@@ -124,12 +126,32 @@ export async function saveAttendance(lessonId: string, marks: Record<string, "p"
             ...ref,
           });
           await notifyStudents(tx, [studentId], { title: "Davamiyyət qeydi", body: `${dateLabel} tarixli "${lesson.title}" dərsində ${STATUS_WORD[status]} kimi qeyd edildin.`, type: "warning", event: "ABSENCE", ...ref });
+          if (status === "ABSENT") absent.push({ studentId, name: student.firstName });
         }
       }
+      await warnLowAttendance(tx, userId, lesson.classId, absent);
       return n;
     });
     return { ok: true, changed };
   });
+}
+
+
+/** Teacher switch "Davamiyyət xəbərdarlığı": below 75% attendance (at least 4 recorded lessons) the teacher is told once a week per student. */
+async function warnLowAttendance(tx: Prisma.TransactionClient, teacherUserId: string, classId: string, absent: { studentId: string; name: string }[]) {
+  if (!absent.length) return;
+  const prefs = await tx.teacherProfile.findUnique({ where: { userId: teacherUserId }, select: { notifyAttendanceWarnings: true } });
+  if (!prefs?.notifyAttendanceWarnings) return;
+  const title = "Davamiyyət xəbərdarlığı";
+  for (const { studentId, name } of absent) {
+    const rows = await tx.attendance.findMany({ where: { studentId, lesson: { classId, status: { not: "CANCELLED" } } }, select: { completed: true } });
+    if (rows.length < 4) continue;
+    const rate = Math.round((rows.filter((r) => r.completed).length / rows.length) * 100);
+    if (rate >= 75) continue;
+    const recent = await tx.notification.findFirst({ where: { userId: teacherUserId, entityType: "student", entityId: studentId, title, createdAt: { gte: new Date(Date.now() - 7 * 86_400_000) } }, select: { id: true } });
+    if (recent) continue;
+    await notifyUsers(tx, [teacherUserId], { title, body: `${name} üçün davamiyyət ${rate}%-ə düşüb (${rows.length} dərsdən ${rows.filter((r) => r.completed).length}).`, type: "warning", event: "ABSENCE", entityType: "student", entityId: studentId });
+  }
 }
 
 // ---- homework + grading --------------------------------------------------------------------
@@ -139,6 +161,8 @@ const hwSchema = z.object({
   title: z.string().trim().min(3),
   description: z.string().trim().min(3),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  /** highest score for this task; omitted = 100 */
+  maxScore: z.number().int().min(1).max(1000).optional(),
   /** optional subset of the class; omitted = every enrolled student */
   studentIds: z.array(z.string().min(1)).optional(),
 });
@@ -148,7 +172,7 @@ const hwSchema = z.object({
  * PENDING submission per assigned student — the submission row is what makes
  * the homework visible to that student and their parent.
  */
-export async function createHomework(input: { classId: string; title: string; description: string; dueDate: string; studentIds?: string[] }): Promise<Result<{ id: string }>> {
+export async function createHomework(input: { classId: string; title: string; description: string; dueDate: string; maxScore?: number; studentIds?: string[] }): Promise<Result<{ id: string }>> {
   return run<{ id: string }>(async (userId) => {
     const parsed = hwSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: "invalid" };
@@ -164,20 +188,20 @@ export async function createHomework(input: { classId: string; title: string; de
 
     const dueDate = new Date(`${parsed.data.dueDate}T23:59:00+04:00`);
     const id = await prisma.$transaction(async (tx) => {
-      const homework = await tx.homework.create({ data: { lessonId: lesson.id, title: parsed.data.title, description: parsed.data.description, dueDate } });
+      const homework = await tx.homework.create({ data: { lessonId: lesson.id, title: parsed.data.title, description: parsed.data.description, dueDate, maxScore: parsed.data.maxScore ?? 100 } });
       await tx.submission.createMany({ data: assigned.map((studentId) => ({ homeworkId: homework.id, studentId, status: "PENDING" as const })) });
       const body = `${classGroup.course.name}: "${homework.title}" — son tarix ${dayMonth(parts(dueDate))}.`;
       const ref = { entityType: "homework" as const, entityId: homework.id };
       await notifyParentsOfStudents(tx, assigned, { title: "Yeni ev tapşırığı", body, category: "grades", ...ref });
       await notifyStudents(tx, assigned, { title: "Yeni ev tapşırığı", body, ...ref });
-      await audit(tx, { actorUserId: userId, action: "homework.create", entityType: "homework", entityId: homework.id, after: { classId, lessonId: lesson.id, title: homework.title, dueDate: dueDate.toISOString(), studentIds: assigned } });
+      await audit(tx, { actorUserId: userId, action: "homework.create", entityType: "homework", entityId: homework.id, after: { classId, lessonId: lesson.id, title: homework.title, dueDate: dueDate.toISOString(), maxScore: homework.maxScore, studentIds: assigned } });
       return homework.id;
     });
     return { ok: true, id };
   });
 }
 
-const gradeSchema = z.array(z.object({ submissionId: z.string().min(1), score: z.coerce.number().int().min(0).max(100), feedback: z.string().optional() })).min(1);
+const gradeSchema = z.array(z.object({ submissionId: z.string().min(1), score: z.coerce.number().int().min(0).max(1000), feedback: z.string().optional() })).min(1);
 
 /**
  * Grades submissions of the teacher's own homework: score + feedback + GRADED,
@@ -198,15 +222,17 @@ export async function saveGrades(rows: { submissionId: string; score: number; fe
           include: { homework: { include: { lesson: { include: { class: { include: { course: true } } } } } } },
         });
         if (!submission) throw new AccessError("forbidden", "submission is not in this teacher's classes");
+        const max = submission.homework.maxScore;
+        if (r.score > max) throw new ApiError(422, `Bal ${max}-dən çox ola bilməz.`); // the form offers only valid chips; this stops a hand-made request
         const feedback = r.feedback?.trim() || null;
         await tx.submission.update({ where: { id: submission.id }, data: { status: "GRADED", score: r.score, feedback, submittedAt: submission.submittedAt ?? new Date() } });
         const grade = await tx.grade.upsert({
           where: { submissionId: submission.id },
-          create: { studentId: submission.studentId, submissionId: submission.id, subject: submission.homework.lesson.class.course.name, score: r.score, maxScore: 100 },
-          update: { score: r.score },
+          create: { studentId: submission.studentId, submissionId: submission.id, subject: submission.homework.lesson.class.course.name, score: r.score, maxScore: max },
+          update: { score: r.score, maxScore: max },
         });
         await audit(tx, { actorUserId: userId, action: "grade.set", entityType: "submission", entityId: submission.id, before: { status: submission.status, score: submission.score, feedback: submission.feedback }, after: { status: "GRADED", score: r.score, feedback, gradeId: grade.id } });
-        const body = `"${submission.homework.title}" — ${r.score} bal${feedback ? `. Müəllim qeydi: ${feedback}` : ""}`;
+        const body = `"${submission.homework.title}" — ${max === 100 ? `${r.score} bal` : `${r.score}/${max} bal`}${feedback ? `. Müəllim qeydi: ${feedback}` : ""}`;
         const ref = { entityType: "grade" as const, entityId: grade.id };
         await notifyParentsOfStudents(tx, [submission.studentId], { title: "Ev tapşırığı qiymətləndirildi", body, type: "success", category: "grades", ...ref });
         await notifyStudents(tx, [submission.studentId], { title: "Tapşırığın qiymətləndirildi", body, type: "success", ...ref });
@@ -265,7 +291,7 @@ export async function deleteStudentNote(noteId: string): Promise<Ok> {
 
 // ---- profile ----------------------------------------------------------------------------------------
 
-const profileSchema = z.object({ name: z.string().trim().min(3), phone: z.string().trim().min(9), position: z.string().trim().min(3) });
+const profileSchema = z.object({ name: z.string().trim().min(3).max(100), phone: z.string().trim().min(9).max(30), position: z.string().trim().min(3).max(100) });
 
 export async function updateTeacherProfile(formData: FormData): Promise<Ok> {
   return run<Record<never, never>>(async (userId) => {
@@ -326,6 +352,28 @@ export async function awardBadge(input: { studentId: string; badgeId: string }):
       await notifyStudents(tx, [studentId], { title: "Yeni nailiyyət", body: `${badge.emoji} ${badge.name} — ${badge.description}`, type: "success", ...ref });
       await audit(tx, { actorUserId: userId, action: "badge.award", entityType: "studentBadge", entityId: row.id, after: { badgeId: badge.id, studentId } });
     });
+    return { ok: true };
+  });
+}
+
+// ---- notifications (the bell panel) ---------------------------------------------------------------------
+
+export async function markNotificationsRead(): Promise<Ok> {
+  return run<Record<never, never>>(async (userId) => {
+    await markAllNotificationsRead(userId);
+    return { ok: true };
+  });
+}
+
+const prefsSchema = z.object({ submission: z.boolean(), absence: z.boolean() });
+
+/** The two notification switches of the profile screen — stored on the teacher and honoured by the actions that create the notices. */
+export async function updateNotificationPrefs(prefs: { submission: boolean; absence: boolean }): Promise<Ok> {
+  return run<Record<never, never>>(async (userId) => {
+    const parsed = prefsSchema.safeParse(prefs);
+    if (!parsed.success) return { ok: false, error: "invalid" };
+    await requireTeacher(userId);
+    await prisma.teacherProfile.update({ where: { userId }, data: { notifySubmissions: parsed.data.submission, notifyAttendanceWarnings: parsed.data.absence } });
     return { ok: true };
   });
 }

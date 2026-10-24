@@ -15,6 +15,7 @@ export async function AdminTopbar({ title, subtitle }: { title: string; subtitle
       userEmail={session?.user?.email ?? ""}
       unreadNotifications={unread}
       notificationsHref="/admin/notifications"
+      settingsHref="/admin/settings"
     />
   );
 }

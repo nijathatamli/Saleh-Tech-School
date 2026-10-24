@@ -296,10 +296,13 @@
         <sc-if value="{{ atAttendance }}">
           <section style="animation:rise 0.5s ease both;animation-delay:40ms">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:22px">
-              <div style="display:flex;gap:3px;padding:4px;border-radius:14px;background:rgba(255,255,255,0.6);backdrop-filter:blur(18px);border:1px solid rgba(23,23,23,0.055)">
-                <sc-for list="{{ monthTabs }}" as="m">
-                  <button sc-camel-on-click="{{ m.onGo }}" style="{{ m.style }}">{{ m.label }}</button>
-                </sc-for>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(23,23,23,0.055);min-width:300px;backdrop-filter:blur(18px)">
+                <button sc-camel-on-click="{{ onPrevMonth }}" aria-label="Əvvəlki ay" style="{{ prevMonthStyle }}">‹</button>
+                <div style="text-align:center;min-width:0">
+                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:-0.02em;color:#171717">{{ monthTitle }}</div>
+                  <sc-if value="{{ showThisMonth }}"><button sc-camel-on-click="{{ onThisMonth }}" style="border:none;background:transparent;cursor:pointer;font-size:11.5px;font-weight:600;color:#FF6B00;padding:2px 0 0">Bu aya qayıt</button></sc-if>
+                </div>
+                <button sc-camel-on-click="{{ onNextMonth }}" aria-label="Növbəti ay" style="{{ nextMonthStyle }}">›</button>
               </div>
               <div style="display:flex;gap:18px;flex-wrap:wrap">
                 <sc-for list="{{ attLegend }}" as="l">
@@ -499,6 +502,55 @@
             <button style="width:100%;margin-top:20px;padding:14px;border-radius:14px;border:none;background:#FF6B00;color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;box-shadow:0 10px 22px -10px rgba(255,107,0,0.6)" sc-camel-on-click="{{ onGoLesson }}">Dərsə keç</button></sc-if><sc-if value="{{ noNextLesson }}"><div style="font-size:14px;font-weight:600">Planlaşdırılmış dərs yoxdur.</div></sc-if>
           </div>
 
+          <sc-if value="{{ hasManyChildren }}"><button sc-camel-on-click="{{ onSwitchChild }}" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(23,23,23,0.08);background:#fff;font-size:13px;font-weight:600;color:#171717;cursor:pointer;margin-bottom:14px">Övladı dəyişdir</button></sc-if>
+          <sc-if value="{{ hasPayments }}"><div style="padding:22px 20px;border-radius:24px;background:#fff;border:1px solid rgba(23,23,23,0.05);margin-bottom:14px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B">Ödənişlər</span>
+              <span style="font-size:12px;color:#6F6F6B">{{ paymentsHeadline }}</span>
+            </div>
+            <sc-for list="{{ payments }}" as="p">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(23,23,23,0.055)">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13.5px;font-weight:600">{{ p.title }}</div>
+                  <div style="font-size:12px;color:#6F6F6B;margin-top:3px">{{ p.meta }}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div style="font-size:13.5px;font-weight:600">{{ p.amount }}</div>
+                  <span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div></sc-if>
+
+          <div style="padding:22px 20px;border-radius:24px;background:#fff;border:1px solid rgba(23,23,23,0.05);margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B">Ev tapşırığı</span>
+              <span style="font-size:12px;font-weight:600;color:#6F6F6B">{{ homeworkActiveLabel }}</span>
+            </div>
+            <sc-if value="{{ hasHomework }}">
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ homework }}" as="h">
+                  <div style="{{ h.rowStyle }}">
+                    <span style="{{ h.dotStyle }}"></span>
+                    <span style="flex:1;font-size:14px;font-weight:500">{{ h.title }}</span>
+                    <span style="{{ h.metaStyle }}">{{ h.meta }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noHomework }}"><div style="font-size:13.5px;color:#6F6F6B">Hər şey tamamlanıb. Hazırda gözləyən tapşırıq yoxdur.</div></sc-if>
+          </div>
+
+          <div style="padding:22px 20px;border-radius:24px;background:#F2F2EF;border:1px solid rgba(23,23,23,0.04);margin-bottom:26px">
+            <div style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B;margin-bottom:14px">Müəllim qeydi</div>
+            <sc-if value="{{ hasNote }}"><p style="font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;line-height:1.55;letter-spacing:-0.012em;margin:0 0 16px 0">"{{ noteText }}"</p>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="{{ noteTeacherAvatar }}">{{ noteTeacherInitials }}</span>
+              <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">{{ noteTeacher }}</div><div style="font-size:12px;color:#6F6F6B;margin-top:2px">{{ noteTeacherRole }}</div></div>
+              <span style="font-size:12px;color:#6F6F6B">{{ noteDate }}</span>
+            </div></sc-if><sc-if value="{{ noNote }}"><p style="font-size:13.5px;color:#6F6F6B;margin:0">Hələ müəllim qeydi yoxdur. Müəllim rəy bildirəndə burada görünəcək.</p></sc-if>
+          </div>
+
           <div style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B;margin-bottom:18px">Öyrənmə inkişafı</div>
           <div style="display:flex;flex-direction:column;gap:18px">
             <sc-for list="{{ subjects }}" as="s">
@@ -508,6 +560,34 @@
                   <span style="font-size:13px;font-weight:600;font-variant-numeric:tabular-nums">{{ s.pctLabel }}</span>
                 </div>
                 <div style="height:5px;border-radius:999px;background:#F0EFEB;overflow:hidden"><div style="{{ s.barStyle }}"></div></div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noSubjects }}"><div style="font-size:13.5px;color:#6F6F6B">Hələ fənn üzrə inkişaf yoxdur. Qiymətlər daxil edildikcə burada görünəcək.</div></sc-if>
+          </div>
+
+          <div style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B;margin:30px 0 14px 0">Nailiyyətlər</div>
+          <sc-if value="{{ hasAchievements }}">
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ achievements }}" as="a">
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:#fff;border:1px solid rgba(23,23,23,0.05)">
+                  <span style="{{ a.medalStyle }}"><i class="{{ a.icon }}" style="font-size:14px">{{ a.iconText }}</i></span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase">{{ a.name }}</div>
+                    <div style="font-size:12px;color:#6F6F6B;margin-top:4px">{{ a.date }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noAchievements }}"><div style="padding:22px 20px;border-radius:18px;background:rgba(255,255,255,0.5);border:1px solid rgba(23,23,23,0.045);font-size:13.5px;color:#6F6F6B">İlk nailiyyət gözləyir. Öyrənməyə davam et.</div></sc-if>
+
+          <div style="font-size:10.5px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:#6F6F6B;margin:30px 0 8px 0">Son fəaliyyət</div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ activity }}" as="v">
+              <div style="display:flex;gap:12px;padding:12px 0;align-items:flex-start">
+                <span style="font-size:12px;color:#6F6F6B;width:64px;flex-shrink:0;padding-top:1px">{{ v.when }}</span>
+                <span style="{{ v.dotStyle }}"></span>
+                <span style="font-size:13.5px;font-weight:450">{{ v.what }}</span>
               </div>
             </sc-for>
           </div>
@@ -559,6 +639,14 @@
 
           <sc-if value="{{ mAtAtt }}">
             <div style="animation:rise-sm 0.34s ease both">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px;border-radius:16px;background:rgba(255,255,255,0.6);border:1px solid rgba(23,23,23,0.055);margin-bottom:14px">
+                <button sc-camel-on-click="{{ onPrevMonth }}" aria-label="Əvvəlki ay" style="{{ prevMonthStyle }}">‹</button>
+                <div style="text-align:center;min-width:0">
+                  <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:-0.02em;color:#171717">{{ monthTitle }}</div>
+                  <sc-if value="{{ showThisMonth }}"><button sc-camel-on-click="{{ onThisMonth }}" style="border:none;background:transparent;cursor:pointer;font-size:11.5px;font-weight:600;color:#FF6B00;padding:2px 0 0">Bu aya qayıt</button></sc-if>
+                </div>
+                <button sc-camel-on-click="{{ onNextMonth }}" aria-label="Növbəti ay" style="{{ nextMonthStyle }}">›</button>
+              </div>
               <div style="padding:24px;border-radius:26px;background:#fff;border:1px solid rgba(23,23,23,0.05);display:flex;align-items:center;gap:20px;margin-bottom:14px">
                 <div style="position:relative;width:92px;height:92px;flex-shrink:0">
                   <svg sc-camel-view-box="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">

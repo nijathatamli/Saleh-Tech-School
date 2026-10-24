@@ -2,10 +2,11 @@ import Link from "next/link";
 import { listPayments } from "@/lib/admin/payments";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { PaymentActions } from "@/components/admin/payment-actions";
-import { PaymentBadge, Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { PaymentBadge, Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 20;
 
@@ -13,17 +14,17 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   await adminGuard();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const status = ["DUE", "OVERDUE", "PAID", "CANCELLED", "ALL"].includes(searchParams.status ?? "") ? searchParams.status! : "DUE";
-  const data = await listPayments({ status, q: searchParams.q?.trim() || undefined, page, size: SIZE });
+  const data = await listPayments({ status, q: cleanQ(searchParams.q), page, size: SIZE });
 
   return (
     <div>
       <AdminTopbar title="Ödənişlər" subtitle="Dərs əsaslı ödəniş dövrləri" />
       <div className="space-y-6 p-6 md:p-10">
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
           {[["DUE", "Ödəniş vaxtıdır"], ["OVERDUE", "Gecikmiş"], ["PAID", "Ödənilib"], ["CANCELLED", "Ləğv edilib"]].map(([k, l]) => (
-            <Link key={k} href={`/admin/payments?status=${k}`} className={`${card} p-5 transition-colors hover:border-electric-500 ${status === k ? "border-electric-500" : ""}`}>
+            <Link key={k} href={`/admin/payments?status=${k}`} className={`${card} p-4 transition-colors sm:p-5 hover:border-electric-500 ${status === k ? "border-electric-500" : ""}`}>
               <p className="text-xs font-bold uppercase tracking-widest text-navy-400">{l}</p>
-              <p className="mt-2 text-3xl font-extrabold text-navy-900">{data.counts[k] ?? 0}</p>
+              <p className="mt-2 break-words text-2xl font-extrabold sm:text-3xl text-navy-900">{data.counts[k] ?? 0}</p>
             </Link>
           ))}
         </div>
@@ -35,21 +36,44 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
           <Button type="submit" variant="app-outline" size="sm">Axtar</Button>
         </form>
         <div className={card}>
-          <div className="overflow-x-auto">
+          {/* phone: one card per payment, so the amount, the status and the buttons are not hidden to the right of a wide table */}
+          <ul className="divide-y divide-navy-50 md:hidden">
+            {data.items.length === 0 && <li className="px-4 py-4"><EmptyState text="Ödəniş tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></li>}
+            {data.items.map((p) => (
+              <li key={p.id} className="space-y-3 px-4 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-bold">
+                      {p.studentId ? <Link href={`/admin/students/${p.studentId}`} className="hover:text-electric-600">{p.studentName}</Link> : p.studentName}
+                      {p.studentActive === false && <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-500">Bloklanıb</span>}
+                    </p>
+                    <p className="truncate text-xs text-navy-400">{p.classId ? <Link href={`/admin/classes/${p.classId}`} className="hover:text-electric-600">{p.className}</Link> : p.className} · {p.lessonsFrom}–{p.lessonsTo}-ci dərslər ({p.cycle}-ci dövr)</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <p className="text-sm font-extrabold">{p.amount} AZN</p>
+                    <PaymentBadge status={p.overdue ? "OVERDUE" : p.status} />
+                  </div>
+                </div>
+                <p className="text-xs text-navy-400">Vaxtı çatıb: {fmtDate(p.dueAt)}{p.paidAt ? ` · Ödənilib: ${fmtDate(p.paidAt)}` : ""}</p>
+                <PaymentActions id={p.id} status={p.status} studentId={p.studentId} studentActive={p.studentActive} />
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Tələbə</th><th className={th}>Sinif</th><th className={th}>Dərslər</th><th className={th}>Məbləğ</th><th className={th}>Status</th><th className={th}>Vaxtı çatıb</th><th className={th}>Ödənilib</th><th className={th}></th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={8} className="px-4 py-12 text-center text-navy-400">Ödəniş tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={8} className="px-4 py-4"><EmptyState text="Ödəniş tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((p) => (
                   <tr key={p.id} className="border-b border-navy-50 last:border-0">
-                    <td className="px-4 py-3">{p.studentId ? <Link href={`/admin/students/${p.studentId}`} className="font-bold hover:text-electric-600">{p.studentName}</Link> : p.studentName}</td>
+                    <td className="px-4 py-3">{p.studentId ? <Link href={`/admin/students/${p.studentId}`} className="font-bold hover:text-electric-600">{p.studentName}</Link> : p.studentName}{p.studentActive === false && <span className="ml-2 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-500">Bloklanıb</span>}</td>
                     <td className="px-4 py-3">{p.classId ? <Link href={`/admin/classes/${p.classId}`} className="hover:text-electric-600">{p.className}</Link> : p.className}</td>
                     <td className="px-4 py-3 text-navy-600">{p.lessonsFrom}–{p.lessonsTo} <span className="text-xs text-navy-400">({p.cycle}-ci dövr)</span></td>
                     <td className="px-4 py-3 font-bold">{p.amount} AZN</td>
                     <td className="px-4 py-3"><PaymentBadge status={p.overdue ? "OVERDUE" : p.status} /></td>
                     <td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.dueAt)}</td>
                     <td className="px-4 py-3 text-xs text-navy-400">{fmtDate(p.paidAt)}</td>
-                    <td className="px-4 py-3"><PaymentActions id={p.id} status={p.status} /></td>
+                    <td className="px-4 py-3"><PaymentActions id={p.id} status={p.status} studentId={p.studentId} studentActive={p.studentActive} /></td>
                   </tr>
                 ))}
               </tbody>

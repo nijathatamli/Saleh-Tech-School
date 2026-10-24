@@ -4,11 +4,12 @@ import { LEAD_STAGES, listApplications } from "@/lib/admin/admissions";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { ConvertDialog, StageSelect } from "@/components/admin/admission-actions";
 import { STAGE_LABEL } from "@/lib/admin/labels";
-import { Pagination, card, fmtDate, th } from "@/components/admin/bits";
+import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
+import { cleanQ } from "@/lib/search";
 export const dynamic = "force-dynamic";
 const SIZE = 25;
 
@@ -16,7 +17,7 @@ export default async function AdminAdmissionsPage({ searchParams }: { searchPara
   await adminGuard();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const [data, classes] = await Promise.all([
-    listApplications({ q: searchParams.q?.trim() || undefined, stage: searchParams.stage || undefined, page, size: SIZE }),
+    listApplications({ q: cleanQ(searchParams.q), stage: searchParams.stage || undefined, page, size: SIZE }),
     prisma.classGroup.findMany({ where: { status: "ACTIVE" }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
   const tab = (stage: string | undefined, label: string, count?: number) => {
@@ -36,11 +37,31 @@ export default async function AdminAdmissionsPage({ searchParams }: { searchPara
           <Button type="submit" variant="app-outline" size="sm">Axtar</Button>
         </form>
         <div className={card}>
-          <div className="overflow-x-auto">
+          {/* phone: one card per request, so the stage and the "Tələbə yarat" button are not hidden to the right of a wide table */}
+          <ul className="divide-y divide-navy-50 md:hidden">
+            {data.items.length === 0 && <li className="px-4 py-4"><EmptyState text="Müraciət tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></li>}
+            {data.items.map((a) => (
+              <li key={a.id} className="space-y-3 px-4 py-4">
+                <div>
+                  <p className="font-bold text-navy-900">{a.studentName}</p>
+                  <p className="text-xs text-navy-400">{a.studentAge} yaş · müraciət {fmtDate(a.createdAt)}</p>
+                </div>
+                <p className="text-sm text-navy-900">{a.parentName} <span className="text-xs text-navy-400">· {a.parentPhone}</span></p>
+                <p className="text-xs text-navy-600">{a.courseName ?? "—"} · sınaq {fmtDate(a.preferredDate).split(",")[0]} {a.preferredTime}</p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>{a.stage === "REGISTERED" ? <Badge variant="success">{STAGE_LABEL.REGISTERED}</Badge> : <StageSelect id={a.id} stage={a.stage} />}</div>
+                  <div>
+                    {a.convertedStudentId ? <Link href={`/admin/students/${a.convertedStudentId}`} className="text-xs font-bold text-electric-600 hover:underline">Tələbəyə bax</Link> : a.stage !== "REJECTED" ? <ConvertDialog app={{ id: a.id, parentName: a.parentName, parentPhone: a.parentPhone, studentName: a.studentName, studentAge: a.studentAge }} classes={classes} /> : null}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-navy-100"><th className={th}>Şagird</th><th className={th}>Valideyn</th><th className={th}>Kurs</th><th className={th}>Sınaq vaxtı</th><th className={th}>Mərhələ</th><th className={th}></th></tr></thead>
               <tbody>
-                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center text-navy-400">Müraciət tapılmadı.</td></tr>}
+                {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-4"><EmptyState text="Müraciət tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((a) => (
                   <tr key={a.id} className="border-b border-navy-50 last:border-0">
                     <td className="px-4 py-3"><p className="font-bold text-navy-900">{a.studentName}</p><p className="text-xs text-navy-400">{a.studentAge} yaş · müraciət {fmtDate(a.createdAt)}</p></td>

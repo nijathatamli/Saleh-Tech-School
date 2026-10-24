@@ -94,6 +94,8 @@ export interface TemplateVals {
   minorStats: StatVal[];
   progressSub: string;
   subjects: SubjectVal[];
+  noSubjects: boolean;
+  hasManyChildren: boolean;
   chartTitle: string;
   chartRange: string;
   chartDelta: string;
@@ -139,7 +141,13 @@ export interface TemplateVals {
   children: ChildVal[];
 
   // attendance
-  monthTabs: SegTabVal[];
+  monthTitle: string;
+  prevMonthStyle: string;
+  nextMonthStyle: string;
+  onPrevMonth: Handler;
+  onNextMonth: Handler;
+  showThisMonth: boolean;
+  onThisMonth: Handler;
   attLegend: LegendVal[];
   weekDays: string[];
   calendar: CalendarCellVal[];

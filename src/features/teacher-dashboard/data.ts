@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { recentNotifications } from "@/lib/notifications";
 import type { TeacherClass, TeacherDashboardData, TeacherStudent } from "./types";
 
 const iso = (d: Date | null | undefined) => (d ? d.toISOString() : null);
@@ -64,7 +65,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
   const lessonIds = teacher.classes.flatMap((c) => c.lessons.map((l) => l.id));
   const studentIds = [...new Set(teacher.classes.flatMap((c) => c.enrollments.map((e) => e.studentId)))];
 
-  const [attendance, submissions, unreadNotifications, notes] = await Promise.all([
+  const [attendance, submissions, unreadNotifications, notes, notifications] = await Promise.all([
     prisma.attendance.findMany({ where: { lessonId: { in: lessonIds }, studentId: { in: studentIds } } }),
     prisma.submission.findMany({
       where: { studentId: { in: studentIds }, homework: { lesson: { classId: { in: classIds } } } },
@@ -72,6 +73,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
     }),
     prisma.notification.count({ where: { userId: teacher.userId, read: false } }),
     prisma.studentNote.findMany({ where: { teacherId: teacher.id, studentId: { in: studentIds } }, orderBy: { createdAt: "desc" } }),
+    recentNotifications(teacher.userId),
   ]);
 
   const classes: TeacherClass[] = teacher.classes.map((c, i) => ({
@@ -132,11 +134,13 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
     ),
     homeworks: teacher.classes.flatMap((c) =>
       c.lessons.flatMap((l) =>
-        l.homeworks.map((h) => ({ id: h.id, lessonId: l.id, classId: c.id, title: h.title, description: h.description, dueDate: h.dueDate.toISOString() }))
+        l.homeworks.map((h) => ({ id: h.id, lessonId: l.id, classId: c.id, title: h.title, description: h.description, dueDate: h.dueDate.toISOString(), maxScore: h.maxScore }))
       )
     ),
     notes: notes.map((n) => ({ id: n.id, studentId: n.studentId, body: n.body, visibility: n.visibility, createdAt: n.createdAt.toISOString() })),
     unreadNotifications,
+    notifPrefs: { submission: teacher.notifySubmissions, absence: teacher.notifyAttendanceWarnings },
+    notifications,
     now: now.getTime(),
   };
 }

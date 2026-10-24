@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { recentNotifications } from "@/lib/notifications";
 import { getLeaderboard } from "@/lib/data";
 import { noteVisibilityFor } from "@/lib/access";
 import { studentClasses } from "@/lib/lessons";
@@ -43,7 +44,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
   const now = new Date();
   const classIds = student.enrollments.map((e) => e.classId).filter((id): id is string => !!id);
 
-  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications, notes, classes] = await Promise.all([
+  const [upcomingLessons, badges, leaderboard, aboveMe, unreadNotifications, notes, classes, notifications] = await Promise.all([
     classIds.length
       ? prisma.lesson.findMany({
           where: { classId: { in: classIds }, date: { gte: now }, status: { not: "CANCELLED" } },
@@ -58,6 +59,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
     student.userId ? prisma.notification.count({ where: { userId: student.userId, read: false } }) : 0,
     prisma.studentNote.findMany({ where: { studentId: student.id, ...noteVisibilityFor("STUDENT") }, include: { teacher: { include: { user: true } } }, orderBy: { createdAt: "desc" } }),
     studentClasses(session.user.id),
+    student.userId ? recentNotifications(student.userId) : [],
   ]);
 
   const earned = new Map(student.studentBadges.map((b) => [b.badgeId, b.earnedAt]));
@@ -101,6 +103,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
       id: s.id,
       status: s.status,
       score: s.score,
+      maxScore: s.homework.maxScore,
       feedback: s.feedback,
       submittedAt: iso(s.submittedAt),
       title: s.homework.title,
@@ -145,6 +148,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
     notes: notes.map((n) => ({ id: n.id, body: n.body, teacherName: n.teacher.user.name, createdAt: n.createdAt.toISOString() })),
     myRank: aboveMe + 1,
     unreadNotifications,
+    notifications,
     now: now.getTime(),
   };
 }

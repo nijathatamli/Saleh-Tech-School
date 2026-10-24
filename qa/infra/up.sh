@@ -9,6 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 mkdir -p .qa
 DBPORT="${QA_DB_PORT:-5434}"; APPPORT="${QA_APP_PORT:-3100}"
+export NEXT_DIST_DIR=.next-qa   # never touch the .next folder of a running `next dev`
 bash qa/infra/down.sh >/dev/null 2>&1 || true
 bash qa/infra/pg-real.sh fresh "$PWD/.qa/pgdata" "$DBPORT" | grep -v NOTICE
 export DATABASE_URL="postgresql://postgres@127.0.0.1:${DBPORT}/postgres?sslmode=disable"

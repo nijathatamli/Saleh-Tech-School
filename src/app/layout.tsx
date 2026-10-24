@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Unbounded } from "next/font/google";
 import Script from "next/script";
 import { Providers } from "@/components/providers";
+import { JsonLd } from "@/components/seo/json-ld";
+import { OG_IMAGE, SEO, SITE_NAME, SITE_URL, organizationLd, websiteLd } from "@/lib/seo";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -12,12 +14,14 @@ const unbounded = Unbounded({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: {
-    default: "Saleh Tech School | Gələcəyin Texnologiyaları",
-    template: "%s | Saleh Tech School",
-  },
-  description:
-    "6-18 yaş arası uşaqlar üçün proqramlaşdırma, kibertəhlükəsizlik, robototexnika və digər texnologiya istiqamətləri.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SEO.home.title, template: `%s | ${SITE_NAME}` },
+  description: SEO.home.description,
+  keywords: SEO.home.keywords,
+  applicationName: SITE_NAME,
+  openGraph: { type: "website", locale: "az_AZ", siteName: SITE_NAME, title: SEO.home.title, description: SEO.home.description, url: "/", images: [OG_IMAGE] },
+  twitter: { card: "summary_large_image", title: SEO.home.title, description: SEO.home.description, images: [OG_IMAGE.url] },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 } },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -41,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body className="bg-white text-secondary dark:bg-black dark:text-white font-sans antialiased transition-colors duration-300">
+        <JsonLd data={[organizationLd(), websiteLd()]} />
         <Providers>{children}</Providers>
       </body>
     </html>
