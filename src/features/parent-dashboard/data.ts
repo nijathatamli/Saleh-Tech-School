@@ -35,7 +35,7 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           submissions: {
             include: {
               homework: {
-                include: { lesson: { include: { class: { include: { course: true, teacher: { include: { user: true } } } } } } },
+                include: { lesson: { include: { class: { include: { course: true, teacher: { include: { user: true } } } } } }, files: { select: { id: true, filename: true, size: true }, orderBy: { createdAt: "asc" } } },
               },
             },
             orderBy: { homework: { dueDate: "desc" } },
@@ -101,6 +101,7 @@ export async function loadParentPortal(): Promise<PortalData | null> {
           teacherName: s.homework.lesson.class.teacher.user.name,
           teacherPosition: s.homework.lesson.class.teacher.position,
           teacherPhotoUrl: s.homework.lesson.class.teacher.photoUrl ?? s.homework.lesson.class.teacher.user.avatarUrl,
+          files: s.homework.files.map((f) => ({ id: f.id, name: f.filename, size: f.size })),
         })),
         badges: child.studentBadges.map((b) => ({
           id: b.id,

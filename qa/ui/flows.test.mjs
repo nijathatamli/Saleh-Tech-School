@@ -1174,3 +1174,83 @@ test("UI-34 public blog on phones and computers: list, article, category and sea
   assert.ok((await ap.page.evaluate(() => document.documentElement.scrollWidth)) <= VIEWPORTS.mobile.width + 1, "admin blog page does not scroll sideways on a phone");
   await ap.ctx.close();
 });
+
+test("UI-35 teacher attaches files to a homework: pick → list → remove → type/size/limit errors → create; student, parent and the teacher's own grading screen get working download links; phone fits", async () => {
+  const w2 = await makeWorld(admin);
+  const tA = await loginAs(w2.teacherA.email, w2.pw);
+  assert.equal((await tA.post(`/api/teacher/classes/${w2.classA.id}/lessons`, { date: slot(2, 13) })).status, 201);
+  const PDF = Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n");
+  const title = `UI fayllı tapşırıq ${tag()}`;
+  const { ctx, page, errors } = await newPage();
+  await signIn(page, w2.teacherA.email, w2.pw, "/teacher");
+  await page.goto(BASE + "/teacher/homework/new");
+  await page.waitForSelector('[name="hwTitle"]');
+  await page.fill('[name="hwTitle"]', title);
+  await page.fill('[name="hwDescription"]', "Faylı oxuyun və tapşırıqları yerinə yetirin.");
+  const picker = page.locator('input[aria-label="Tapşırığa fayl əlavə et"]');
+  assert.equal(await picker.getAttribute("accept") !== null, true, "the picker limits the dialog to the allowed types");
+  // the section is there with its hint
+  await page.waitForSelector("text=Fayl əlavə et");
+  assert.match(await page.locator("body").innerText(), /ən çox 10 MB/);
+  // two good files and one executable: the good ones are listed, the bad one gets a toast
+  await picker.setInputFiles([
+    { name: "Tapşırıq vərəqi.pdf", mimeType: "application/pdf", buffer: PDF },
+    { name: "başlanğıc.py", mimeType: "text/x-python", buffer: Buffer.from("print('salam')\n") },
+    { name: "virus.exe", mimeType: "application/octet-stream", buffer: Buffer.from("MZ......") },
+  ]);
+  await page.waitForSelector("text=Tapşırıq vərəqi.pdf");
+  await page.waitForSelector("text=başlanğıc.py");
+  await page.waitForSelector("text=/virus\\.exe.*dəstəklənmir/");
+  assert.equal(await page.getByRole("button", { name: "Faylı sil" }).count(), 2, "two files in the list, the refused one is not");
+  assert.equal(await page.locator("text=virus.exe").count() <= 1, true);
+  // remove one: it leaves the list and the database
+  const orphansBefore = (await sql(`select count(*)::int n from "HomeworkFile" f join "User" u on u.id=f."uploaderId" where lower(u.email)=lower($1) and f."homeworkId" is null`, [w2.teacherA.email]))[0].n;
+  assert.equal(orphansBefore, 2);
+  await page.locator("div", { hasText: /^başlanğıc\.py/ }).getByRole("button", { name: "Faylı sil" }).last().click();
+  await page.waitForFunction(() => !document.body.innerText.includes("başlanğıc.py"));
+  await page.waitForFunction(async () => true);
+  await page.waitForTimeout(400);
+  assert.equal((await sql(`select count(*)::int n from "HomeworkFile" f join "User" u on u.id=f."uploaderId" where lower(u.email)=lower($1) and f."homeworkId" is null`, [w2.teacherA.email]))[0].n, 1, "the removed file is gone from the database");
+  // the limit of five
+  await picker.setInputFiles(Array.from({ length: 6 }, (_, i) => ({ name: `ek${i}.txt`, mimeType: "text/plain", buffer: Buffer.from(`ek ${i}`) })));
+  await page.waitForSelector("text=/Ən çox 5 fayl/");
+  await page.waitForFunction(() => document.querySelectorAll('button[aria-label="Faylı sil"]').length === 5, null, { timeout: 15_000 });
+  await page.waitForTimeout(300);
+  // phone: a long name must not widen the page
+  await page.setViewportSize({ width: 390, height: 844 });
+  // create (only the first file stays: remove the four extras one by one)
+  await page.setViewportSize({ width: 1366, height: 900 });
+  for (let i = 0; i < 4; i++) await page.getByRole("button", { name: "Faylı sil" }).last().click();
+  await page.waitForFunction(() => document.querySelectorAll('button[aria-label="Faylı sil"]').length === 1);
+  await page.getByRole("button", { name: "Tapşırığı təyin et" }).click();
+  await page.waitForURL(/\/teacher\/homework$/, { timeout: 30_000 });
+  const hw = (await sql(`select id from "Homework" where title=$1`, [title]))[0];
+  assert.ok(hw, "the homework exists");
+  const files = await sql(`select filename, size from "HomeworkFile" where "homeworkId"=$1`, [hw.id]);
+  assert.deepEqual(files.map((f) => f.filename), ["Tapşırıq vərəqi.pdf"]);
+  assert.equal((await sql(`select count(*)::int n from "HomeworkFile" f join "User" u on u.id=f."uploaderId" where lower(u.email)=lower($1) and f."homeworkId" is null`, [w2.teacherA.email]))[0].n, 0, "nothing left unattached");
+
+  // the teacher's grading screen has the link; clicking it downloads the file with its real name
+  await page.goto(BASE + `/teacher/homework/${hw.id}/grade`);
+  const link = page.locator('a[href^="/api/files/homework/"]', { hasText: "Tapşırıq vərəqi.pdf" });
+  await link.waitFor();
+  const [download] = await Promise.all([page.waitForEvent("download"), link.evaluate((a) => { a.removeAttribute("target"); a.click(); })]);
+  assert.equal(download.suggestedFilename(), "Tapşırıq vərəqi.pdf");
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource|status of 4/.test(e)), []);
+  await ctx.close();
+
+  // student and parent: the homework row carries the link; a phone fits
+  for (const [who, u, home, vp] of [["student", w2.student1, "/student", "desktop"], ["parent", w2.parent1, "/parent", "desktop"], ["student on a phone", w2.student1, "/student", "mobile"]]) {
+    const s = await newPage(vp);
+    await signIn(s.page, u.email, w2.pw, home);
+    await s.page.goto(BASE + `${home}/homework`, { waitUntil: "domcontentloaded" });
+    const a = s.page.locator('a[href^="/api/files/homework/"]', { hasText: "Tapşırıq vərəqi.pdf" }).locator("visible=true").first();
+    await a.waitFor({ timeout: 30_000 });
+    const res = await s.page.request.get(BASE + (await a.getAttribute("href")));
+    assert.equal(res.status(), 200, `${who}: the link works`);
+    assert.equal(res.headers()["content-type"], "application/pdf");
+    const sw = await s.page.evaluate(() => document.documentElement.scrollWidth);
+    assert.ok(sw <= (vp === "mobile" ? VIEWPORTS.mobile.width : VIEWPORTS.desktop.width) + 1, `${who}: no sideways scroll (${sw}px)`);
+    await s.ctx.close();
+  }
+});

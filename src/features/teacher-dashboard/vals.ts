@@ -67,6 +67,10 @@ export type ClassCardVal = {
   onAttendance: Handler;
 };
 export type HwRowVal = { title: string; meta: string; due: string; status: string; rowStyle: string; icon: string; iconStyle: string; chipStyle: string; onOpen: Handler };
+/** a file picked for the new homework (already uploaded) with its ✕ button */
+export type FileRowVal = { name: string; size: string; onRemove: Handler };
+/** a file attached to an existing homework: a real download link */
+export type FileLinkVal = { name: string; size: string; href: string };
 export type NoteVal = { body: string; when: string; visibilityLabel: string; rowStyle: string; chipStyle: string; onDelete: Handler };
 export type FieldVal = { label: string; value: string; name: string; readOnly: boolean };
 export type ToggleVal = { label: string; on: boolean; desc: string; trackStyle: string; knobStyle: string; onToggle: Handler };
@@ -148,6 +152,13 @@ export interface TemplateVals {
   newHwStudents: PickVal[];
   hwDefaultDue: string;
   onCreateHw: Handler;
+  newHwFiles: FileRowVal[];
+  hasNewHwFiles: boolean;
+  pickFilesLabel: string;
+  hwFilesHint: string;
+  onPickHwFiles: Handler;
+  gradeFiles: FileLinkVal[];
+  hasGradeFiles: boolean;
 
   // home
   hasNextLesson: boolean;

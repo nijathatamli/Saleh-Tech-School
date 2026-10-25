@@ -34,7 +34,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
         orderBy: { date: "desc" },
       },
       submissions: {
-        include: { homework: { include: { lesson: { include: { class: { include: { course: true } } } } } } },
+        include: { homework: { include: { lesson: { include: { class: { include: { course: true } } } }, files: { select: { id: true, filename: true, size: true }, orderBy: { createdAt: "asc" } } } } },
         orderBy: { homework: { dueDate: "desc" } },
       },
     },
@@ -109,6 +109,7 @@ export async function loadStudentDashboard(): Promise<StudentDashboardData | nul
       title: s.homework.title,
       dueDate: s.homework.dueDate.toISOString(),
       courseName: s.homework.lesson.class.course.name,
+      files: s.homework.files.map((f) => ({ id: f.id, name: f.filename, size: f.size })),
     })),
     projects: student.projects.map((p) => ({
       id: p.id,

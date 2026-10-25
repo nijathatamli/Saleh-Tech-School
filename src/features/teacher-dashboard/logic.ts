@@ -1,6 +1,7 @@
 // Port of teacher-dashboard.html's `renderVals()`: the same style builders
 // (navItems, bar, seg, chip, row, smallBtn, calendar cells, medal-less rosters)
 // with the prototype's demo arrays replaced by the teacher's real snapshot.
+import { formatSize } from "@/lib/file-size";
 import { cycleProgress } from "@/lib/cycle";
 import { MONTHS, clock, dayDiff, dayMonth, initialsOf, longDate, parts, twoDigits, type Parts } from "@/features/parent-dashboard/az";
 import { WEEKDAYS_LONG } from "@/features/student-dashboard/az";
@@ -50,6 +51,9 @@ export type UiState = {
   newHwClassId: string | null;
   /** student ids picked for the new homework; null = the whole class */
   newHwStudentIds: string[] | null;
+  /** files already uploaded for the new homework (ids go to createHomework) */
+  newHwFiles: { id: string; name: string; size: number }[];
+  hwUploading: boolean;
   noteVisibility: NoteVisibility;
 };
 
@@ -80,6 +84,8 @@ export type Actions = {
   setNewHwClass: (id: string) => void;
   toggleNewHwStudent: (id: string, all: string[]) => void;
   createHw: (classId: string | null, studentIds: string[] | null) => void;
+  pickHwFiles: () => void;
+  removeHwFile: (id: string) => void;
   setNoteVisibility: (v: NoteVisibility) => void;
   sendNote: (studentId: string, visibility: NoteVisibility) => void;
   deleteNote: (noteId: string) => void;
@@ -517,6 +523,13 @@ export function buildVals(data: TeacherDashboardData, state: UiState, act: Actio
       return `${d.getUTCFullYear()}-${twoDigits(d.getUTCMonth() + 1)}-${twoDigits(d.getUTCDate())}`;
     })(),
     onCreateHw: () => act.createHw(newHwClassId, state.newHwStudentIds),
+    newHwFiles: state.newHwFiles.map((f) => ({ name: f.name, size: formatSize(f.size), onRemove: () => act.removeHwFile(f.id) })),
+    hasNewHwFiles: state.newHwFiles.length > 0,
+    pickFilesLabel: state.hwUploading ? "Yüklənir…" : state.newHwFiles.length ? "Daha bir fayl əlavə et" : "Fayl əlavə et",
+    hwFilesHint: "PDF, Word, PowerPoint, Excel, ZIP, şəkil, mətn və kod faylları · hər biri ən çox 10 MB · 5 fayla qədər",
+    onPickHwFiles: act.pickHwFiles,
+    gradeFiles: (activeHw?.files ?? []).map((f) => ({ name: f.name, size: formatSize(f.size), href: `/api/files/homework/${f.id}` })),
+    hasGradeFiles: (activeHw?.files.length ?? 0) > 0,
 
     hasNextLesson: !!nextLesson,
     noNextLesson: !nextLesson,

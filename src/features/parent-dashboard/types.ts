@@ -26,6 +26,8 @@ export type PortalSubmission = {
   teacherName: string;
   teacherPosition: string;
   teacherPhotoUrl: string | null;
+  /** files the teacher attached to the homework (download: /api/files/homework/<id>) */
+  files: { id: string; name: string; size: number }[];
 };
 
 export type PortalLesson = {

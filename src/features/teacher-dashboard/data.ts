@@ -43,7 +43,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
         orderBy: { name: "asc" },
         include: {
           course: true,
-          lessons: { where: { status: { not: "CANCELLED" } }, orderBy: { date: "asc" }, include: { homeworks: true } },
+          lessons: { where: { status: { not: "CANCELLED" } }, orderBy: { date: "asc" }, include: { homeworks: { include: { files: { select: { id: true, filename: true, size: true }, orderBy: { createdAt: "asc" } } } } } },
           enrollments: {
             include: {
               student: {
@@ -134,7 +134,7 @@ export async function loadTeacherDashboard(): Promise<TeacherDashboardData | nul
     ),
     homeworks: teacher.classes.flatMap((c) =>
       c.lessons.flatMap((l) =>
-        l.homeworks.map((h) => ({ id: h.id, lessonId: l.id, classId: c.id, title: h.title, description: h.description, dueDate: h.dueDate.toISOString(), maxScore: h.maxScore }))
+        l.homeworks.map((h) => ({ id: h.id, lessonId: l.id, classId: c.id, title: h.title, description: h.description, dueDate: h.dueDate.toISOString(), maxScore: h.maxScore, files: h.files.map((f) => ({ id: f.id, name: f.filename, size: f.size })) }))
       )
     ),
     notes: notes.map((n) => ({ id: n.id, studentId: n.studentId, body: n.body, visibility: n.visibility, createdAt: n.createdAt.toISOString() })),

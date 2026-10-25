@@ -35,6 +35,8 @@ export type LessonVal = {
   dayStyle: string;
   timeStyle: string;
 };
+/** a file the teacher attached to the homework: a real download link */
+export type FileLinkVal = { name: string; size: string; href: string };
 export type HwRowVal = {
   title: string;
   subject: string;
@@ -44,6 +46,8 @@ export type HwRowVal = {
   icon: string;
   iconStyle: string;
   chipStyle: string;
+  files: FileLinkVal[];
+  hasFiles: boolean;
   canSubmit: boolean;
   onSubmit: Handler;
 };

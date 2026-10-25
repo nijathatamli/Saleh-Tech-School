@@ -23,6 +23,8 @@ export type StudentSubmission = {
   title: string;
   dueDate: string;
   courseName: string;
+  /** files the teacher attached to the homework (download: /api/files/homework/<id>) */
+  files: { id: string; name: string; size: number }[];
 };
 
 export type StudentLesson = {

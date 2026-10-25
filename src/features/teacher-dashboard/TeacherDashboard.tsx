@@ -17,6 +17,7 @@ import { buildVals, mobileKeyForSection, sectionForMobileKey, TIME_SLOTS, type A
 import { parseTeacherPath, pathFor, sectionForDetail, type Screen } from "./routes";
 import { createHomework, createLesson, createStudentNote, deleteLesson, deleteStudentNote, saveAttendance, saveGrades, markNotificationsRead, updateNotificationPrefs, updateTeacherAvatar, updateTeacherProfile } from "./actions";
 import { parts } from "@/features/parent-dashboard/az";
+import { HW_ACCEPT, HW_MAX_FILES } from "@/lib/homework-file-types";
 import type { NoteVisibility, TeacherDashboardData } from "./types";
 
 const ERROR_TEXT: Record<string, string> = {
@@ -75,10 +76,13 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
   const [gradesSaved, setGradesSaved] = useState(false);
   const [newHwClassId, setNewHwClassId] = useState<string | null>(null);
   const [newHwStudentIds, setNewHwStudentIds] = useState<string[] | null>(null);
+  const [newHwFiles, setNewHwFiles] = useState<{ id: string; name: string; size: number }[]>([]);
+  const [hwUploading, setHwUploading] = useState(false);
   const [noteVisibility, setNoteVisibility] = useState<NoteVisibility>("PARENT");
   const [now, setNow] = useState(data.now);
 
   const avatarInput = useRef<HTMLInputElement>(null);
+  const hwFileInput = useRef<HTMLInputElement>(null);
   const litTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const light = useCallback(() => {
@@ -333,15 +337,32 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
         toast.error("Maksimal bal 1 ilə 1000 arasında tam ədəd olmalıdır.");
         return;
       }
+      if (hwUploading) {
+        toast("Fayllar hələ yüklənir, bir az gözləyin.");
+        return;
+      }
       startTransition(async () => {
-        const result = await createHomework({ classId, title: read("hwTitle"), description: read("hwDescription"), dueDate: read("hwDueDate"), maxScore, studentIds: studentIds ?? undefined });
+        const result = await createHomework({ classId, title: read("hwTitle"), description: read("hwDescription"), dueDate: read("hwDueDate"), maxScore, studentIds: studentIds ?? undefined, attachmentIds: newHwFiles.map((f) => f.id) });
         if (result.ok) {
           toast.success("Tapşırıq təyin edildi.");
           setNewHwStudentIds(null);
+          setNewHwFiles([]);
           router.refresh();
           navigate({ section: "/teacher/homework", detail: null });
         } else fail(result.error, "Başlıq və təsvir ən azı 3 simvol, son tarix seçilməlidir.");
       });
+    },
+    pickHwFiles: () => {
+      if (hwUploading) return;
+      if (newHwFiles.length >= HW_MAX_FILES) {
+        toast.error(`Ən çox ${HW_MAX_FILES} fayl əlavə etmək olar.`);
+        return;
+      }
+      hwFileInput.current?.click();
+    },
+    removeHwFile: (id) => {
+      setNewHwFiles((list) => list.filter((f) => f.id !== id));
+      void fetch(`/api/teacher/homework-files/${id}`, { method: "DELETE" }).catch(() => {});
     },
     setNoteVisibility,
     sendNote: (studentId, visibility) => {
@@ -400,6 +421,35 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     },
   };
 
+  /** uploads the chosen files one by one (the server checks type, size and content); each one appears in the form when it is stored */
+  async function onHwFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (!picked.length) return;
+    const room = HW_MAX_FILES - newHwFiles.length;
+    if (picked.length > room) toast.error(`Ən çox ${HW_MAX_FILES} fayl əlavə etmək olar; ilk ${Math.max(room, 0)} fayl götürüldü.`);
+    setHwUploading(true);
+    try {
+      for (const file of picked.slice(0, Math.max(room, 0))) {
+        const fd = new FormData();
+        fd.append("file", file);
+        try {
+          const res = await fetch("/api/teacher/homework-files", { method: "POST", body: fd });
+          const body = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            toast.error(`${file.name}: ${body.error ?? "yüklənmədi"}`);
+            continue;
+          }
+          setNewHwFiles((list) => [...list, { id: body.id as string, name: body.name as string, size: body.size as number }]);
+        } catch {
+          toast.error(`${file.name}: əlaqə qurulmadı.`);
+        }
+      }
+    } finally {
+      setHwUploading(false);
+    }
+  }
+
   async function onAvatarPicked(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -415,7 +465,7 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
     }
   }
 
-  const state: UiState = { bellOpen, nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftClassId, draftTime, attMarks, attSaved, attDirty, scores, gradesSaved, newHwClassId, newHwStudentIds, noteVisibility };
+  const state: UiState = { bellOpen, nav, detail, mnav, lit, hwFilter, classFilter, notif, month, pickedDay, addingLesson, draftClassId, draftTime, attMarks, attSaved, attDirty, scores, gradesSaved, newHwClassId, newHwStudentIds, newHwFiles, hwUploading, noteVisibility };
   // the design's clickable rows are <div role="button">: make them operable from the keyboard like real buttons
   const activateOnKey = (e: React.KeyboardEvent) => {
     const t = e.target as HTMLElement;
@@ -431,6 +481,7 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
       <div style={{ display: "contents" }} onKeyDown={activateOnKey}>
         {renderTemplate(vals)}
       </div>
+      <input ref={hwFileInput} type="file" multiple accept={HW_ACCEPT} hidden onChange={onHwFilesPicked} aria-label="Tapşırığa fayl əlavə et" />
       <input ref={avatarInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onAvatarPicked} />
     </>
   );

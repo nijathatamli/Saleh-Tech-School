@@ -25,6 +25,7 @@ import { markAllNotificationsRead } from "@/lib/notifications";
 import { audit, notifyParentsOfStudents, notifyStudents, notifyUsers } from "@/lib/events";
 import { setParticipation } from "@/lib/billing";
 import { createLessonFor } from "@/lib/lessons";
+import { MAX_FILES_PER_HOMEWORK, attachFiles } from "@/lib/homework-files";
 import { ApiError } from "@/lib/api";
 import { isOwnUploadUrl } from "@/lib/avatar-url";
 import { clock, dayMonth, fromBakuLocal, parts } from "@/features/parent-dashboard/az";
@@ -165,6 +166,8 @@ const hwSchema = z.object({
   maxScore: z.number().int().min(1).max(1000).optional(),
   /** optional subset of the class; omitted = every enrolled student */
   studentIds: z.array(z.string().min(1)).optional(),
+  /** ids returned by POST /api/teacher/homework-files */
+  attachmentIds: z.array(z.string().min(1)).max(MAX_FILES_PER_HOMEWORK).optional(),
 });
 
 /**
@@ -172,7 +175,7 @@ const hwSchema = z.object({
  * PENDING submission per assigned student — the submission row is what makes
  * the homework visible to that student and their parent.
  */
-export async function createHomework(input: { classId: string; title: string; description: string; dueDate: string; maxScore?: number; studentIds?: string[] }): Promise<Result<{ id: string }>> {
+export async function createHomework(input: { classId: string; title: string; description: string; dueDate: string; maxScore?: number; studentIds?: string[]; attachmentIds?: string[] }): Promise<Result<{ id: string }>> {
   return run<{ id: string }>(async (userId) => {
     const parsed = hwSchema.safeParse(input);
     if (!parsed.success) return { ok: false, error: "invalid" };
@@ -190,11 +193,13 @@ export async function createHomework(input: { classId: string; title: string; de
     const id = await prisma.$transaction(async (tx) => {
       const homework = await tx.homework.create({ data: { lessonId: lesson.id, title: parsed.data.title, description: parsed.data.description, dueDate, maxScore: parsed.data.maxScore ?? 100 } });
       await tx.submission.createMany({ data: assigned.map((studentId) => ({ homeworkId: homework.id, studentId, status: "PENDING" as const })) });
-      const body = `${classGroup.course.name}: "${homework.title}" — son tarix ${dayMonth(parts(dueDate))}.`;
+      const fileIds = parsed.data.attachmentIds ?? [];
+      await attachFiles(tx, userId, homework.id, fileIds); // throws (and rolls the whole homework back) if a file is not the teacher's own
+      const body = `${classGroup.course.name}: "${homework.title}" — son tarix ${dayMonth(parts(dueDate))}.${fileIds.length ? ` Əlavə fayl: ${fileIds.length}.` : ""}`;
       const ref = { entityType: "homework" as const, entityId: homework.id };
       await notifyParentsOfStudents(tx, assigned, { title: "Yeni ev tapşırığı", body, category: "grades", ...ref });
       await notifyStudents(tx, assigned, { title: "Yeni ev tapşırığı", body, ...ref });
-      await audit(tx, { actorUserId: userId, action: "homework.create", entityType: "homework", entityId: homework.id, after: { classId, lessonId: lesson.id, title: homework.title, dueDate: dueDate.toISOString(), maxScore: homework.maxScore, studentIds: assigned } });
+      await audit(tx, { actorUserId: userId, action: "homework.create", entityType: "homework", entityId: homework.id, after: { classId, lessonId: lesson.id, title: homework.title, dueDate: dueDate.toISOString(), maxScore: homework.maxScore, studentIds: assigned, fileIds } });
       return homework.id;
     });
     return { ok: true, id };

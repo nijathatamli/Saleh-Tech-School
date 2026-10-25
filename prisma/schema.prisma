@@ -282,6 +282,7 @@ model Homework {
   maxScore    Int      @default(100)
 
   submissions Submission[]
+  files       HomeworkFile[]
 
   @@index([lessonId])
 }
@@ -692,4 +693,23 @@ model BlogPost {
   @@index([status, publishedAt])
   @@index([category])
   @@index([authorId])
+}
+
+/// A file the teacher attaches to a homework (worksheet, task sheet, starter code ...). The bytes live in the
+/// database, not on the server's disk: the host's disk is wiped on every deploy. Uploaded first (homeworkId null),
+/// linked when the homework is created; unlinked leftovers are swept after a day.
+model HomeworkFile {
+  id         String    @id @default(cuid())
+  homeworkId String?
+  homework   Homework? @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  /// User.id of the teacher who uploaded it
+  uploaderId String
+  filename   String
+  mime       String
+  size       Int
+  data       Bytes
+  createdAt  DateTime  @default(now())
+
+  @@index([homeworkId])
+  @@index([uploaderId, createdAt])
 }

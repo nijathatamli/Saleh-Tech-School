@@ -7,4 +7,5 @@
 .sd-root .sd-h6:hover { background:#FAFAF8 !important; transform:translateY(-1px) !important; }
 .sd-root .sd-h7:hover { transform:translateY(-3px) !important; box-shadow:0 20px 44px -26px rgba(23,23,23,0.3) !important; }
 .sd-root .sd-h8:hover { transform:translateY(-1px) !important; box-shadow:0 12px 28px -20px rgba(23,23,23,0.3) !important; }
-.sd-root .sd-h9:hover { background:#FAFAF8 !important; }
+.sd-root .sd-h9:hover { background:rgba(255,107,0,0.08) !important; }
+.sd-root .sd-h10:hover { background:#FAFAF8 !important; }

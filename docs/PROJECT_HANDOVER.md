@@ -34,6 +34,14 @@ snapshot** (`src/lib/public-content.json`) so nothing edited in the admin panel 
 - Contact page and vacancies page show the phone / e-mail / address saved in Admin → Settings; fill them in (they also feed the structured data).
 - Tests: `qa/tests/seo.test.mjs` (SEO-01…07).
 
+### Homework files (teacher → students and parents)
+- The teacher's "Yeni tapşırıq" form (desktop panel) has a **Fayl əlavə et** section: up to 5 files, 10 MB each. Each file is uploaded on its own to `POST /api/teacher/homework-files` (TEACHER only) and waits unattached; `createHomework` links the ids inside its transaction (`attachFiles` in `src/lib/homework-files.ts`: only the teacher's own, still unattached files; anything else fails the whole homework). Unattached files are swept after a day; the ✕ next to a file removes it (`DELETE …/homework-files/<id>`).
+- **Storage: the file bytes are in PostgreSQL** (`HomeworkFile.data`, patch `2026-10-25-homework-files.sql`), not on disk: Render's disk is wiped on every deploy. Plan database size accordingly (a class of 10 sharing a 5 MB sheet per lesson is ~5 MB per lesson, not per student).
+- Allowed: pdf, docx/doc, pptx/ppt, xlsx/xls, odt, zip, sb3 (Scratch), png/jpg/webp, txt/csv/md/py/ino/java/c/cpp/json. The type is decided from the extension AND the first bytes; html/svg/exe are refused.
+- Download: `GET /api/files/homework/<id>` (signed in; admin, the class's teacher, an assigned student, that student's parent; anyone else gets 404). Always a fixed content type, `nosniff`, a sandboxing CSP and `Content-Disposition: attachment` (pictures inline).
+- Shown as download chips on the teacher's grading screen and in the student's and parent's homework lists (desktop and phone). The teacher **phone** view is read-only by design (no new-homework form), so files can only be attached from the desktop/tablet panel.
+- Tests: `qa/tests/homework-files.test.mjs` (FILE-01…06), UI-35.
+
 ### Admin panel design system
 The admin panel uses the same visual language as the teacher/student/parent dashboards: `src/components/admin/admin.css` (glass surfaces, sliding pill navigation, tokens; scoped under `.ad-root` and `html.ad-portal` so the public site and login are untouched), `admin-sidebar.tsx` (floating glass sidebar / phone drawer with the gliding pill hover), `admin-chrome.tsx`, `src/components/app/topbar.tsx` (page header) and `src/app/admin/layout.tsx`. The accessibility rules (contrast, 44px touch targets, visible focus, minimum text size, reduced motion) are at the end of `admin.css` and checked by UI-30; `.agents/skills/ui-ux-pro-max` is the design-guideline skill used for that pass (its palette and fonts were not adopted: the brand stays orange). Shared primitives carry marker classes (`ad-btn*`, `ad-badge*`, `ad-dialog`, `ad-menu`) that only take effect inside the admin panel.
 

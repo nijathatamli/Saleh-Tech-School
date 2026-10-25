@@ -30,6 +30,8 @@ export type ChildVal = {
 export type CalendarCellVal = { label: string; style: string };
 export type LegendVal = { label: string; dotStyle: string };
 export type TileVal = { v: string; k: string };
+/** a file the teacher attached to the homework: a real download link */
+export type FileLinkVal = { name: string; size: string; href: string };
 export type HwRowVal = {
   title: string;
   subject: string;
@@ -39,6 +41,8 @@ export type HwRowVal = {
   icon: string;
   iconStyle: string;
   chipStyle: string;
+  files: FileLinkVal[];
+  hasFiles: boolean;
 };
 export type NotificationVal = {
   title: string;

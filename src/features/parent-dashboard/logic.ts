@@ -1,6 +1,7 @@
 // Port of parent-dashboard.html's `renderVals()`: the same style builders
 // (seg, chip, listRow, bar, calendar, chart maths, nav/tab/toggle styles) with
 // the prototype's demo arrays replaced by the parent's real data.
+import { formatSize } from "@/lib/file-size";
 import {
   MONTHS,
   MONTHS_SHORT,
@@ -641,6 +642,8 @@ export function buildVals(data: PortalData, state: UiState, act: Actions): Templ
         x.tone === "due" ? `background:${accent}14;color:#E66000` : "background:#F2F2EF;color:#4A4A46",
       ].join(";"),
       chipStyle: chip(x.tone),
+      files: x.s.files.map((f) => ({ name: f.name, size: formatSize(f.size), href: `/api/files/homework/${f.id}` })),
+      hasFiles: x.s.files.length > 0,
     })),
     hwEmpty: hwVisible.length === 0,
 

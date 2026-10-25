@@ -706,13 +706,28 @@ export function renderTemplate(v: TemplateVals) {
                           <div style={{ flex: "1", minWidth: "0" }}>
                             <div style={{ fontSize: "15px", fontWeight: "500", letterSpacing: "-0.008em" }}>{h.title}</div>
                             <div style={{ fontSize: "12.5px", color: "#6F6F6B", marginTop: "5px" }}>{h.subject}</div>
+                            {h.hasFiles ? (
+                              <>
+                                <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginTop: "10px" }}>
+                                  {h.files.map((f, i17) => (
+                                    <Fragment key={i17}>
+                                      <a href={f.href} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: "7px", padding: "6px 11px", borderRadius: "10px", background: "#F6F6F3", border: "1px solid rgba(23,23,23,0.06)", fontSize: "12px", fontWeight: "600", color: "#171717", textDecoration: "none", maxWidth: "100%" }} className="sd-h9">
+                                        <i style={{ fontSize: "10px", color: "#E66000" }} className="fa-solid fa-paperclip"></i>
+                                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                        <span style={{ fontWeight: "400", color: "#6F6F6B" }}>{f.size}</span>
+                                      </a>
+                                    </Fragment>
+                                  ))}
+                                </div>
+                              </>
+                            ) : null}
                           </div>
                           <span style={sx(h.chipStyle)}>{h.status}</span>
                           {" "}
                           <span style={{ fontSize: "12.5px", color: "#6F6F6B", width: "104px", textAlign: "right", flexShrink: "0" }}>{h.due}</span>
                           {h.canSubmit ? (
                             <>
-                              <button onClick={h.onSubmit} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h9">Təhvil ver</button>
+                              <button onClick={h.onSubmit} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h10">Təhvil ver</button>
                             </>
                           ) : null}
                         </div>
@@ -745,8 +760,8 @@ export function renderTemplate(v: TemplateVals) {
                         {v.studentName}
                       </div>
                       <div style={{ display: "flex", gap: "8px", marginTop: "14px", flexWrap: "wrap" }}>
-                        {v.enrollments.map((e, i17) => (
-                          <Fragment key={i17}>
+                        {v.enrollments.map((e, i18) => (
+                          <Fragment key={i18}>
                             <span style={{ padding: "6px 12px", borderRadius: "9px", background: "#F2F2EF", color: "#4A4A46", fontSize: "11.5px", fontWeight: "600" }}>{e}</span>
                           </Fragment>
                         ))}
@@ -757,8 +772,8 @@ export function renderTemplate(v: TemplateVals) {
                     <div style={{ padding: "32px 34px", borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)" }}>
                       <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "26px" }}>Bacarıqlar</div>
                       <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
-                        {v.skills.map((s, i18) => (
-                          <Fragment key={i18}>
+                        {v.skills.map((s, i19) => (
+                          <Fragment key={i19}>
                             <div>
                               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "9px" }}>
                                 <span style={{ fontSize: "14px", fontWeight: "500" }}>{s.name}</span>
@@ -776,8 +791,8 @@ export function renderTemplate(v: TemplateVals) {
                       <div>
                         <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "18px", paddingLeft: "2px" }}>Layihələr</div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: "20px" }}>
-                          {v.projects.map((p, i19) => (
-                            <Fragment key={i19}>
+                          {v.projects.map((p, i20) => (
+                            <Fragment key={i20}>
                               <div style={{ borderRadius: "24px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)", overflow: "hidden", transition: "transform 0.2s ease,box-shadow 0.2s ease" }} className="sd-h7">
                                 <div style={sx(p.artStyle)}>
                                   <i style={sx(p.iconStyle)} className={p.icon}></i>
@@ -819,8 +834,8 @@ export function renderTemplate(v: TemplateVals) {
               <>
                 <section style={{ animation: "rise 0.5s ease both", animationDelay: "40ms", maxWidth: "820px" }}>
                   <div style={{ borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)", overflow: "hidden" }}>
-                    {v.leaderboard.map((r, i20) => (
-                      <Fragment key={i20}>
+                    {v.leaderboard.map((r, i21) => (
+                      <Fragment key={i21}>
                         <div style={sx(r.rowStyle)}>
                           <span style={sx(r.rankStyle)}>{r.rank}</span>
                           {" "}
@@ -855,11 +870,11 @@ export function renderTemplate(v: TemplateVals) {
                     <span style={{ padding: "8px 15px", borderRadius: "10px", background: "rgba(255,107,0,0.1)", color: "#E66000", fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap" }}>
                       {v.levelTitle}{" · "}{v.levelLabel}
                     </span>
-                    <button onClick={v.onChangeAvatar} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h9">Şəkli dəyiş</button>
+                    <button onClick={v.onChangeAvatar} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h10">Şəkli dəyiş</button>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: "20px" }}>
-                    {v.profileStats.map((p, i21) => (
-                      <Fragment key={i21}>
+                    {v.profileStats.map((p, i22) => (
+                      <Fragment key={i22}>
                         <div style={{ padding: "24px 26px", borderRadius: "22px", background: "rgba(255,255,255,0.6)", border: "1px solid rgba(23,23,23,0.045)" }}>
                           <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B" }}>{p.k}</div>
                           <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "28px", fontWeight: "600", letterSpacing: "-0.032em", marginTop: "12px" }}>{p.v}</div>
@@ -870,8 +885,8 @@ export function renderTemplate(v: TemplateVals) {
                   <div style={{ padding: "32px 34px", borderRadius: "26px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)", boxShadow: "0 1px 2px rgba(23,23,23,0.03)" }}>
                     <div style={{ fontSize: "11px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "22px" }}>Bütün nailiyyətlər</div>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "11px" }}>
-                      {v.achievements.map((a, i22) => (
-                        <Fragment key={i22}>
+                      {v.achievements.map((a, i23) => (
+                        <Fragment key={i23}>
                           <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "16px 18px", borderRadius: "20px", background: "#FCFCFA", border: "1px solid rgba(23,23,23,0.05)" }}>
                             <span style={sx(a.medalStyle)}>
                               <i style={{ fontSize: "13px" }} className={a.icon}></i>
@@ -922,8 +937,8 @@ export function renderTemplate(v: TemplateVals) {
                               </>
                             ) : null}
                           </div>
-                          {v.notifItems.map((n, i23) => (
-                            <Fragment key={i23}>
+                          {v.notifItems.map((n, i24) => (
+                            <Fragment key={i24}>
                               <div style={{ display: "flex", gap: "12px", padding: "14px 18px", borderBottom: "1px solid rgba(23,23,23,0.04)" }}>
                                 <span style={sx(n.dotStyle)}></span>
                                 <div style={{ minWidth: "0" }}>
@@ -1040,8 +1055,8 @@ export function renderTemplate(v: TemplateVals) {
                       </div>
                       <div style={{ fontSize: "12px", color: "#6F6F6B", marginTop: "8px" }}>Günlük seriya</div>
                       <div style={{ display: "flex", gap: "4px", marginTop: "14px" }}>
-                        {v.streak.map((s, i24) => (
-                          <Fragment key={i24}>
+                        {v.streak.map((s, i25) => (
+                          <Fragment key={i25}>
                             <span style={sx(s.pipStyle)}></span>
                           </Fragment>
                         ))}
@@ -1050,8 +1065,8 @@ export function renderTemplate(v: TemplateVals) {
                   </div>
                   <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "16px" }}>Nailiyyətlər</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "26px" }}>
-                    {v.achievementsTop.map((a, i25) => (
-                      <Fragment key={i25}>
+                    {v.achievementsTop.map((a, i26) => (
+                      <Fragment key={i26}>
                         <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "16px 18px", borderRadius: "20px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                           <span style={sx(a.medalStyle)}>
                             <i style={{ fontSize: "12px" }} className={a.icon}></i>
@@ -1066,8 +1081,8 @@ export function renderTemplate(v: TemplateVals) {
                   </div>
                   <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "16px" }}>Layihələrim</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "11px" }}>
-                    {v.projects.map((p, i26) => (
-                      <Fragment key={i26}>
+                    {v.projects.map((p, i27) => (
+                      <Fragment key={i27}>
                         <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                           <span style={sx(p.chipArtStyle)}>
                             <i style={{ fontSize: "13px" }} className={p.icon}></i>
@@ -1103,8 +1118,8 @@ export function renderTemplate(v: TemplateVals) {
                     </div>
                     <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", margin: "24px 0 16px 0" }}>Fənlər üzrə</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                      {v.subjects.map((s, i27) => (
-                        <Fragment key={i27}>
+                      {v.subjects.map((s, i28) => (
+                        <Fragment key={i28}>
                           <div>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px" }}>
                               <span style={{ fontSize: "14px", fontWeight: "500" }}>{s.name}</span>
@@ -1160,8 +1175,8 @@ export function renderTemplate(v: TemplateVals) {
                       </div>
                     </div>
                     <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", margin: "14px 0 4px 0" }}>Qarşıdakı dərslər</div>
-                    {v.lessons.map((l, i28) => (
-                      <Fragment key={i28}>
+                    {v.lessons.map((l, i29) => (
+                      <Fragment key={i29}>
                         <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 20px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                           <span style={sx(l.dayStyle)}>{l.dayShort}</span>
                           <div style={{ flex: "1", minWidth: "0" }}>
@@ -1186,8 +1201,8 @@ export function renderTemplate(v: TemplateVals) {
               {v.mAtTasks ? (
                 <>
                   <div style={{ animation: "rise-sm 0.34s ease both", display: "flex", flexDirection: "column", gap: "11px" }}>
-                    {v.hwList.map((h, i29) => (
-                      <Fragment key={i29}>
+                    {v.hwList.map((h, i30) => (
+                      <Fragment key={i30}>
                         <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 20px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                           <span style={sx(h.iconStyle)}>
                             <i style={{ fontSize: "12px" }} className={h.icon}></i>
@@ -1195,11 +1210,26 @@ export function renderTemplate(v: TemplateVals) {
                           <div style={{ flex: "1", minWidth: "0" }}>
                             <div style={{ fontSize: "14px", fontWeight: "500", letterSpacing: "-0.008em" }}>{h.title}</div>
                             <div style={{ fontSize: "12px", color: "#6F6F6B", marginTop: "5px" }}>{h.subject}{" · "}{h.due}</div>
+                            {h.hasFiles ? (
+                              <>
+                                <div style={{ display: "flex", gap: "7px", flexWrap: "wrap", marginTop: "10px" }}>
+                                  {h.files.map((f, i31) => (
+                                    <Fragment key={i31}>
+                                      <a href={f.href} target="_blank" rel="noopener" style={{ display: "inline-flex", alignItems: "center", gap: "7px", padding: "6px 11px", borderRadius: "10px", background: "#F6F6F3", border: "1px solid rgba(23,23,23,0.06)", fontSize: "12px", fontWeight: "600", color: "#171717", textDecoration: "none", maxWidth: "100%" }} className="sd-h9">
+                                        <i style={{ fontSize: "10px", color: "#E66000" }} className="fa-solid fa-paperclip"></i>
+                                        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                                        <span style={{ fontWeight: "400", color: "#6F6F6B" }}>{f.size}</span>
+                                      </a>
+                                    </Fragment>
+                                  ))}
+                                </div>
+                              </>
+                            ) : null}
                           </div>
                           <span style={sx(h.chipStyle)}>{h.status}</span>
                           {h.canSubmit ? (
                             <>
-                              <button onClick={h.onSubmit} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h9">Təhvil ver</button>
+                              <button onClick={h.onSubmit} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h10">Təhvil ver</button>
                             </>
                           ) : null}
                         </div>
@@ -1231,11 +1261,11 @@ export function renderTemplate(v: TemplateVals) {
                           {v.studentMeta}
                         </div>
                       </div>
-                      <button onClick={v.onChangeAvatar} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h9">Şəkli dəyiş</button>
+                      <button onClick={v.onChangeAvatar} style={{ padding: "9px 16px", borderRadius: "11px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "12.5px", fontWeight: "600", cursor: "pointer", whiteSpace: "nowrap", flexShrink: "0", transition: "background 0.18s ease" }} className="sd-h10">Şəkli dəyiş</button>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "26px" }}>
-                      {v.profileStats.map((p, i30) => (
-                        <Fragment key={i30}>
+                      {v.profileStats.map((p, i32) => (
+                        <Fragment key={i32}>
                           <div style={{ padding: "20px 18px", borderRadius: "22px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                             <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.08em", textTransform: "uppercase", color: "#6F6F6B" }}>{p.k}</div>
                             <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: "24px", fontWeight: "600", letterSpacing: "-0.032em", marginTop: "10px" }}>{p.v}</div>
@@ -1245,8 +1275,8 @@ export function renderTemplate(v: TemplateVals) {
                     </div>
                     <div style={{ fontSize: "10.5px", fontWeight: "600", letterSpacing: "0.09em", textTransform: "uppercase", color: "#6F6F6B", marginBottom: "16px" }}>Nailiyyətlər</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                      {v.achievements.map((a, i31) => (
-                        <Fragment key={i31}>
+                      {v.achievements.map((a, i33) => (
+                        <Fragment key={i33}>
                           <div style={{ display: "flex", alignItems: "center", gap: "13px", padding: "16px 18px", borderRadius: "20px", background: "#fff", border: "1px solid rgba(23,23,23,0.05)" }}>
                             <span style={sx(a.medalStyle)}>
                               <i style={{ fontSize: "12px" }} className={a.icon}></i>
@@ -1259,14 +1289,14 @@ export function renderTemplate(v: TemplateVals) {
                         </Fragment>
                       ))}
                     </div>
-                    <button onClick={v.onLogout} style={{ width: "100%", marginTop: "14px", padding: "15px", borderRadius: "15px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "13.5px", fontWeight: "600", cursor: "pointer", transition: "background 0.18s ease" }} className="sd-h9">Çıxış</button>
+                    <button onClick={v.onLogout} style={{ width: "100%", marginTop: "14px", padding: "15px", borderRadius: "15px", border: "1px solid rgba(23,23,23,0.09)", background: "#fff", fontSize: "13.5px", fontWeight: "600", cursor: "pointer", transition: "background 0.18s ease" }} className="sd-h10">Çıxış</button>
                   </div>
                 </>
               ) : null}
             </div>
             <div style={{ position: "absolute", bottom: "22px", left: "20px", right: "20px", zIndex: "5", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "2px", padding: "9px", borderRadius: "26px", background: "rgba(255,255,255,0.72)", backdropFilter: "blur(26px) saturate(180%)", WebkitBackdropFilter: "blur(26px) saturate(180%)", border: "1px solid rgba(23,23,23,0.06)", boxShadow: "0 1px 0 rgba(255,255,255,0.8) inset,0 20px 44px -22px rgba(23,23,23,0.4)" }}>
-              {v.mobileNav.map((m, i32) => (
-                <Fragment key={i32}>
+              {v.mobileNav.map((m, i34) => (
+                <Fragment key={i34}>
                   <button onClick={m.onGo} style={sx(m.style)}>
                     <i style={{ fontSize: "16px" }} className={m.icon}></i>
                     {" "}

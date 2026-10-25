@@ -2,6 +2,7 @@
 // (nav, segmented tabs, chips, bars, ring maths, streak cells/pips, project
 // art, medals, leaderboard rows, calendar) with the prototype's demo arrays
 // replaced by the student's real snapshot.
+import { formatSize } from "@/lib/file-size";
 import {
   MONTHS,
   MONTHS_SHORT,
@@ -651,6 +652,8 @@ export function buildVals(data: StudentDashboardData, state: UiState, act: Actio
         x.tone === "due" ? `background:${accent}14;color:${accentText}` : "background:#F2F2EF;color:#4A4A46",
       ].join(";"),
       chipStyle: chip(x.tone),
+      files: x.s.files.map((f) => ({ name: f.name, size: formatSize(f.size), href: `/api/files/homework/${f.id}` })),
+      hasFiles: x.s.files.length > 0,
       canSubmit: x.s.status === "PENDING" || x.s.status === "OVERDUE",
       onSubmit: () => act.submitHomework(x.s.id),
     })),

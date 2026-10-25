@@ -58,6 +58,8 @@ export type TeacherHomework = {
   description: string;
   dueDate: string;
   maxScore: number;
+  /** files attached to the homework (download: /api/files/homework/<id>) */
+  files: { id: string; name: string; size: number }[];
 };
 
 export type TeacherDashboardData = {
