@@ -319,3 +319,117 @@
 .blog-prose th { background: rgba(0, 0, 0, 0.04); font-weight: 700; }
 .dark .blog-prose th { background: rgba(255, 255, 255, 0.06); }
 @media (max-width: 640px) { .blog-prose { font-size: 1rem; line-height: 1.8; } .blog-prose h2 { font-size: 1.3rem; } .blog-prose h3 { font-size: 1.1rem; } }
+
+/* ---- Cadet hero (landing, second section): the head follows the cursor and points at a course ----
+   Everything inside .cd-frame is laid out in "frame units" (--u) on a 1440x810 canvas that always covers the section;
+   the course cards sit on the section itself (not in the frame) so they stay on screen on narrow windows. */
+.cd-section {
+  --u: max(calc(100vw / 1440), calc(100svh / 810));
+  position: relative;
+  background: #02040d;
+  color: #fff;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: var(--font-urbanist), var(--font-inter), system-ui, sans-serif;
+}
+.cd-stage { position: relative; height: 100svh; min-height: 540px; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.cd-frame { position: absolute; width: calc(1440 * var(--u)); height: calc(810 * var(--u)); left: calc(50% - 720 * var(--u)); top: calc(50% - 405 * var(--u)); isolation: isolate; }
+.cd-plate { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.cd-head {
+  position: absolute; left: calc(510 * var(--u)); top: calc(255 * var(--u)); width: calc(435 * var(--u)); height: calc(450 * var(--u)); object-fit: fill; opacity: 0; transition: opacity 0.6s ease; pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 72%, transparent 99%); mask-image: radial-gradient(ellipse 50% 50% at 50% 46%, #000 72%, transparent 99%);
+}
+.cd-head.is-on { opacity: 1; }
+.cd-helmet {
+  position: absolute; left: calc(533 * var(--u)); top: calc(288 * var(--u)); width: calc(360 * var(--u)); height: calc(360 * var(--u)); mix-blend-mode: screen; opacity: 0; pointer-events: none;
+  transform: translateY(calc(-70 * var(--u)));
+  -webkit-mask-image: linear-gradient(to bottom, #000 76%, transparent 92%); mask-image: linear-gradient(to bottom, #000 76%, transparent 92%);
+}
+.cd-copy { position: absolute; left: 0; right: 0; top: calc(122 * var(--u)); text-align: center; pointer-events: none; padding: 0 16px; }
+.cd-eyebrow { display: block; font-weight: 700; font-size: calc(18 * var(--u)); letter-spacing: 0.46em; text-indent: 0.46em; color: #cdd2e6; text-transform: uppercase; }
+.cd-title {
+  margin: calc(8 * var(--u)) 0 0; font-family: var(--font-archivo), var(--font-urbanist), sans-serif; font-style: italic; font-weight: 900; font-size: calc(98 * var(--u));
+  line-height: 0.95; letter-spacing: -0.02em; color: #fff; text-transform: uppercase;
+  text-shadow: 0 0 calc(14 * var(--u)) #fff, 0 0 calc(34 * var(--u)) #bcd3ff, 0 0 calc(70 * var(--u)) #3b6dff;
+}
+.cd-sub { margin: calc(9 * var(--u)) auto 0; min-height: calc(30 * var(--u)); max-width: 92%; font-weight: 600; font-size: calc(23 * var(--u)); color: #cdd2e6; transition: opacity 0.3s ease; }
+.cd-caption { position: absolute; bottom: calc(26 * var(--u)); font-weight: 700; font-size: calc(12.2 * var(--u)); letter-spacing: 0.04em; color: #cdd2e6; pointer-events: none; }
+.cd-caption-l { left: calc(55 * var(--u)); }
+.cd-caption-r { right: calc(55 * var(--u)); }
+.cd-push {
+  position: absolute; left: calc(675 * var(--u)); top: calc(720 * var(--u)); width: calc(75 * var(--u)); height: calc(75 * var(--u)); border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+  font: 700 calc(16.5 * var(--u)) / 1.05 var(--font-urbanist), sans-serif; color: #fff; text-align: center;
+  background: radial-gradient(circle at 36% 28%, #ff6b5f 0%, #e5271f 46%, #a80f0f 100%);
+  box-shadow: 0 0 0 calc(4 * var(--u)) #2a0d0d, 0 0 0 calc(7 * var(--u)) rgba(255, 255, 255, 0.18), inset 0 calc(-5 * var(--u)) calc(9 * var(--u)) rgba(0, 0, 0, 0.35), inset 0 calc(4 * var(--u)) calc(6 * var(--u)) rgba(255, 255, 255, 0.35);
+  transition: box-shadow 0.3s ease, transform 0.32s ease;
+}
+.cd-push[aria-pressed="true"] { box-shadow: 0 0 0 calc(4 * var(--u)) #2a0d0d, 0 0 0 calc(7 * var(--u)) rgba(255, 255, 255, 0.18), 0 0 calc(34 * var(--u)) calc(8 * var(--u)) rgba(255, 60, 40, 0.75), inset 0 calc(-5 * var(--u)) calc(9 * var(--u)) rgba(0, 0, 0, 0.3), inset 0 calc(4 * var(--u)) calc(6 * var(--u)) rgba(255, 255, 255, 0.4); }
+.cd-push:focus-visible, .cd-card:focus-visible, .cd-chip:focus-visible { outline: 3px solid #ffb27a; outline-offset: 3px; }
+
+/* course cards: left and right of the cadet, vertically in frame units */
+.cd-cards { position: absolute; margin: 0; padding: 0; list-style: none; width: clamp(210px, 20vw, 290px); display: flex; flex-direction: column; gap: calc(16 * var(--u)); top: calc(50% + (300 - 405) * var(--u)); z-index: 3; }
+.cd-cards-l { left: clamp(14px, 4.5vw, 96px); }
+.cd-cards-r { right: clamp(14px, 4.5vw, 96px); }
+.cd-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 20px; text-decoration: none; color: #fff;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04)); border: 1px solid rgba(255, 255, 255, 0.16); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 18px 40px -22px rgba(0, 0, 0, 0.7); transform: scale(0.97); opacity: 0.78;
+  transition: transform 0.32s ease, opacity 0.32s ease, background 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease;
+}
+.cd-card.is-active, .cd-chip.is-active { transform: scale(1.04); opacity: 1; border-color: rgba(255, 143, 66, 0.9); background: linear-gradient(135deg, rgba(255, 107, 0, 0.42), rgba(255, 107, 0, 0.12)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 1px rgba(255, 107, 0, 0.35), 0 0 34px -4px rgba(255, 107, 0, 0.55); }
+.cd-cards-r .cd-card { flex-direction: row-reverse; text-align: right; }
+.cd-ico { flex: none; width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.12); color: #ffd2b0; }
+.is-active .cd-ico { background: #ff6b00; color: #fff; }
+.cd-card b, .cd-chip b { display: block; font-size: 15px; font-weight: 700; line-height: 1.2; }
+.cd-card small, .cd-chip small { display: block; margin-top: 3px; font-size: 12px; color: #cdd2e6; }
+.cd-card .cd-go { display: none; margin-top: 6px; font-size: 12px; font-weight: 700; color: #ffd2b0; }
+.cd-card.is-active .cd-go { display: block; }
+
+/* phones: the courses become a scrolling row under the stage */
+.cd-dock { display: none; position: relative; }
+@media (max-width: 820px) {
+  .cd-stage { height: 100svh; min-height: 520px; }
+  .cd-cards { display: none; }
+  .cd-copy { top: 96px; }
+  .cd-eyebrow { font-size: 14px; }
+  .cd-title { font-size: clamp(40px, 15vw, 64px); margin-top: 8px; }
+  .cd-sub { font-size: 16px; margin-top: 10px; min-height: 48px; }
+  .cd-caption { bottom: 14px; font-size: 11px; }
+  .cd-caption-l { left: 16px; }
+  .cd-caption-r { right: 16px; }
+  .cd-dock { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 18px 16px 26px; margin: 0; list-style: none; background: linear-gradient(#02040d, #070b1d); }
+  .cd-chip { flex: none; scroll-snap-align: center; min-width: 200px; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; text-decoration: none; color: #fff; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16); opacity: 0.8; transition: transform 0.3s ease, opacity 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+}
+@media (max-width: 820px) and (min-width: 0px) { .cd-chip.is-active { transform: none; } }
+.cd-dock::-webkit-scrollbar { display: none; }
+
+/* the ring + dot cursor (fine pointers, over the stage only) */
+.cd-ring, .cd-dot { position: fixed; left: 0; top: 0; z-index: 10000; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; border-radius: 50%; }
+.cd-ring { width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 1.5px solid #fff; mix-blend-mode: difference; }
+.cd-dot { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; background: #fff; }
+html.cd-over .cd-ring, html.cd-over .cd-dot { opacity: 1; }
+html.cd-over .cursor-fox { opacity: 0 !important; }
+.cd-stage, .cd-stage * { cursor: none; }
+@media (pointer: coarse) { .cd-stage, .cd-stage * { cursor: auto; } .cd-ring, .cd-dot { display: none; } }
+@media (prefers-reduced-motion: reduce) { .cd-head, .cd-sub, .cd-card, .cd-chip, .cd-push { transition: none; } }
+
+/* floating header over the dark cadet section */
+html.cd-dark-nav header.fixed { background: rgba(8, 10, 24, 0.58) !important; border-color: rgba(255, 255, 255, 0.16) !important; box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 18px 44px -24px rgba(0, 0, 0, 0.8) !important; transition: background 0.3s ease; }
+html.cd-dark-nav header.fixed .pill-nav { background: rgba(255, 255, 255, 0.08) !important; --tw-ring-color: rgba(255, 255, 255, 0.12); }
+html.cd-dark-nav header.fixed .pill-nav-link:not([aria-current="page"]):not(.text-primary) { color: #cdd2e6 !important; }
+html.cd-dark-nav header.fixed .pill-nav-link:not([aria-current="page"]):not(.text-primary):hover { color: #fff !important; }
+html.cd-dark-nav header.fixed a[href="/"], html.cd-dark-nav header.fixed a[href="/giris"], html.cd-dark-nav header.fixed button[aria-label="Menyu"] { color: #fff; }
+html.cd-dark-nav header.fixed button[aria-label="Tema dəyiş"] { color: #cdd2e6; border-color: rgba(255, 255, 255, 0.22); }
+
+/* ---- Glass dock (footer quick links) ---- */
+.glass-border { border: 1px solid rgba(0, 0, 0, 0.08); }
+.dark .glass-border { border-color: rgba(255, 255, 255, 0.14); }
+.glass-dock { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 24px 48px -24px rgba(0, 0, 0, 0.35); }
+.dark .glass-dock { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 24px 48px -24px rgba(0, 0, 0, 0.8); }
+/* a morphing icon: the shape is the <path>; --dock-scale / --dock-opacity are animated by GSAP while it morphs (resting value 0.7 of a 32px box = 22px) */
+.dock-ic { --dock-scale: 0.7; --dock-opacity: 1; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #737373; transition: color 0.2s ease; }
+.dock-ic.active { color: #171717; }
+.dark .dock-ic { color: #a3a3a3; }
+.dark .dock-ic.active { color: #fff; }
+.dock-ic svg { width: 32px; height: 32px; overflow: visible; fill: currentColor; }
+.dock-ic svg path { transform-box: view-box; transform-origin: 50% 50%; transform: scale(var(--dock-scale)); opacity: var(--dock-opacity); }

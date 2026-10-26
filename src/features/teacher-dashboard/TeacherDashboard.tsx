@@ -481,8 +481,8 @@ export function TeacherDashboard({ data, initialScreen }: { data: TeacherDashboa
       <div style={{ display: "contents" }} onKeyDown={activateOnKey}>
         {renderTemplate(vals)}
       </div>
-      <input ref={hwFileInput} type="file" multiple accept={HW_ACCEPT} hidden onChange={onHwFilesPicked} aria-label="Tapşırığa fayl əlavə et" />
       <input ref={avatarInput} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={onAvatarPicked} />
+      <input ref={hwFileInput} type="file" multiple accept={HW_ACCEPT} hidden onChange={onHwFilesPicked} aria-label="Tapşırığa fayl əlavə et" />
     </>
   );
 }

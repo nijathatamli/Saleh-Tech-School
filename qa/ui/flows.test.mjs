@@ -790,14 +790,14 @@ test("UI-28 parent phone 'Ana' screen shows the same sections as the computer on
   assert.ok(phone.sw <= 390, "the phone Ana screen scrolls sideways");
 });
 
-test("UI-29 admin design: glass sidebar, pill hover glides between items and hides when the cursor leaves, the active capsule follows the page, all 15 items fit", async () => {
+test("UI-29 admin design: glass sidebar, pill hover glides between items and hides when the cursor leaves, the active capsule follows the page, all 16 items fit", async () => {
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
   const aside = page.locator("aside.ad-glass").first();
   assert.match(await aside.evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter), /blur/, "the sidebar is liquid glass (backdrop blur)");
   const links = page.locator("aside.ad-glass").first().locator("a.ad-navlink");
-  assert.equal(await links.count(), 15);
+  assert.equal(await links.count(), 16);
   // every item is reachable without scrolling the list (900px high window)
   const hidden = await links.evaluateAll((els) => els.filter((e) => { const r = e.getBoundingClientRect(); const box = e.closest("nav").getBoundingClientRect(); return r.bottom > box.bottom + 1; }).length);
   assert.equal(hidden, 0, "a nav item is cut off at the bottom of the sidebar");
@@ -835,9 +835,9 @@ const rgbOf = (css) => css.match(/[\d.]+/g).slice(0, 3).map(Number);
 test("UI-30 admin accessibility basics: contrast, minimum text size, visible focus, 44px touch targets, grouped nav with counts, helpful empty states", async () => {
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
-  // 1) grouped navigation: 5 groups -> 4 separators, all 15 pages still listed
+  // 1) grouped navigation: 6 groups -> 5 separators, all 16 pages still listed
   await page.waitForLoadState("networkidle").catch(() => {});
-  assert.equal(await page.locator("aside.ad-glass").first().locator(".ad-sep").count(), 4, "nav groups");
+  assert.equal(await page.locator("aside.ad-glass").first().locator(".ad-sep").count(), 5, "nav groups");
   // 2) contrast >= 4.5:1 for the colours used for small text on white
   await page.goto(BASE + "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
@@ -1091,7 +1091,7 @@ test("UI-33 blog author panel: write with the toolbar, preview, upload a cover, 
   await page.waitForSelector("text=Yazı planlandı.");
   assert.equal((await fetch(`${BASE}/bloq/${slug}`)).status, 404, "scheduled: not public");
   await page.goto(BASE + "/blogger/yazilar");
-  assert.match(await page.locator("tbody tr").first().innerText(), /Planlanıb/);
+  assert.match(await page.locator("tbody tr").first().innerText(), /planlan/i); // the badge is upper-cased by CSS
 
   // profile
   await page.goto(BASE + "/blogger/profil");
@@ -1115,7 +1115,7 @@ test("UI-33 blog author panel: write with the toolbar, preview, upload a cover, 
   await a.page.goto(BASE + "/admin/blog");
   await a.page.waitForSelector(`text=UI Blogger ${t}`);
   await a.page.locator("tr", { hasText: `UI Blogger ${t}` }).getByRole("button", { name: "Deaktiv et" }).click();
-  await a.page.waitForFunction((n) => [...document.querySelectorAll("tr")].some((r) => r.innerText.includes(n) && /Deaktiv/.test(r.innerText) && /Aktiv et/.test(r.innerText)), `UI Blogger ${t}`, { timeout: 15_000 });
+  await a.page.waitForFunction((n) => [...document.querySelectorAll("tr")].some((r) => r.innerText.includes(n) && [...r.querySelectorAll("button")].some((b) => b.textContent.trim().toLowerCase() === "aktiv et")), `UI Blogger ${t}`, { timeout: 15_000 });
   assert.equal(await new (await import("../tests/helpers.mjs")).Client("x").login(email, "Blogger-pw-1"), false, "a deactivated author cannot sign in");
   assert.deepEqual(a.errors.filter((e) => !/Failed to load resource/.test(e)), []);
   await a.ctx.close();
@@ -1252,5 +1252,190 @@ test("UI-35 teacher attaches files to a homework: pick → list → remove → t
     const sw = await s.page.evaluate(() => document.documentElement.scrollWidth);
     assert.ok(sw <= (vp === "mobile" ? VIEWPORTS.mobile.width : VIEWPORTS.desktop.width) + 1, `${who}: no sideways scroll (${sw}px)`);
     await s.ctx.close();
+  }
+});
+
+test("UI-36 landing cadet section (second section): the head follows the pointer, the course he looks at lights up, hovering a course turns him, the helmet toggles, courses link to their pages; phone row, touch, reduced motion, no overflow", async () => {
+  const { ctx, page, errors } = await newPage();
+  const reqs = [];
+  page.on("response", (r) => /\/assets\/cadet\//.test(r.url()) && reqs.push(`${r.status()} ${r.url().split("/").pop()}`));
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  // it sits right below the hero (the h1 section), before the marquee and the course highlights
+  const around = await page.evaluate(() => { const w = document.querySelector(".cd-section").parentElement; return { before: w.previousElementSibling?.querySelector("h1") ? "hero" : w.previousElementSibling?.tagName, after: w.nextElementSibling?.innerText.slice(0, 40) }; });
+  assert.equal(around.before, "hero", "directly below the hero");
+  assert.match(around.after, /ROBOTOTEXN/i, "the marquee comes right after it");
+  await page.evaluate(() => document.querySelector(".cd-section").scrollIntoView());
+  await page.waitForFunction(() => document.querySelector(".cd-head")?.classList.contains("is-on") || document.querySelector(".cd-head")?.readyState >= 2, null, { timeout: 30_000 });
+  await page.mouse.move(700, 500);
+  await page.waitForTimeout(600);
+  assert.equal(await page.locator("h2#cd-title").textContent(), "Kəşf et");
+  assert.equal(await page.locator(".cd-cards-l .cd-card").count() + (await page.locator(".cd-cards-r .cd-card").count()), 6, "six courses");
+  // left stack top→bottom looks from far left towards the middle; right stack top→bottom from far right towards the middle:
+  // moving the pointer DOWN brings the gaze back to the centre (the clip's extreme poses look up, so they sit at the top)
+  assert.deepEqual(await page.locator(".cd-cards-l .cd-card b").allInnerTexts(), ["Kibertəhlükəsizlik", "Proqramlaşdırma", "Robotexnika"]);
+  assert.deepEqual(await page.locator(".cd-cards-r .cd-card b").allInnerTexts(), ["Oyun Yaratma", "Süni İntellekt", "Elektronika"]);
+  const gazeOfCard = async (name) => { await page.locator(".cd-card", { hasText: name }).hover(); await page.waitForTimeout(1000); return page.evaluate(() => document.querySelector(".cd-head").currentTime); };
+  const down = [await gazeOfCard("Oyun Yaratma"), await gazeOfCard("Süni İntellekt"), await gazeOfCard("Elektronika")];
+  const dur = await page.evaluate(() => document.querySelector(".cd-head").duration);
+  assert.ok(down[0] > down[1] && down[1] > down[2], `down the right stack the pose gets milder: ${down.map((x) => x.toFixed(2))}`);
+  assert.ok(down[2] / dur >= 0.78, `even the lowest right card (Elektronika) is looked AT: his head is turned to the right (${(down[2] / dur).toFixed(2)} of the clip)`);
+  const downL = [await gazeOfCard("Kibertəhlükəsizlik"), await gazeOfCard("Proqramlaşdırma"), await gazeOfCard("Robotexnika")];
+  assert.ok(downL[0] < downL[1] && downL[1] < downL[2], `down the left stack too: ${downL.map((x) => x.toFixed(2))}`);
+  assert.ok(downL[2] / dur <= 0.25, `the lowest left card is looked at too: head turned left (${(downL[2] / dur).toFixed(2)} of the clip)`);
+  // straight ahead: no course is highlighted and the subtitle invites to move the pointer
+  await page.mouse.move(Math.round(VIEWPORTS.desktop.width / 2), 300);
+  await page.waitForFunction(() => !document.querySelector(".cd-card.is-active"), null, { timeout: 8000 });
+  assert.match(await page.locator(".cd-sub").innerText(), /kursoru sağa-sola apar/i);
+  const time = () => page.evaluate(() => document.querySelector(".cd-head").currentTime);
+  const activeName = () => page.locator(".cd-card.is-active b").innerText();
+  // far left of the frame: head looks left, the first course is the active one; far right: the last one
+  await page.mouse.move(6, 450);
+  await page.waitForFunction(() => document.querySelector(".cd-card.is-active b")?.textContent === "Kibertəhlükəsizlik", null, { timeout: 8000 });
+  const tLeft = await time();
+  await page.mouse.move(VIEWPORTS.desktop.width - 6, 450);
+  await page.waitForFunction(() => document.querySelector(".cd-card.is-active b")?.textContent === "Oyun Yaratma", null, { timeout: 8000 });
+  const tRight = await time();
+  assert.ok(tRight - tLeft > 3, `the clip is scrubbed from the left pose to the right pose (${tLeft.toFixed(2)} → ${tRight.toFixed(2)} s)`);
+  assert.match(await page.locator(".cd-sub").innerText(), /^Oyun Yaratma: /, "the subtitle shows the active course's line");
+  // hovering a course turns him to it
+  await page.locator(".cd-card", { hasText: "Proqramlaşdırma" }).hover();
+  await page.waitForFunction(() => document.querySelector(".cd-card.is-active b")?.textContent === "Proqramlaşdırma");
+  await page.waitForTimeout(900);
+  const tProg = await time();
+  assert.ok(tProg > tLeft + 0.3 && tProg < tRight - 0.3, `hovering the 2nd course turns the head part of the way (${tProg.toFixed(2)} s)`);
+  assert.equal(await page.locator(".cd-card.is-active .cd-go").isVisible(), true, "the active card offers 'Kursa bax'");
+  // the ring cursor replaces the fox cursor over the stage
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("cd-over")), true);
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".cd-ring")).opacity), "1");
+  // the floating header goes dark over this section and back to normal above it
+  assert.equal(await page.evaluate(() => document.documentElement.classList.contains("cd-dark-nav")), true);
+  // the helmet
+  const push = page.locator(".cd-push");
+  assert.equal(await push.getAttribute("aria-pressed"), "false");
+  await push.click();
+  await page.waitForTimeout(1000);
+  assert.equal(await push.getAttribute("aria-pressed"), "true");
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".cd-helmet")).opacity), "1", "the helmet is on");
+  await push.click();
+  await page.waitForTimeout(1000);
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".cd-helmet")).opacity), "0", "the helmet is off again");
+  // a course card is a real link to the course page
+  await Promise.all([page.waitForURL(/\/kurslar\/kibertehlukesizlik$/), page.locator(".cd-card", { hasText: "Kibertəhlükəsizlik" }).click()]);
+  assert.ok(reqs.some((r) => /^200 head\.mp4/.test(r)) && reqs.some((r) => /^200 plate\.jpg/.test(r)), `assets served: ${reqs.join(", ")}`);
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
+  await ctx.close();
+
+  // reduced motion: no clip is downloaded, the poster stays, courses still work
+  const calm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: "reduce" });
+  const cp = await calm.newPage();
+  const calmReqs = [];
+  cp.on("response", (r) => /head\.mp4/.test(r.url()) && calmReqs.push(r.status()));
+  await cp.goto(BASE + "/", { waitUntil: "networkidle" });
+  await cp.evaluate(() => document.querySelector(".cd-section").scrollIntoView());
+  await cp.waitForTimeout(1500);
+  assert.deepEqual(calmReqs, [], "no video under reduced motion");
+  assert.equal(await cp.locator(".cd-head.is-on").count(), 0);
+  assert.equal(await cp.locator(".cd-title").isVisible(), true, "nothing is left invisible without the entrance animation");
+  await calm.close();
+
+  // phones: the courses become a row under the stage, a finger scrubs the head, nothing is wider than the screen
+  for (const width of [320, 390]) {
+    const phone = await browser.newContext({ viewport: { width, height: 800 }, isMobile: true, hasTouch: true });
+    const pp = await phone.newPage();
+    await pp.goto(BASE + "/", { waitUntil: "networkidle" });
+    await pp.evaluate(() => document.querySelector(".cd-section").scrollIntoView());
+    await pp.waitForFunction(() => document.querySelector(".cd-head")?.readyState >= 2, null, { timeout: 30_000 });
+    assert.ok((await pp.evaluate(() => document.documentElement.scrollWidth)) <= width + 1, `${width}px: no sideways scroll`);
+    assert.equal(await pp.locator(".cd-dock").isVisible(), true);
+    assert.equal(await pp.locator(".cd-cards:visible").count(), 0, "the side cards are not used on phones");
+    assert.equal(await pp.locator(".cd-chip").count(), 6);
+    // untouched, the head sweeps by itself and the courses take turns being looked at (a phone has no cursor)
+    if (width === 390) {
+      assert.match(await pp.locator(".cd-sub").innerText(), /Ekrana toxun/, "the phone hint talks about touch, not a cursor");
+      const lit = new Set();
+      let lo = 99;
+      let hi = 0;
+      for (let i = 0; i < 28; i++) {
+        const [t, n] = await pp.evaluate(() => [document.querySelector(".cd-head").currentTime, document.querySelector(".cd-chip.is-active b")?.textContent ?? "-"]);
+        lit.add(n); lo = Math.min(lo, t); hi = Math.max(hi, t);
+        await pp.waitForTimeout(500);
+      }
+      lit.delete("-");
+      assert.ok(hi - lo > 2.5, `the head moves on its own (${lo.toFixed(2)} → ${hi.toFixed(2)} s)`);
+      assert.ok(lit.size >= 3, `several courses get their turn on their own: ${[...lit].join(", ")}`);
+    }
+    const t1 = await pp.evaluate(() => document.querySelector(".cd-head").currentTime);
+    await pp.touchscreen.tap(Math.round(width * 0.9), 350);
+    await pp.waitForTimeout(900);
+    const t2 = await pp.evaluate(() => document.querySelector(".cd-head").currentTime);
+    assert.ok(Math.abs(t2 - t1) > 0.1, `a tap on the stage turns the head (${t1.toFixed(2)} → ${t2.toFixed(2)})`);
+    const push2 = pp.locator(".cd-push");
+    await push2.tap();
+    await pp.waitForTimeout(1000);
+    assert.equal(await push2.getAttribute("aria-pressed"), "true");
+    await phone.close();
+  }
+});
+
+test("UI-37 footer glass dock: real links (home, blog, contact, e-mail), tooltip centred over the hovered icon, icon morphs on hover, keyboard focus, dark mode, phones fit, no social icon without an address", async () => {
+  const { ctx, page, errors } = await newPage();
+  await page.goto(BASE + "/bloq", { waitUntil: "networkidle" });
+  const dock = page.locator("nav.glass-dock");
+  await dock.scrollIntoViewIfNeeded();
+  const links = await dock.locator("a").evaluateAll((as) => as.map((a) => [a.getAttribute("aria-label"), a.getAttribute("href")]));
+  assert.deepEqual(
+    links,
+    [["Instagram", "https://www.instagram.com/saleh.tech.school/"], ["LinkedIn", "https://www.linkedin.com/company/salehtechschool/"], ["TikTok", "https://www.tiktok.com/@saleh.tech.school"], ["Bloq", "/bloq"], ["E-poçt", "/elaqe"]],
+    "Instagram first, then LinkedIn and TikTok, the blog, and the e-mail LAST (it falls back to the contact page); no home / contact / address icons, no Facebook / X / GitHub without an address"
+  );
+  for (const name of ["Instagram", "LinkedIn", "TikTok"]) {
+    const a = dock.locator(`a[aria-label="${name}"]`);
+    assert.equal(await a.getAttribute("target"), "_blank", `${name} opens in a new tab`);
+    assert.match((await a.getAttribute("rel")) ?? "", /noopener/, `${name} has rel=noopener`);
+    assert.ok((await a.locator("svg").count()) >= 1, `${name} has an icon`);
+  }
+  assert.equal(await page.locator("footer h4", { hasText: "Bizi İzləyin" }).count(), 0, "the old social column is replaced by the dock");
+  const d = () => page.evaluate(() => document.querySelector('a[aria-label="Bloq"] [data-dock-morph] path').getAttribute("d"));
+  const rest = await d(); // the blog icon's own shape, before anything was hovered
+  // hovering shows the label centred above the icon
+  const blog = dock.locator('a[aria-label="Bloq"]');
+  await blog.hover();
+  const tip = page.locator(".glass-dock .whitespace-nowrap", { hasText: "Bloq" }).first();
+  await tip.waitFor();
+  await page.waitForTimeout(900);
+  const seenShapes = new Set([rest]);
+  for (let i = 0; i < 6; i++) { seenShapes.add(await d()); await page.waitForTimeout(60); }
+  const [a, t] = [await blog.boundingBox(), await tip.boundingBox()];
+  assert.ok(Math.abs(a.x + a.width / 2 - (t.x + t.width / 2)) < 6, `tooltip centred over the icon (icon ${Math.round(a.x + a.width / 2)}, tip ${Math.round(t.x + t.width / 2)})`);
+  assert.ok(t.y + t.height <= a.y + 2, "the tooltip sits above the icon");
+  // the icon collapses into a teardrop and springs back (GSAP MorphSVG, loaded on first hover)
+  await dock.locator("a").nth(0).hover(); // Instagram: lifts, does not morph
+  await blog.hover();
+  await page.waitForFunction((r) => document.querySelector('a[aria-label="Bloq"] [data-dock-morph] path').getAttribute("d") !== r, rest, { timeout: 8000 }).catch(() => {}); // (the first hover above may already have played it)
+  await page.waitForTimeout(1800);
+  assert.equal((await d()).replace(/\s+/g, " ").slice(0, 20), rest.replace(/\s+/g, " ").slice(0, 20), "back to the icon's own shape after the morph");
+  // keyboard: Tab onto an icon shows its label too
+  await page.mouse.move(5, 5);
+  await dock.locator("a").last().focus();
+  await page.waitForSelector(".glass-dock .whitespace-nowrap:has-text('E-poçt')");
+  // a link works: client-side navigation to the contact page
+  await Promise.all([page.waitForURL(/\/elaqe$/), dock.locator("a").last().click()]);
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
+  // dark mode: the dock is dark glass with light icons
+  await page.evaluate(() => document.documentElement.classList.add("dark"));
+  await page.waitForTimeout(700); // colours fade over a few hundred ms
+  const bg = await page.evaluate(() => getComputedStyle(document.querySelector("nav.glass-dock")).backgroundColor);
+  assert.match(bg, /rgba?\(0, 0, 0/, `dark dock background ${bg}`);
+  await ctx.close();
+  for (const width of [320, 390]) {
+    const phone = await browser.newContext({ viewport: { width, height: 800 }, isMobile: true, hasTouch: true });
+    const pp = await phone.newPage();
+    await pp.goto(BASE + "/", { waitUntil: "networkidle" });
+    await pp.locator("nav.glass-dock").scrollIntoViewIfNeeded();
+    assert.ok((await pp.evaluate(() => document.documentElement.scrollWidth)) <= width + 1, `${width}px: no sideways scroll`);
+    const box = await pp.locator("nav.glass-dock").boundingBox();
+    assert.ok(box.x >= 0 && box.x + box.width <= width, `${width}px: the dock fits on the screen (${JSON.stringify(box)})`);
+    await Promise.all([pp.waitForURL(/\/bloq$/), pp.locator("nav.glass-dock a[aria-label='Bloq']").tap()]);
+    await phone.close();
   }
 });

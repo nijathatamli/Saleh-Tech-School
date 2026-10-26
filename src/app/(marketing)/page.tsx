@@ -1,4 +1,5 @@
 import { Hero } from "@/components/marketing/hero";
+import { CadetSection } from "@/components/marketing/cadet-section";
 import { Marquee } from "@/components/marketing/marquee";
 import { Stats } from "@/components/marketing/stats";
 import { CourseHighlights } from "@/components/marketing/course-highlights";
@@ -71,6 +72,7 @@ export default async function HomePage() {
     <>
       <JsonLd data={ld} />
       <Hero />
+      <CadetSection />
       <Marquee />
       <Stats />
       <CourseHighlights />

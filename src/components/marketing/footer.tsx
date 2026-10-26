@@ -1,20 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Logo } from "@/components/app/logo";
-import { Facebook, Instagram, Linkedin } from "lucide-react";
+import { FooterDock } from "@/components/marketing/footer-dock";
+import { getPublicContact } from "@/lib/contact";
 
-// Real profile links come from the environment (NEXT_PUBLIC_SOCIAL_FACEBOOK / _INSTAGRAM / _LINKEDIN). An icon without
-// a URL is not rendered: the old placeholders pointed at "#" and had no accessible name.
-const social = [
-  { label: "Facebook", Icon: Facebook, href: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK },
-  { label: "Instagram", Icon: Instagram, href: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM },
-  { label: "LinkedIn", Icon: Linkedin, href: process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN },
-].filter((x): x is { label: string; Icon: typeof Facebook; href: string } => !!x.href && /^https:\/\//.test(x.href));
+import { SOCIAL } from "@/lib/social";
 
-export function Footer() {
+export async function Footer() {
+  const contact = await getPublicContact();
   return (
     <footer className="border-t border-grey-100 bg-white px-6 py-20 dark:border-zinc-800 dark:bg-black md:px-20">
-      <div className="mx-auto grid max-w-7xl gap-12 pb-20 md:grid-cols-4">
+      <div className="mx-auto grid max-w-7xl gap-12 pb-12 md:grid-cols-3">
         <div className="space-y-6">
           <Link href="/" className="flex items-center">
             <Logo size={20} />
@@ -39,25 +35,9 @@ export function Footer() {
             <li><Link href="/" className="relative hover:text-primary transition-colors after:absolute after:inset-x-0 after:-inset-y-2 after:content-['']">Əlaqə</Link></li>
           </ul>
         </div>
-        {social.length > 0 && (
-          <div>
-            <h4 className="mb-6 text-sm font-bold uppercase tracking-widest">Bizi İzləyin</h4>
-            <div className="flex space-x-4">
-              {social.map(({ label, href, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-grey-100 text-grey-500 transition-all hover:border-primary hover:bg-primary hover:text-white dark:border-zinc-800 dark:text-zinc-400"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
+      </div>
+      <div className="mx-auto flex max-w-7xl justify-center px-2 pb-16 pt-14">
+        <FooterDock email={contact.email || undefined} {...SOCIAL} />
       </div>
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-grey-100 pt-10 text-xs text-grey-500 dark:border-zinc-800 dark:text-zinc-500 md:flex-row">
         <p>© 2026 Saleh Tech School. Bütün hüquqlar qorunur.</p>

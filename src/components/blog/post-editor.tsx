@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bold, Code, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Minus, Quote, Trash2 } from "lucide-react";
@@ -51,6 +51,16 @@ export function PostEditor({ initial }: { initial?: EditorPost }) {
   const [host, setHost] = useState("sayt.az");
   useEffect(() => setHost(window.location.host), []);
   const area = useRef<HTMLTextAreaElement>(null);
+  /** where the caret / selection goes once a toolbar action's new text is in the textarea (applied right after that render, before any typing) */
+  const pendingSelection = useRef<[number, number] | null>(null);
+  useLayoutEffect(() => {
+    const el = area.current;
+    const sel = pendingSelection.current;
+    if (!el || !sel) return;
+    pendingSelection.current = null;
+    el.focus();
+    el.setSelectionRange(sel[0], sel[1]);
+  }, [f.content]);
   const coverInput = useRef<HTMLInputElement>(null);
   const bodyInput = useRef<HTMLInputElement>(null);
 
@@ -87,12 +97,9 @@ export function PostEditor({ initial }: { initial?: EditorPost }) {
       const { selectionStart: a, selectionEnd: b, value } = el;
       const r = fn(value.slice(a, b), value.slice(0, a), value.slice(b));
       const next = value.slice(0, a) + r.text + value.slice(b);
+      const sel = r.select ?? [r.text.length, r.text.length];
+      pendingSelection.current = [a + sel[0], a + sel[1]];
       set("content", next);
-      requestAnimationFrame(() => {
-        el.focus();
-        const s = r.select ?? [a + r.text.length, a + r.text.length];
-        el.setSelectionRange(a + s[0], a + s[1]);
-      });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -102,7 +109,9 @@ export function PostEditor({ initial }: { initial?: EditorPost }) {
     edit((sel, before) => {
       const lead = before.length === 0 || before.endsWith("\n") ? "" : "\n";
       const lines = (sel || placeholder).split("\n").map((l, i) => `${prefix(i)}${l}`);
-      return { text: `${lead}${lines.join("\n")}\n`, select: [lead.length, lead.length + lines.join("\n").length] };
+      // nothing selected: the placeholder is selected (not the "## " before it) so typing replaces just the placeholder
+      const from = lead.length + (sel ? 0 : prefix(0).length);
+      return { text: `${lead}${lines.join("\n")}\n`, select: [from, lead.length + lines.join("\n").length] };
     });
   const link = () => {
     const url = window.prompt("Link ünvanı (https://… və ya /sinaq-dersi):", "https://");

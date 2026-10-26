@@ -1,6 +1,7 @@
 // On-page SEO for the public site: one table holds the title tag (≤ 60), meta description (≤ 160), keywords and canonical
 // path of every indexable page, so the copy lives in one place and `qa/tests/seo.test.mjs` can check the limits.
 import type { Metadata } from "next";
+import { socialLinks } from "@/lib/social";
 
 export const SITE_NAME = "Saleh Tech School";
 
@@ -160,9 +161,6 @@ export function clip(text: string, max: number): string {
 }
 
 // ---- structured data (schema.org JSON-LD) ----
-
-const socialLinks = () =>
-  [process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK, process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM, process.env.NEXT_PUBLIC_SOCIAL_LINKEDIN].filter((u): u is string => !!u && /^https:\/\//.test(u));
 
 export const organizationLd = () => ({
   "@context": "https://schema.org",
