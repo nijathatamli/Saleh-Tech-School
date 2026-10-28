@@ -4,9 +4,9 @@
  */
 export function AppTopbar({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
   return (
-    <div className="ad-pagehead">
+    <div className="ap-pagehead">
       <div className="min-w-0">
-        <h1 className="ad-title">{title}</h1>
+        <h1 className="ap-title">{title}</h1>
         {subtitle && <p>{subtitle}</p>}
       </div>
       {children}

@@ -11,7 +11,7 @@ export default async function AdminSettingsPage() {
   return (
     <div>
       <AdminTopbar title="Tənzimləmələr" subtitle="Məktəb məlumatları, dərs və ödəniş qaydaları" />
-      <div className="max-w-4xl ad-content"><SettingsForm initial={settings} /></div>
+      <div className="max-w-4xl ap-content"><SettingsForm initial={settings} /></div>
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
   return (
     <div>
       <AdminTopbar title="Hesabatlar" subtitle={`${r.range.from} — ${r.range.to}`} />
-      <div className="space-y-10 ad-content">
+      <div className="space-y-10 ap-content">
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           <input type="date" name="from" defaultValue={r.range.from} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Başlanğıc" />
           <input type="date" name="to" defaultValue={r.range.to} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Son" />

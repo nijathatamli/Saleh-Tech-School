@@ -71,14 +71,14 @@ export function AdminHeader({ tabs, badges, user, unread, shell }: { tabs: Tab[]
   const single = shell.create.length === 1 ? shell.create[0] : null;
 
   return (
-    <header className="ad-header">
-      <div className="ad-header-row">
+    <header className="ap-header">
+      <div className="ap-header-row">
         <Link href={shell.home} className="mr-2 flex items-center text-[#1c2333]" aria-label={shell.logoLabel}>
           <Logo size={17} />
         </Link>
 
         {shell.search && (
-          <form action={shell.search.action} method="GET" role="search" className="ad-search">
+          <form action={shell.search.action} method="GET" role="search" className="ap-search">
             <Search aria-hidden="true" />
             <input name="q" type="search" placeholder={shell.search.placeholder} aria-label={shell.search.label} autoComplete="off" />
           </form>
@@ -86,12 +86,12 @@ export function AdminHeader({ tabs, badges, user, unread, shell }: { tabs: Tab[]
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           {single ? (
-            <Link href={single.href} className="ad-btn ad-btn-app inline-flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 text-xs font-semibold">
+            <Link href={single.href} className="ap-btn ap-btn-app inline-flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 text-xs font-semibold">
               <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{shell.createLabel}</span><span className="sm:hidden">{single.label}</span>
             </Link>
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger className="ad-btn ad-btn-app inline-flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 text-xs font-semibold outline-none" aria-label={shell.createLabel}>
+              <DropdownMenuTrigger className="ap-btn ap-btn-app inline-flex items-center gap-2 whitespace-nowrap rounded-md px-3.5 text-xs font-semibold outline-none" aria-label={shell.createLabel}>
                 <Plus className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{shell.createLabel}</span> <ChevronDown className="hidden h-3.5 w-3.5 opacity-80 sm:block" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -102,20 +102,20 @@ export function AdminHeader({ tabs, badges, user, unread, shell }: { tabs: Tab[]
             </DropdownMenu>
           )}
 
-          <Link href={shell.settingsHref} aria-label="Tənzimləmələr" title="Tənzimləmələr" className="ad-iconbtn">
+          <Link href={shell.settingsHref} aria-label="Tənzimləmələr" title="Tənzimləmələr" className="ap-iconbtn">
             <Settings />
           </Link>
           {shell.notificationsHref && (
-            <Link href={shell.notificationsHref} aria-label={unread ? `Bildirişlər (${unread} oxunmamış)` : "Bildirişlər"} title="Bildirişlər" className="ad-iconbtn">
+            <Link href={shell.notificationsHref} aria-label={unread ? `Bildirişlər (${unread} oxunmamış)` : "Bildirişlər"} title="Bildirişlər" className="ap-iconbtn">
               <Bell />
-              {!!unread && <span className="ad-dot">{unread > 9 ? "9+" : unread}</span>}
+              {!!unread && <span className="ap-dot">{unread > 9 ? "9+" : unread}</span>}
             </Link>
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Hesab menyusu" className="ad-user outline-none">
+            <DropdownMenuTrigger aria-label="Hesab menyusu" className="ap-user outline-none">
               <Avatar name={user.name} size={32} />
-              <span className="ad-user-name">{user.name}</span>
+              <span className="ap-user-name">{user.name}</span>
               <ChevronDown className="h-3.5 w-3.5 text-[#667085]" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -132,30 +132,30 @@ export function AdminHeader({ tabs, badges, user, unread, shell }: { tabs: Tab[]
         </div>
       </div>
 
-      <div className="ad-tabs-wrap">
-        <button type="button" className="ad-tab-arrow l" data-show={edge.l} onClick={() => more(-1)} aria-label="Əvvəlki bölmələr" tabIndex={-1}>
+      <div className="ap-tabs-wrap">
+        <button type="button" className="ap-tab-arrow l" data-show={edge.l} onClick={() => more(-1)} aria-label="Əvvəlki bölmələr" tabIndex={-1}>
           <ChevronLeft />
         </button>
         <nav aria-label={shell.ariaLabel}>
-          <div ref={strip} className="ad-tabs" onScroll={measure}>
+          <div ref={strip} className="ap-tabs" onScroll={measure}>
             {tabs.map((t) => {
               const count = badges[t.href] ?? 0;
               return (
-                <Link key={t.href} href={t.href} aria-current={t.href === current ? "page" : undefined} className="ad-tab">
+                <Link key={t.href} href={t.href} aria-current={t.href === current ? "page" : undefined} className="ap-tab">
                   {t.label}
                   {count > 0 && (
                     <>
-                      <span aria-hidden="true" className="ad-tab-count">{count > 99 ? "99+" : count}</span>
+                      <span aria-hidden="true" className="ap-tab-count">{count > 99 ? "99+" : count}</span>
                       <span className="sr-only">({count} gözləyir)</span>
                     </>
                   )}
                 </Link>
               );
             })}
-            <span aria-hidden="true" className="ad-tab-ink" style={{ width: ink?.w ?? 0, opacity: ink ? 1 : 0, transform: `translateX(${ink?.x ?? 0}px)` }} />
+            <span aria-hidden="true" className="ap-tab-ink" style={{ width: ink?.w ?? 0, opacity: ink ? 1 : 0, transform: `translateX(${ink?.x ?? 0}px)` }} />
           </div>
         </nav>
-        <button type="button" className="ad-tab-arrow r" data-show={edge.r} onClick={() => more(1)} aria-label="Növbəti bölmələr" tabIndex={-1}>
+        <button type="button" className="ap-tab-arrow r" data-show={edge.r} onClick={() => more(1)} aria-label="Növbəti bölmələr" tabIndex={-1}>
           <ChevronRight />
         </button>
       </div>

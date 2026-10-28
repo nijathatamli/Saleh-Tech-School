@@ -23,7 +23,7 @@ export default async function AdminClassDetailPage({ params }: { params: { id: s
   return (
     <div>
       <AdminTopbar title={c.name} subtitle={`${c.course.name} · ${c.teacher.name}`} />
-      <div className="space-y-6 ad-content">
+      <div className="space-y-6 ap-content">
         <Link href="/admin/classes" className="text-xs font-bold text-electric-600 hover:underline">← Bütün siniflər</Link>
 
         <div className={`${card} flex flex-wrap items-center justify-between gap-4 p-6`}>

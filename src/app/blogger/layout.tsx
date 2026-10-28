@@ -18,7 +18,7 @@ export default async function BloggerLayout({ children }: { children: React.Reac
 
   const tabs = bloggerNav.map((n) => ({ href: n.href, label: n.label }));
   return (
-    <div className="ad-root">
+    <div className="ap-root">
       <AdminChrome />
       <AdminHeader
         tabs={tabs}
@@ -33,7 +33,7 @@ export default async function BloggerLayout({ children }: { children: React.Reac
           create: [{ label: "Yeni yazı", href: "/blogger/yazilar/yeni" }],
         }}
       />
-      <main className="ad-main">
+      <main className="ap-main">
         <PageTransition>{children}</PageTransition>
       </main>
     </div>

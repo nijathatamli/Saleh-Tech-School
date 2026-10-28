@@ -25,7 +25,7 @@ function Delta({ now, before, unit = "%", text, goodWhenDown = false }: { now: n
   const good = goodWhenDown ? down : up;
   const Icon = up ? ArrowUpRight : down ? ArrowDownRight : Minus;
   return (
-    <p className={`t-delta ${diff === 0 ? "ad-flat0" : good ? "ad-up" : "ad-down"}`}>
+    <p className={`t-delta ${diff === 0 ? "ap-flat0" : good ? "ap-up" : "ap-down"}`}>
       <Icon aria-hidden="true" />
       <span>{up ? "+" : ""}{unit === "%" ? `${diff}%` : diff}</span>
       <span className="font-medium text-navy-400">{text}</span>
@@ -41,7 +41,7 @@ function Tile({ label, value, href, tone, hint, children }: { label: string; val
       {children}
     </>
   );
-  return href ? <Link href={href} className="ad-tile" data-tone={tone}>{body}</Link> : <div className="ad-tile" data-tone={tone}>{body}</div>;
+  return href ? <Link href={href} className="ap-tile" data-tone={tone}>{body}</Link> : <div className="ap-tile" data-tone={tone}>{body}</div>;
 }
 
 export default async function AdminDashboardPage() {
@@ -57,10 +57,10 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       <AdminTopbar title="Dashboard" subtitle="Məktəbin əməliyyat mərkəzi" />
-      <div className="ad-content space-y-4">
-        <div className="ad-grid dash">
+      <div className="ap-content space-y-4">
+        <div className="ap-grid dash">
           <div className="min-w-0 space-y-4">
-            <div className="ad-tiles">
+            <div className="ap-tiles">
               <Tile label="Aktiv tələbələr" value={d.activeStudents} href="/admin/students?active=true" tone="blue" hint="Hamısı">
                 <Delta now={series.studentsNew7d} before={0} unit="abs" text="son 7 gündə yeni" />
               </Tile>
@@ -73,19 +73,19 @@ export default async function AdminDashboardPage() {
             </div>
 
             <section className={`${card} p-5`} aria-label="Gəlir və müraciətlər">
-              <div className="ad-panel-title">
+              <div className="ap-panel-title">
                 <h2>Gəlir və müraciətlər</h2>
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="ad-legend"><span><i style={{ background: BLUE }} />Gəlir (AZN)</span><span><i style={{ background: MINT }} />Müraciət</span></div>
-                  <span className="ad-pillselect">Son 7 gün</span>
+                  <div className="ap-legend"><span><i style={{ background: BLUE }} />Gəlir (AZN)</span><span><i style={{ background: MINT }} />Müraciət</span></div>
+                  <span className="ap-pillselect">Son 7 gün</span>
                 </div>
               </div>
               <DualBars data={bars} aName="Gəlir" bName="Müraciət" />
               <p className="mt-2 text-xs text-navy-400">Son 7 gündə ödənilib: <b className="text-navy-900">{formatAzn(weekRevenue)}</b> · yeni müraciət: <b className="text-navy-900">{week("applications")}</b></p>
             </section>
 
-            <section className={`${card} ad-flat p-5`} aria-label="Bu günün dərsləri">
-              <div className="ad-panel-title">
+            <section className={`${card} ap-flat p-5`} aria-label="Bu günün dərsləri">
+              <div className="ap-panel-title">
                 <h2>Bu günün dərsləri</h2>
                 <Link href="/admin/schedule" className="text-xs font-semibold text-electric-600 hover:underline">Cədvəl</Link>
               </div>
@@ -117,7 +117,7 @@ export default async function AdminDashboardPage() {
                 { t: "Qayıblar", sub: `${week("absences")} son 7 gündə`, href: "/admin/attendance?status=ABSENT", color: "#10b981", v: series.days.map((x) => x.absences) },
                 { t: "Yeni qaimələr", sub: `${week("invoices")} son 7 gündə`, href: "/admin/payments", color: RED, v: series.days.map((x) => x.invoices) },
               ].map((c) => (
-                <Link key={c.t} href={c.href} className="ad-sparkcard">
+                <Link key={c.t} href={c.href} className="ap-sparkcard">
                   <h3>{c.t}</h3>
                   <p>{c.sub}</p>
                   <div className="s-row">
@@ -131,26 +131,26 @@ export default async function AdminDashboardPage() {
 
           <div className="min-w-0 space-y-4">
             <section className={`${card} p-5`} aria-label="Müraciət mərhələləri">
-              <div className="ad-panel-title"><h2>Müraciət mərhələləri</h2><Link href="/admin/leads" className="text-xs font-semibold text-electric-600 hover:underline">Hamısı</Link></div>
+              <div className="ap-panel-title"><h2>Müraciət mərhələləri</h2><Link href="/admin/leads" className="text-xs font-semibold text-electric-600 hover:underline">Hamısı</Link></div>
               <Donut data={stage} label={`Müraciətlər mərhələlərə görə: ${stage.map((s) => `${s.name} ${s.value}`).join(", ")}`} />
               <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs text-navy-600">
                 {stage.map((s) => (
                   <li key={s.name} className="flex items-center gap-2"><i aria-hidden="true" className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} /><span className="truncate">{s.name}</span><b className="ml-auto text-navy-900 tabular-nums">{s.value}</b></li>
                 ))}
               </ul>
-              <div className="ad-summary mt-4">
+              <div className="ap-summary mt-4">
                 <b>{stageTotal ? Math.round((registered / stageTotal) * 100) : 0}%</b>
                 <span>Qeydiyyata çevrilmə<br />{registered} / {stageTotal} müraciət</span>
               </div>
             </section>
 
             <section className={`${card} p-5`} aria-label="Tez əməliyyatlar">
-              <div className="ad-panel-title"><h2>Tez əməliyyatlar</h2></div>
-              <div className="ad-quick">
+              <div className="ap-panel-title"><h2>Tez əməliyyatlar</h2></div>
+              <div className="ap-quick">
                 <Link href="/admin/students?yarat=telebe"><UserPlus aria-hidden="true" /><span>Yeni tələbə yarat</span></Link>
                 <Link href="/admin/classes?yarat=sinif"><Layers aria-hidden="true" /><span>Yeni sinif yarat</span></Link>
               </div>
-              <div className="ad-mint-box mt-4">
+              <div className="ap-mint-box mt-4">
                 <Link href="/admin/payments?status=DUE" className="block">
                   <p className="text-xs font-semibold text-navy-900">Ödəniş vaxtı çatıb</p>
                   <p className="mt-1 text-xl font-bold text-[#0f9d63]">{d.paymentsDue.count} qaimə</p>
@@ -166,7 +166,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        <div className="ad-tiles">
+        <div className="ap-tiles">
           <Tile label="Aktiv siniflər" value={d.activeClasses} href="/admin/classes" tone="mint" />
           <Tile label="Aktiv müəllimlər" value={d.activeTeachers} href="/admin/teachers" tone="blue" />
           <Tile label="Bu günkü dərslər" value={d.todayLessons.length} href="/admin/schedule" tone="violet" />
@@ -177,7 +177,7 @@ export default async function AdminDashboardPage() {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <section className={`${card} p-5`}>
-            <div className="ad-panel-title"><h2>Müəllim yükü (növbəti 7 gün)</h2></div>
+            <div className="ap-panel-title"><h2>Müəllim yükü (növbəti 7 gün)</h2></div>
             <ul className="divide-y divide-navy-50 text-sm">
               {d.teacherLoad.map((t) => (
                 <li key={t.id} className="flex items-center justify-between py-2.5"><Link href={`/admin/teachers/${t.id}`} className="font-semibold text-navy-900 hover:text-electric-600">{t.name}</Link><span className="text-navy-600">{t.lessonsWeek} dərs · {t.students} tələbə</span></li>
@@ -185,7 +185,7 @@ export default async function AdminDashboardPage() {
             </ul>
           </section>
           <section className={`${card} p-5`}>
-            <div className="ad-panel-title"><h2>Dolmaq üzrə olan siniflər</h2></div>
+            <div className="ap-panel-title"><h2>Dolmaq üzrə olan siniflər</h2></div>
             {d.fullClasses.length === 0 ? (
               <EmptyState text="Dolmağa yaxın sinif yoxdur." />
             ) : (

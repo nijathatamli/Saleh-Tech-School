@@ -20,7 +20,7 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   return (
     <div>
       <AdminTopbar title="Ödənişlər" subtitle="Dərs əsaslı ödəniş dövrləri" />
-      <div className="space-y-6 ad-content">
+      <div className="space-y-6 ap-content">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
           {[["DUE", "Ödəniş vaxtıdır"], ["OVERDUE", "Gecikmiş"], ["PAID", "Ödənilib"], ["CANCELLED", "Ləğv edilib"]].map(([k, l], i) => (
             <StatTile key={k} href={`/admin/payments?status=${k}`} label={l} value={data.counts[k] ?? 0} tone={(["sand", "lilac", "mint", "blue"] as const)[i]} active={status === k} />

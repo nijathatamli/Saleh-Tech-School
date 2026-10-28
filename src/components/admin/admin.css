@@ -3,11 +3,11 @@
    blue underline; below it a cool grey canvas of white cards (8-10px radius, almost no shadow), pastel stat tiles,
    blue + mint charts, rectangular pastel status tags, white rows on a grey panel for tables, a plain white dialog with
    its close button outside the corner. Plus Jakarta Sans, blue #3B82F6 as the only accent.
-   Everything is scoped under `.ad-root` (the page) or `html.ad-portal` (also reaches dialogs and menus, which Radix
+   Everything is scoped under `.ap-root` (the page) or `html.ap-portal` (also reaches dialogs and menus, which Radix
    renders in a portal outside the page), so the public site and the other panels are untouched. */
 
-.ad-root,
-html.ad-portal {
+.ap-root,
+html.ap-portal {
   --ad-bg: #f3f5f9;
   --ad-surface: #ffffff;
   --ad-panel: #f6f7fb;
@@ -27,7 +27,7 @@ html.ad-portal {
   --ad-font: "Plus Jakarta Sans", var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
-.ad-root {
+.ap-root {
   position: relative;
   min-height: 100vh;
   overflow-x: clip;
@@ -38,21 +38,21 @@ html.ad-portal {
   line-height: 1.5;
   letter-spacing: 0;
 }
-.ad-root h1,
-.ad-root h2,
-.ad-root h3 {
+.ap-root h1,
+.ap-root h2,
+.ap-root h3 {
   text-wrap: balance;
 }
 
 /* ---- header: logo, search, action button, settings, bell, account ------------------------------------------- */
-.ad-header {
+.ap-header {
   position: sticky;
   top: 0;
   z-index: 30;
   background: var(--ad-surface);
   border-bottom: 1px solid var(--ad-line);
 }
-.ad-header-row {
+.ap-header-row {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -61,15 +61,15 @@ html.ad-portal {
   margin: 0 auto;
   padding: 0 28px;
 }
-.ad-search {
+.ap-search {
   position: relative;
   display: none;
   width: min(300px, 28vw);
 }
 @media (min-width: 768px) {
-  .ad-search { display: block; }
+  .ap-search { display: block; }
 }
-.ad-root .ad-search input {
+.ap-root .ap-search input {
   width: 100%;
   height: 38px;
   padding: 0 14px 0 38px !important;
@@ -80,11 +80,11 @@ html.ad-portal {
   font-size: 13px;
   color: var(--ad-ink);
 }
-.ad-root .ad-search input:focus {
+.ap-root .ap-search input:focus {
   background: #fff !important;
   box-shadow: 0 0 0 2px var(--ad-blue) !important;
 }
-.ad-search svg {
+.ap-search svg {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -94,7 +94,7 @@ html.ad-portal {
   color: var(--ad-muted);
   pointer-events: none;
 }
-.ad-iconbtn {
+.ap-iconbtn {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -108,16 +108,16 @@ html.ad-portal {
   cursor: pointer;
   transition: background-color 0.16s ease, color 0.16s ease;
 }
-.ad-iconbtn:hover,
-.ad-iconbtn[data-state="open"] {
+.ap-iconbtn:hover,
+.ap-iconbtn[data-state="open"] {
   background: var(--ad-bg);
   color: var(--ad-ink);
 }
-.ad-iconbtn svg {
+.ap-iconbtn svg {
   width: 18px;
   height: 18px;
 }
-.ad-iconbtn .ad-dot {
+.ap-iconbtn .ap-dot {
   position: absolute;
   top: 3px;
   right: 2px;
@@ -133,7 +133,7 @@ html.ad-portal {
   text-align: center;
   box-shadow: 0 0 0 2px #fff;
 }
-.ad-user {
+.ap-user {
   display: flex;
   align-items: center;
   gap: 9px;
@@ -146,27 +146,27 @@ html.ad-portal {
   cursor: pointer;
   transition: background-color 0.16s ease;
 }
-.ad-user:hover,
-.ad-user[data-state="open"] {
+.ap-user:hover,
+.ap-user[data-state="open"] {
   background: var(--ad-bg);
 }
-.ad-user span.ad-user-name {
+.ap-user span.ap-user-name {
   display: none;
   font-size: 12.5px;
   font-weight: 600;
 }
 @media (min-width: 900px) {
-  .ad-user span.ad-user-name { display: inline; }
+  .ap-user span.ap-user-name { display: inline; }
 }
 
 /* ---- tabs: plain text, the current one bold with a blue underline that slides --------------------------------- */
-.ad-tabs-wrap {
+.ap-tabs-wrap {
   position: relative;
   max-width: 1560px;
   margin: 0 auto;
   padding: 0 28px;
 }
-.ad-tabs {
+.ap-tabs {
   position: relative;
   display: flex;
   align-items: stretch;
@@ -178,10 +178,10 @@ html.ad-portal {
   -ms-overflow-style: none;
   scroll-behavior: smooth;
 }
-.ad-tabs::-webkit-scrollbar {
+.ap-tabs::-webkit-scrollbar {
   display: none;
 }
-.ad-tab {
+.ap-tab {
   position: relative;
   display: inline-flex;
   flex: none;
@@ -195,19 +195,19 @@ html.ad-portal {
   outline: none;
   transition: color 0.18s ease;
 }
-.ad-tab:hover {
+.ap-tab:hover {
   color: var(--ad-ink);
 }
-.ad-tab[aria-current="page"] {
+.ap-tab[aria-current="page"] {
   color: var(--ad-ink);
   font-weight: 700;
 }
-.ad-tab:focus-visible {
+.ap-tab:focus-visible {
   border-radius: 4px;
   outline: 2px solid var(--ad-blue);
   outline-offset: 2px;
 }
-.ad-tab-count {
+.ap-tab-count {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
@@ -220,7 +220,7 @@ html.ad-portal {
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.ad-tab-ink {
+.ap-tab-ink {
   position: absolute;
   left: 0;
   bottom: 0;
@@ -230,7 +230,7 @@ html.ad-portal {
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
   pointer-events: none;
 }
-.ad-tab-arrow {
+.ap-tab-arrow {
   position: absolute;
   top: 0;
   z-index: 2;
@@ -242,23 +242,23 @@ html.ad-portal {
   color: var(--ad-ink);
   cursor: pointer;
 }
-.ad-tab-arrow[data-show="true"] {
+.ap-tab-arrow[data-show="true"] {
   display: flex;
 }
-.ad-tab-arrow.l { left: 18px; justify-content: flex-start; padding-left: 10px; background: linear-gradient(90deg, #fff 55%, rgba(255, 255, 255, 0)); }
-.ad-tab-arrow.r { right: 18px; justify-content: flex-end; padding-right: 10px; background: linear-gradient(270deg, #fff 55%, rgba(255, 255, 255, 0)); }
-.ad-tab-arrow svg {
+.ap-tab-arrow.l { left: 18px; justify-content: flex-start; padding-left: 10px; background: linear-gradient(90deg, #fff 55%, rgba(255, 255, 255, 0)); }
+.ap-tab-arrow.r { right: 18px; justify-content: flex-end; padding-right: 10px; background: linear-gradient(270deg, #fff 55%, rgba(255, 255, 255, 0)); }
+.ap-tab-arrow svg {
   width: 16px;
   height: 16px;
 }
 
 /* ---- canvas ----------------------------------------------------------------------------------------------------- */
-.ad-main {
+.ap-main {
   max-width: 1560px;
   margin: 0 auto;
   padding: 24px 28px 56px;
 }
-.ad-pagehead {
+.ap-pagehead {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -266,7 +266,7 @@ html.ad-portal {
   gap: 8px 16px;
   margin-bottom: 18px;
 }
-.ad-pagehead h1 {
+.ap-pagehead h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
@@ -274,100 +274,100 @@ html.ad-portal {
   letter-spacing: -0.01em;
   color: var(--ad-ink);
 }
-.ad-pagehead p {
+.ap-pagehead p {
   margin: 2px 0 0;
   font-size: 12.5px;
   color: var(--ad-muted);
 }
-.ad-content {
+.ap-content {
   min-width: 0;
 }
 @media (max-width: 640px) {
-  .ad-header-row,
-  .ad-tabs-wrap { padding-left: 16px; padding-right: 16px; }
-  .ad-main { padding: 18px 16px 48px; }
-  .ad-tabs { gap: 22px; }
+  .ap-header-row,
+  .ap-tabs-wrap { padding-left: 16px; padding-right: 16px; }
+  .ap-main { padding: 18px 16px 48px; }
+  .ap-tabs { gap: 22px; }
 }
-.ad-root .font-display,
-html.ad-portal [role="dialog"] .font-display {
+.ap-root .font-display,
+html.ap-portal [role="dialog"] .font-display {
   font-family: var(--ad-font);
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 /* ---- text and surface tokens (the pages keep their markup; the palette underneath is swapped) ------------------ */
-:is(.ad-root, html.ad-portal) .text-navy-900 { color: var(--ad-ink); }
-:is(.ad-root, html.ad-portal) .text-navy-600 { color: var(--ad-ink2); }
-:is(.ad-root, html.ad-portal) .text-navy-400 { color: var(--ad-muted); }
-:is(.ad-root, html.ad-portal) .border-navy-100 { border-color: var(--ad-line); }
-:is(.ad-root, html.ad-portal) .border-navy-50 { border-color: var(--ad-line2); }
-:is(.ad-root, html.ad-portal) .bg-navy-50 { background-color: var(--ad-bg); }
-:is(.ad-root, html.ad-portal) .hover\:bg-navy-50:hover { background-color: var(--ad-bg); }
-:is(.ad-root, html.ad-portal) .divide-navy-50 > :not([hidden]) ~ :not([hidden]) { border-color: var(--ad-line2); }
-:is(.ad-root, html.ad-portal) .tracking-widest { letter-spacing: 0.02em; }
+:is(.ap-root, html.ap-portal) .text-navy-900 { color: var(--ad-ink); }
+:is(.ap-root, html.ap-portal) .text-navy-600 { color: var(--ad-ink2); }
+:is(.ap-root, html.ap-portal) .text-navy-400 { color: var(--ad-muted); }
+:is(.ap-root, html.ap-portal) .border-navy-100 { border-color: var(--ad-line); }
+:is(.ap-root, html.ap-portal) .border-navy-50 { border-color: var(--ad-line2); }
+:is(.ap-root, html.ap-portal) .bg-navy-50 { background-color: var(--ad-bg); }
+:is(.ap-root, html.ap-portal) .hover\:bg-navy-50:hover { background-color: var(--ad-bg); }
+:is(.ap-root, html.ap-portal) .divide-navy-50 > :not([hidden]) ~ :not([hidden]) { border-color: var(--ad-line2); }
+:is(.ap-root, html.ap-portal) .tracking-widest { letter-spacing: 0.02em; }
 /* the reference has no upper-case labels: sentence case everywhere in the panel */
-.ad-root .uppercase,
-html.ad-portal [role="dialog"] .uppercase { text-transform: none; }
-.ad-root label.block { font-size: 12px; font-weight: 600; color: var(--ad-ink2); }
-:is(.ad-root, html.ad-portal) .text-electric-600,
-:is(.ad-root, html.ad-portal) .text-electric-700,
-:is(.ad-root, html.ad-portal) .text-electric-500,
-:is(.ad-root, html.ad-portal) .hover\:text-electric-600:hover { color: var(--ad-blue-d); }
-:is(.ad-root, html.ad-portal) .bg-electric-500 { background-color: var(--ad-blue); }
-:is(.ad-root, html.ad-portal) .bg-electric-50,
-:is(.ad-root, html.ad-portal) .bg-electric-500\/10 { background-color: var(--ad-blue-t); }
-:is(.ad-root, html.ad-portal) .bg-electric-500\/20 { background-color: #d6e4fd; }
-:is(.ad-root, html.ad-portal) .border-electric-500,
-:is(.ad-root, html.ad-portal) .hover\:border-electric-500:hover { border-color: var(--ad-blue); }
-:is(.ad-root, html.ad-portal) .ring-electric-400 { --tw-ring-color: var(--ad-blue); }
-:is(.ad-root, html.ad-portal) .shadow-electric-500\/25 { --tw-shadow-color: rgba(59, 130, 246, 0.25); }
-:is(.ad-root, html.ad-portal) .text-red-500,
-:is(.ad-root, html.ad-portal) .text-red-600 { color: #d92d20; }
-:is(.ad-root, html.ad-portal) .text-amber-600,
-:is(.ad-root, html.ad-portal) .text-amber-700 { color: #a15c07; }
-:is(.ad-root, html.ad-portal) .text-emerald-700 { color: #12804f; }
-:is(.ad-root, html.ad-portal) .bg-red-50 { background-color: #fef0ef; }
-:is(.ad-root, html.ad-portal) .bg-emerald-50 { background-color: #e8f8ef; }
-:is(.ad-root, html.ad-portal) .bg-amber-50\/50 { background-color: #f1f6ff; }
-:is(.ad-root, html.ad-portal) .bg-amber-100 { background-color: #fdf3d6; }
+.ap-root .uppercase,
+html.ap-portal [role="dialog"] .uppercase { text-transform: none; }
+.ap-root label.block { font-size: 12px; font-weight: 600; color: var(--ad-ink2); }
+:is(.ap-root, html.ap-portal) .text-electric-600,
+:is(.ap-root, html.ap-portal) .text-electric-700,
+:is(.ap-root, html.ap-portal) .text-electric-500,
+:is(.ap-root, html.ap-portal) .hover\:text-electric-600:hover { color: var(--ad-blue-d); }
+:is(.ap-root, html.ap-portal) .bg-electric-500 { background-color: var(--ad-blue); }
+:is(.ap-root, html.ap-portal) .bg-electric-50,
+:is(.ap-root, html.ap-portal) .bg-electric-500\/10 { background-color: var(--ad-blue-t); }
+:is(.ap-root, html.ap-portal) .bg-electric-500\/20 { background-color: #d6e4fd; }
+:is(.ap-root, html.ap-portal) .border-electric-500,
+:is(.ap-root, html.ap-portal) .hover\:border-electric-500:hover { border-color: var(--ad-blue); }
+:is(.ap-root, html.ap-portal) .ring-electric-400 { --tw-ring-color: var(--ad-blue); }
+:is(.ap-root, html.ap-portal) .shadow-electric-500\/25 { --tw-shadow-color: rgba(59, 130, 246, 0.25); }
+:is(.ap-root, html.ap-portal) .text-red-500,
+:is(.ap-root, html.ap-portal) .text-red-600 { color: #d92d20; }
+:is(.ap-root, html.ap-portal) .text-amber-600,
+:is(.ap-root, html.ap-portal) .text-amber-700 { color: #a15c07; }
+:is(.ap-root, html.ap-portal) .text-emerald-700 { color: #12804f; }
+:is(.ap-root, html.ap-portal) .bg-red-50 { background-color: #fef0ef; }
+:is(.ap-root, html.ap-portal) .bg-emerald-50 { background-color: #e8f8ef; }
+:is(.ap-root, html.ap-portal) .bg-amber-50\/50 { background-color: #f1f6ff; }
+:is(.ap-root, html.ap-portal) .bg-amber-100 { background-color: #fdf3d6; }
 
 /* ---- cards ------------------------------------------------------------------------------------------------------- */
-.ad-root .ad-card,
-.ad-root .bg-white:is(.rounded-2xl, .rounded-3xl, .rounded-\[22px\], .rounded-\[26px\]):not(input):not(select):not(textarea) {
+.ap-root .ap-card,
+.ap-root .bg-white:is(.rounded-2xl, .rounded-3xl, .rounded-\[22px\], .rounded-\[26px\]):not(input):not(select):not(textarea) {
   background: var(--ad-surface);
   border: 0;
   border-radius: 10px;
   box-shadow: var(--ad-shadow);
 }
-.ad-root a:hover > .ad-card,
-.ad-root a:focus-visible > .ad-card {
+.ap-root a:hover > .ap-card,
+.ap-root a:focus-visible > .ap-card {
   box-shadow: 0 6px 20px -8px rgba(16, 24, 40, 0.16), 0 1px 2px rgba(16, 24, 40, 0.05);
 }
-.ad-root a > .ad-card {
+.ap-root a > .ap-card {
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
-.ad-root a:hover > .ad-card {
+.ap-root a:hover > .ap-card {
   transform: translateY(-1px);
 }
 /* a card that holds a table is the grey panel the white rows sit on */
-.ad-root .ad-card:has(table):not(.ad-flat) {
+.ap-root .ap-card:has(table):not(.ap-flat) {
   background: var(--ad-panel);
   padding: 6px 14px 12px;
 }
-.ad-root .ad-card h2,
-.ad-root .ad-card h3 {
+.ap-root .ap-card h2,
+.ap-root .ap-card h3 {
   letter-spacing: -0.01em;
 }
 
 /* ---- tables: grey header row, white row strips ---------------------------------------------------------------- */
-.ad-root table {
+.ap-root table {
   border-collapse: separate;
   border-spacing: 0 6px;
 }
-.ad-root thead tr {
+.ap-root thead tr {
   border: 0;
 }
-.ad-root th {
+.ap-root th {
   padding: 8px 14px;
   font-size: 12px;
   font-weight: 600;
@@ -376,46 +376,46 @@ html.ad-portal [role="dialog"] .uppercase { text-transform: none; }
   text-transform: none;
   color: var(--ad-ink2);
 }
-.ad-root tbody tr {
+.ap-root tbody tr {
   border: 0;
 }
-.ad-root tbody td {
+.ap-root tbody td {
   background: #fff;
   border: 0;
   transition: background-color 0.16s ease;
 }
-.ad-root tbody td:first-child {
+.ap-root tbody td:first-child {
   border-radius: 8px 0 0 8px;
 }
-.ad-root tbody td:last-child {
+.ap-root tbody td:last-child {
   border-radius: 0 8px 8px 0;
 }
-.ad-root tbody tr:hover td {
+.ap-root tbody tr:hover td {
   background: #fbfcff;
 }
-.ad-root tbody tr:has(td[colspan]) td {
+.ap-root tbody tr:has(td[colspan]) td {
   border-radius: 8px;
 }
 /* tables inside a white card (not the grey panel) keep hairline rows */
-.ad-root .ad-flat table {
+.ap-root .ap-flat table {
   border-spacing: 0;
 }
-.ad-root .ad-flat tbody td {
+.ap-root .ap-flat tbody td {
   border-bottom: 1px solid var(--ad-line2);
   border-radius: 0;
   background: transparent;
 }
-.ad-root .ad-flat tbody tr:last-child td {
+.ap-root .ap-flat tbody tr:last-child td {
   border-bottom: 0;
 }
-.ad-root .ad-flat th {
+.ap-root .ap-flat th {
   background: var(--ad-bg);
 }
-.ad-root .ad-flat th:first-child { border-radius: 6px 0 0 6px; }
-.ad-root .ad-flat th:last-child { border-radius: 0 6px 6px 0; }
+.ap-root .ap-flat th:first-child { border-radius: 6px 0 0 6px; }
+.ap-root .ap-flat th:last-child { border-radius: 0 6px 6px 0; }
 
 /* ---- buttons ------------------------------------------------------------------------------------------------------ */
-:is(.ad-root, html.ad-portal) .ad-btn {
+:is(.ap-root, html.ap-portal) .ap-btn {
   min-height: 34px;
   padding: 7px 16px;
   border-radius: 6px;
@@ -426,42 +426,42 @@ html.ad-portal [role="dialog"] .uppercase { text-transform: none; }
   box-shadow: none;
   transition: background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.12s ease;
 }
-:is(.ad-root, html.ad-portal) .ad-btn:not(:disabled):active {
+:is(.ap-root, html.ap-portal) .ap-btn:not(:disabled):active {
   transform: scale(0.985);
 }
-:is(.ad-root, html.ad-portal) .ad-btn-app {
+:is(.ap-root, html.ap-portal) .ap-btn-app {
   background: var(--ad-blue);
   color: #fff;
 }
-:is(.ad-root, html.ad-portal) .ad-btn-app:hover {
+:is(.ap-root, html.ap-portal) .ap-btn-app:hover {
   background: var(--ad-blue-d);
   box-shadow: 0 6px 16px -8px rgba(37, 99, 235, 0.7);
 }
-:is(.ad-root, html.ad-portal) .ad-btn-outline {
+:is(.ap-root, html.ap-portal) .ap-btn-outline {
   background: #eff1f6;
   color: var(--ad-ink);
   border: 0;
 }
-:is(.ad-root, html.ad-portal) .ad-btn-outline:hover {
+:is(.ap-root, html.ap-portal) .ap-btn-outline:hover {
   background: #e4e8f0;
 }
-:is(.ad-root, html.ad-portal) .ad-btn-ghost {
+:is(.ap-root, html.ap-portal) .ap-btn-ghost {
   color: var(--ad-ink2);
 }
-:is(.ad-root, html.ad-portal) .ad-btn-ghost:hover {
+:is(.ap-root, html.ap-portal) .ap-btn-ghost:hover {
   background: var(--ad-bg);
   color: var(--ad-ink);
 }
-:is(.ad-root, html.ad-portal) .ad-btn.bg-red-500 {
+:is(.ap-root, html.ap-portal) .ap-btn.bg-red-500 {
   background: #e5484d;
   color: #fff;
 }
-:is(.ad-root, html.ad-portal) .ad-btn.bg-red-500:hover {
+:is(.ap-root, html.ap-portal) .ap-btn.bg-red-500:hover {
   background: #cf3a3f;
 }
 
 /* ---- badges: rectangular pastel tags ------------------------------------------------------------------------------- */
-:is(.ad-root, html.ad-portal) .ad-badge {
+:is(.ap-root, html.ap-portal) .ap-badge {
   border-radius: 4px;
   font-size: 11.5px;
   font-weight: 600;
@@ -469,20 +469,20 @@ html.ad-portal [role="dialog"] .uppercase { text-transform: none; }
   text-transform: none;
   padding: 3px 10px;
 }
-:is(.ad-root, html.ad-portal) .ad-badge-default { background: #eceef4; color: #475067; }
-:is(.ad-root, html.ad-portal) .ad-badge-success { background: #ddf6e8; color: #12804f; }
-:is(.ad-root, html.ad-portal) .ad-badge-warning { background: #fdf0cc; color: #8f5f00; }
-:is(.ad-root, html.ad-portal) .ad-badge-danger { background: #fde4e4; color: #b42318; }
-:is(.ad-root, html.ad-portal) .ad-badge-primary { background: #e1ecfe; color: #1d4ed8; }
-:is(.ad-root, html.ad-portal) .ad-badge-violet { background: #eddffb; color: #7a2fc9; }
+:is(.ap-root, html.ap-portal) .ap-badge-default { background: #eceef4; color: #475067; }
+:is(.ap-root, html.ap-portal) .ap-badge-success { background: #ddf6e8; color: #12804f; }
+:is(.ap-root, html.ap-portal) .ap-badge-warning { background: #fdf0cc; color: #8f5f00; }
+:is(.ap-root, html.ap-portal) .ap-badge-danger { background: #fde4e4; color: #b42318; }
+:is(.ap-root, html.ap-portal) .ap-badge-primary { background: #e1ecfe; color: #1d4ed8; }
+:is(.ap-root, html.ap-portal) .ap-badge-violet { background: #eddffb; color: #7a2fc9; }
 
 /* ---- fields ------------------------------------------------------------------------------------------------------- */
-.ad-root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
-.ad-root select,
-.ad-root textarea,
-html.ad-portal [role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
-html.ad-portal [role="dialog"] select,
-html.ad-portal [role="dialog"] textarea {
+.ap-root input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.ap-root select,
+.ap-root textarea,
+html.ap-portal [role="dialog"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+html.ap-portal [role="dialog"] select,
+html.ap-portal [role="dialog"] textarea {
   border-radius: 8px;
   border: 1px solid #dde2ec;
   background-color: #fff;
@@ -492,8 +492,8 @@ html.ad-portal [role="dialog"] textarea {
   font-family: inherit;
   transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
-.ad-root select,
-html.ad-portal [role="dialog"] select {
+.ap-root select,
+html.ap-portal [role="dialog"] select {
   appearance: none;
   -webkit-appearance: none;
   padding-right: 32px;
@@ -501,35 +501,35 @@ html.ad-portal [role="dialog"] select {
   background-repeat: no-repeat;
   background-position: right 11px center;
 }
-.ad-root input:focus,
-.ad-root select:focus,
-.ad-root textarea:focus,
-html.ad-portal [role="dialog"] input:focus,
-html.ad-portal [role="dialog"] select:focus,
-html.ad-portal [role="dialog"] textarea:focus {
+.ap-root input:focus,
+.ap-root select:focus,
+.ap-root textarea:focus,
+html.ap-portal [role="dialog"] input:focus,
+html.ap-portal [role="dialog"] select:focus,
+html.ap-portal [role="dialog"] textarea:focus {
   border-color: var(--ad-blue);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.16);
   background-color: #fff;
 }
-.ad-root input[type="checkbox"],
-.ad-root input[type="radio"],
-html.ad-portal [role="dialog"] input[type="checkbox"],
-html.ad-portal [role="dialog"] input[type="radio"] {
+.ap-root input[type="checkbox"],
+.ap-root input[type="radio"],
+html.ap-portal [role="dialog"] input[type="checkbox"],
+html.ap-portal [role="dialog"] input[type="radio"] {
   accent-color: var(--ad-blue);
 }
-:is(.ad-root, html.ad-portal) input::placeholder,
-html.ad-portal textarea::placeholder {
+:is(.ap-root, html.ap-portal) input::placeholder,
+html.ap-portal textarea::placeholder {
   color: #6a7386;
   opacity: 1;
 }
 
 /* ---- dialogs and menus: plain white sheet, close button outside the corner ---------------------------------------- */
-html.ad-portal .ad-overlay {
+html.ap-portal .ap-overlay {
   background: rgba(15, 23, 42, 0.46);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-html.ad-portal .ad-dialog {
+html.ap-portal .ap-dialog {
   border-radius: 8px;
   background: #fff;
   border: 0;
@@ -540,11 +540,11 @@ html.ad-portal .ad-dialog {
   max-height: calc(100vh - 88px);
   overflow-y: auto;
 }
-html.ad-portal .ad-dialog .font-display {
+html.ap-portal .ap-dialog .font-display {
   font-size: 16px;
 }
 /* close button: a quiet grey square in the top-right corner of the sheet */
-html.ad-portal .ad-dialog > button:last-child {
+html.ap-portal .ap-dialog > button:last-child {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -558,32 +558,32 @@ html.ad-portal .ad-dialog > button:last-child {
   background: var(--ad-bg);
   color: var(--ad-ink2);
 }
-html.ad-portal .ad-dialog > button:last-child:hover {
+html.ap-portal .ap-dialog > button:last-child:hover {
   background: #e4e8f0;
   color: var(--ad-ink);
 }
 @media (max-width: 760px) {
-  html.ad-portal .ad-dialog { padding: 22px 18px; }
+  html.ap-portal .ap-dialog { padding: 22px 18px; }
 }
-html.ad-portal .ad-menu {
+html.ap-portal .ap-menu {
   border-radius: 8px;
   background: #fff;
   border: 1px solid var(--ad-line);
   box-shadow: 0 14px 34px -12px rgba(16, 24, 40, 0.2);
   font-family: var(--ad-font);
 }
-html.ad-portal .ad-menu-item {
+html.ap-portal .ap-menu-item {
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
 }
-html.ad-portal .ad-menu-item:hover,
-html.ad-portal .ad-menu-item:focus {
+html.ap-portal .ap-menu-item:hover,
+html.ap-portal .ap-menu-item:focus {
   background: var(--ad-bg);
 }
 
 /* ---- pagination: ‹ 1 2 [3] … 19 20 › --------------------------------------------------------------------------------- */
-.ad-pager {
+.ap-pager {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -593,14 +593,14 @@ html.ad-portal .ad-menu-item:focus {
   font-size: 12px;
   color: var(--ad-muted);
 }
-.ad-pager nav {
+.ap-pager nav {
   display: flex;
   align-items: center;
   gap: 2px;
   margin: 0 auto;
 }
-.ad-pager a,
-.ad-pager span.ad-pg {
+.ap-pager a,
+.ap-pager span.ap-pg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -614,37 +614,37 @@ html.ad-portal .ad-menu-item:focus {
   text-decoration: none;
   transition: background-color 0.14s ease;
 }
-.ad-pager a:hover {
+.ap-pager a:hover {
   background: #e9edf5;
 }
-.ad-pager a[aria-current="page"] {
+.ap-pager a[aria-current="page"] {
   background: var(--ad-blue);
   color: #fff;
   font-weight: 600;
 }
-.ad-pager span.ad-pg[aria-disabled="true"] {
+.ap-pager span.ap-pg[aria-disabled="true"] {
   opacity: 0.35;
 }
-.ad-pager svg {
+.ap-pager svg {
   width: 14px;
   height: 14px;
 }
 
 /* ---- dashboard pieces ----------------------------------------------------------------------------------------------- */
-.ad-grid {
+.ap-grid {
   display: grid;
   gap: 16px;
   grid-template-columns: minmax(0, 1fr);
 }
 @media (min-width: 1100px) {
-  .ad-grid.dash { grid-template-columns: minmax(0, 1fr) 340px; }
+  .ap-grid.dash { grid-template-columns: minmax(0, 1fr) 340px; }
 }
-.ad-tiles {
+.ap-tiles {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
-.ad-tile {
+.ap-tile {
   display: block;
   padding: 16px 18px 15px;
   border-radius: 8px;
@@ -652,17 +652,17 @@ html.ad-portal .ad-menu-item:focus {
   text-decoration: none;
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-a.ad-tile:hover {
+a.ap-tile:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px -14px rgba(37, 56, 120, 0.4);
 }
-.ad-tile[data-active="true"] { box-shadow: 0 0 0 2px var(--ad-blue); }
-.ad-tile[data-tone="blue"] { background: #e5edfb; }
-.ad-tile[data-tone="violet"] { background: #ebe7fb; }
-.ad-tile[data-tone="lilac"] { background: #efe6f7; }
-.ad-tile[data-tone="mint"] { background: #def5ee; }
-.ad-tile[data-tone="sand"] { background: #fbf0d9; }
-.ad-tile .t-top {
+.ap-tile[data-active="true"] { box-shadow: 0 0 0 2px var(--ad-blue); }
+.ap-tile[data-tone="blue"] { background: #e5edfb; }
+.ap-tile[data-tone="violet"] { background: #ebe7fb; }
+.ap-tile[data-tone="lilac"] { background: #efe6f7; }
+.ap-tile[data-tone="mint"] { background: #def5ee; }
+.ap-tile[data-tone="sand"] { background: #fbf0d9; }
+.ap-tile .t-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -671,12 +671,12 @@ a.ad-tile:hover {
   font-weight: 500;
   color: var(--ad-ink2);
 }
-.ad-tile .t-top em {
+.ap-tile .t-top em {
   font-style: normal;
   font-size: 11.5px;
   color: var(--ad-muted);
 }
-.ad-tile .t-num {
+.ap-tile .t-num {
   margin-top: 10px;
   font-size: 26px;
   font-weight: 600;
@@ -685,7 +685,7 @@ a.ad-tile:hover {
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.ad-tile .t-delta {
+.ap-tile .t-delta {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -693,28 +693,28 @@ a.ad-tile:hover {
   font-size: 12px;
   font-weight: 600;
 }
-.ad-tile .t-delta svg {
+.ap-tile .t-delta svg {
   width: 12px;
   height: 12px;
 }
-.ad-up { color: #0f9d63; }
-.ad-down { color: #d92d56; }
-.ad-flat0 { color: var(--ad-muted); }
-.ad-panel-title {
+.ap-up { color: #0f9d63; }
+.ap-down { color: #d92d56; }
+.ap-flat0 { color: var(--ad-muted); }
+.ap-panel-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 14px;
 }
-.ad-panel-title h2,
-.ad-panel-title h3 {
+.ap-panel-title h2,
+.ap-panel-title h3 {
   margin: 0;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
-.ad-legend {
+.ap-legend {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -722,7 +722,7 @@ a.ad-tile:hover {
   font-size: 11.5px;
   color: var(--ad-muted);
 }
-.ad-legend i {
+.ap-legend i {
   display: inline-block;
   width: 9px;
   height: 9px;
@@ -730,7 +730,7 @@ a.ad-tile:hover {
   border-radius: 2px;
   vertical-align: -0.5px;
 }
-.ad-pillselect {
+.ap-pillselect {
   display: inline-flex;
   align-items: center;
   height: 28px;
@@ -742,12 +742,12 @@ a.ad-tile:hover {
   font-weight: 500;
   color: var(--ad-ink2);
 }
-.ad-quick {
+.ap-quick {
   display: grid;
   gap: 10px;
   grid-template-columns: 1fr 1fr;
 }
-.ad-quick a {
+.ap-quick a {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -761,29 +761,29 @@ a.ad-tile:hover {
   text-decoration: none;
   transition: background-color 0.16s ease, transform 0.16s ease;
 }
-.ad-quick a:hover {
+.ap-quick a:hover {
   background: var(--ad-blue-t);
   transform: translateY(-1px);
 }
-.ad-quick a svg {
+.ap-quick a svg {
   width: 18px;
   height: 18px;
   color: var(--ad-blue);
 }
-.ad-quick a[data-tone="red"] svg { color: #e5484d; }
-.ad-mint-box {
+.ap-quick a[data-tone="red"] svg { color: #e5484d; }
+.ap-mint-box {
   padding: 10px;
   border-radius: 8px;
   background: #def5ee;
 }
-.ad-mint-box > * {
+.ap-mint-box > * {
   display: block;
   padding: 12px 14px;
   border-radius: 6px;
   background: #fff;
 }
-.ad-mint-box > * + * { margin-top: 10px; }
-.ad-sparkcard {
+.ap-mint-box > * + * { margin-top: 10px; }
+.ap-sparkcard {
   display: block;
   padding: 16px 18px 14px;
   border-radius: 8px;
@@ -793,16 +793,16 @@ a.ad-tile:hover {
   text-decoration: none;
   transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
-a.ad-sparkcard:hover {
+a.ap-sparkcard:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 22px -12px rgba(16, 24, 40, 0.22);
 }
-.ad-sparkcard h3 { margin: 0; font-size: 14px; font-weight: 700; }
-.ad-sparkcard p { margin: 2px 0 0; font-size: 12px; color: var(--ad-muted); }
-.ad-sparkcard .s-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 14px; }
-.ad-sparkcard .s-link { font-size: 12px; font-weight: 500; color: var(--ad-blue-d); text-decoration: underline; text-underline-offset: 3px; }
-.ad-donut-center { font-variant-numeric: tabular-nums; }
-.ad-summary {
+.ap-sparkcard h3 { margin: 0; font-size: 14px; font-weight: 700; }
+.ap-sparkcard p { margin: 2px 0 0; font-size: 12px; color: var(--ad-muted); }
+.ap-sparkcard .s-row { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 14px; }
+.ap-sparkcard .s-link { font-size: 12px; font-weight: 500; color: var(--ad-blue-d); text-decoration: underline; text-underline-offset: 3px; }
+.ap-donut-center { font-variant-numeric: tabular-nums; }
+.ap-summary {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -810,40 +810,40 @@ a.ad-sparkcard:hover {
   border-radius: 8px;
   background: var(--ad-bg);
 }
-.ad-summary b { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
-.ad-summary span { display: block; font-size: 11.5px; color: var(--ad-muted); line-height: 1.3; }
+.ap-summary b { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.ap-summary span { display: block; font-size: 11.5px; color: var(--ad-muted); line-height: 1.3; }
 
 /* ---- accessibility and comfort (WCAG 2.2 AA oriented) -------------------------------------------------------------- */
-:is(.ad-root, html.ad-portal) .text-\[10px\] {
+:is(.ap-root, html.ap-portal) .text-\[10px\] {
   font-size: 11px; /* nothing smaller than 11px in the admin panel */
 }
 /* a visible keyboard focus on every operable thing */
-:is(.ad-root, html.ad-portal) :where(a, button, summary, [role="button"], [role="menuitem"], [tabindex]):focus-visible {
+:is(.ap-root, html.ap-portal) :where(a, button, summary, [role="button"], [role="menuitem"], [tabindex]):focus-visible {
   outline: 2px solid var(--ad-blue);
   outline-offset: 2px;
 }
 /* touch screens: 44px targets */
 @media (pointer: coarse) {
-  .ad-root :where(button, select, a.ad-tab, input:not([type="checkbox"]):not([type="radio"])),
-  html.ad-portal [role="dialog"] :where(button, select, input:not([type="checkbox"]):not([type="radio"])) {
+  .ap-root :where(button, select, a.ap-tab, input:not([type="checkbox"]):not([type="radio"])),
+  html.ap-portal [role="dialog"] :where(button, select, input:not([type="checkbox"]):not([type="radio"])) {
     min-height: 44px;
   }
-  :is(.ad-root, html.ad-portal) .ad-btn { min-height: 44px; }
-  .ad-pager a, .ad-pager span.ad-pg { min-width: 40px; height: 40px; }
-  html.ad-portal .ad-dialog > button:last-child {
+  :is(.ap-root, html.ap-portal) .ap-btn { min-height: 44px; }
+  .ap-pager a, .ap-pager span.ap-pg { min-width: 40px; height: 40px; }
+  html.ap-portal .ap-dialog > button:last-child {
     min-width: 44px;
     min-height: 44px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  html.ad-portal .ad-btn,
-  html.ad-portal .ad-btn:not(:disabled):active,
-  .ad-tab-ink,
-  .ad-tabs,
-  .ad-root tbody td,
-  .ad-root a > .ad-card,
-  a.ad-tile,
-  a.ad-sparkcard {
+  html.ap-portal .ap-btn,
+  html.ap-portal .ap-btn:not(:disabled):active,
+  .ap-tab-ink,
+  .ap-tabs,
+  .ap-root tbody td,
+  .ap-root a > .ap-card,
+  a.ap-tile,
+  a.ap-sparkcard {
     transition: none;
     transform: none;
     scroll-behavior: auto;
@@ -851,16 +851,16 @@ a.ad-sparkcard:hover {
 }
 
 /* ---- loading skeleton in the same language -------------------------------------------------------------------------- */
-.ad-skeleton {
+.ap-skeleton {
   border-radius: 10px;
   background: linear-gradient(100deg, #e9ecf3 30%, #f6f8fb 50%, #e9ecf3 70%);
   background-size: 220% 100%;
-  animation: ad-shimmer 1.4s ease-in-out infinite;
+  animation: ap-shimmer 1.4s ease-in-out infinite;
 }
-@keyframes ad-shimmer {
+@keyframes ap-shimmer {
   from { background-position: 120% 0; }
   to { background-position: -120% 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ad-skeleton { animation: none; }
+  .ap-skeleton { animation: none; }
 }

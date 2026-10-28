@@ -22,7 +22,7 @@ export default async function AdminScholarshipPage() {
     <div>
       <AdminTopbar title={`${SCHOLARSHIP_NAME} — təqaüd imtahanı`} />
 
-      <div className="space-y-8 ad-content">
+      <div className="space-y-8 ap-content">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { l: "Qeydiyyatdan keçən", v: students.length },

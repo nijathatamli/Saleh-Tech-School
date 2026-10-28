@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const tabs = adminNav.filter((n) => n.href !== "/admin/settings" && n.href !== "/admin/notifications").map((n) => ({ href: n.href, label: n.label }));
 
   return (
-    <div className="ad-root">
+    <div className="ap-root">
       <AdminChrome />
       <NotificationToaster />
       <AdminHeader
@@ -53,7 +53,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ],
         }}
       />
-      <main className="ad-main">
+      <main className="ap-main">
         <PageTransition>{children}</PageTransition>
       </main>
     </div>

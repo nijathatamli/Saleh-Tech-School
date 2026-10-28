@@ -9,7 +9,7 @@ export default async function NewPostPage() {
   return (
     <div>
       <BloggerTopbar title="Yeni yazı" subtitle="Qaralama kimi saxlayın və ya dərc edin" />
-      <div className="ad-content"><PostEditor /></div>
+      <div className="ap-content"><PostEditor /></div>
     </div>
   );
 }

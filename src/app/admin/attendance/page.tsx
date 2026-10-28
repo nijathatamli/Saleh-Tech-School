@@ -25,7 +25,7 @@ export default async function AdminAttendancePage({ searchParams }: { searchPara
   return (
     <div>
       <AdminTopbar title="Davamiyyət" subtitle="Bütün siniflər üzrə qeydlər (müəllim qeyd edir, admin yoxlayır)" />
-      <div className="space-y-6 ad-content">
+      <div className="space-y-6 ap-content">
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           <input type="date" name="from" defaultValue={range.fromDay} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Başlanğıc" />
           <input type="date" name="to" defaultValue={range.toDay} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Son" />

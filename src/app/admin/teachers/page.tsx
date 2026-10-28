@@ -20,7 +20,7 @@ export default async function AdminTeachersPage({ searchParams }: { searchParams
   return (
     <div>
       <AdminTopbar title="Müəllimlər" subtitle="Hesablar, siniflər və yük" />
-      <div className="space-y-6 ad-content">
+      <div className="space-y-6 ap-content">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
             <input name="q" defaultValue={searchParams.q} placeholder="Ad, e-poçt və ya vəzifə..." className="w-64 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />

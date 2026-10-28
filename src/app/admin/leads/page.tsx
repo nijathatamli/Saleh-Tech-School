@@ -29,7 +29,7 @@ export default async function AdminAdmissionsPage({ searchParams }: { searchPara
   return (
     <div>
       <AdminTopbar title="Qəbul / Müraciətlər" subtitle="Sınaq dərsi müraciətlərindən tələbəyə qədər" />
-      <div className="space-y-6 ad-content">
+      <div className="space-y-6 ap-content">
         <div className="flex flex-wrap gap-2">{tab(undefined, "Hamısı", totalAll)}{LEAD_STAGES.map((s) => tab(s, STAGE_LABEL[s], data.counts[s] ?? 0))}</div>
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           {searchParams.stage && <input type="hidden" name="stage" value={searchParams.stage} />}

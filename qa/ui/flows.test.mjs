@@ -213,10 +213,10 @@ test("UI-11 admin on a phone: the tab row scrolls sideways (arrow appears), the 
   const { ctx, page, errors } = await newPage("mobile");
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
-  const strip = page.locator("header.ad-header .ad-tabs");
+  const strip = page.locator("header.ap-header .ap-tabs");
   const dims = await strip.evaluate((e) => ({ sw: e.scrollWidth, cw: e.clientWidth }));
   assert.ok(dims.sw > dims.cw, "more tabs than fit: the row scrolls");
-  assert.equal(await page.locator(".ad-tab-arrow.r").getAttribute("data-show"), "true", "an arrow tells there is more on the right");
+  assert.equal(await page.locator(".ap-tab-arrow.r").getAttribute("data-show"), "true", "an arrow tells there is more on the right");
   assert.equal(await page.locator("#app-mobile-sidebar").count(), 0, "no drawer any more");
   const link = strip.getByRole("link", { name: "Siniflər" });
   await link.scrollIntoViewIfNeeded();
@@ -805,17 +805,20 @@ test("UI-29 admin design (flat dashboard look): white top bar with search, blue 
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
-  const header = page.locator("header.ad-header");
+  const header = page.locator("header.ap-header");
+  // ad blockers (Brave Shields, uBlock ...) hide anything whose class looks like an advert: that once hid the whole top bar and the page title
+  const adLike = await page.evaluate(() => [...document.querySelectorAll("[class]")].flatMap((e) => [...e.classList]).filter((c) => /^(ad|ads|advert|sponsor|banner)(-|$)/i.test(c)));
+  assert.deepEqual([...new Set(adLike)], [], "no class name that an ad blocker would hide");
   assert.equal(await header.evaluate((e) => getComputedStyle(e).position), "sticky", "the bar stays on top while the page scrolls");
   assert.equal(await header.evaluate((e) => getComputedStyle(e).backgroundColor), "rgb(255, 255, 255)");
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".ad-root")).backgroundColor), "rgb(243, 245, 249)", "cool grey canvas");
-  assert.match(await page.evaluate(() => getComputedStyle(document.querySelector(".ad-root")).fontFamily), /Plus Jakarta Sans/);
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".ap-root")).backgroundColor), "rgb(243, 245, 249)", "cool grey canvas");
+  assert.match(await page.evaluate(() => getComputedStyle(document.querySelector(".ap-root")).fontFamily), /Plus Jakarta Sans/);
   const cta = header.getByRole("button", { name: "Yarat" });
   assert.equal(await cta.evaluate((e) => getComputedStyle(e).backgroundColor), "rgb(59, 130, 246)", "the action button is blue");
   // tabs: 14 pages (settings = gear, notifications = bell), the current one is bold with the underline under it
-  const tabs = header.locator("nav a.ad-tab");
+  const tabs = header.locator("nav a.ap-tab");
   assert.equal(await tabs.count(), 14);
-  const ink = header.locator(".ad-tab-ink");
+  const ink = header.locator(".ap-tab-ink");
   const inkX = () => ink.evaluate((e) => ({ x: new DOMMatrix(getComputedStyle(e).transform).m41, w: e.getBoundingClientRect().width }));
   const geom = (i) => tabs.nth(i).evaluate((e) => ({ x: e.offsetLeft, w: e.offsetWidth }));
   await page.waitForTimeout(700); // the underline grows into place on arrival
@@ -836,7 +839,7 @@ test("UI-29 admin design (flat dashboard look): white top bar with search, blue 
   // cards are flat white with a small radius (no glass)
   await page.goto(BASE + "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
-  const card = await page.locator(".ad-card").first().evaluate((e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, r: c.borderTopLeftRadius, bf: c.backdropFilter }; });
+  const card = await page.locator(".ap-card").first().evaluate((e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, r: c.borderTopLeftRadius, bf: c.backdropFilter }; });
   assert.equal(card.bg, "rgb(255, 255, 255)");
   assert.equal(card.r, "10px");
   assert.ok(!/blur/.test(card.bf), "flat, not frosted");
@@ -850,7 +853,7 @@ test("UI-29 admin design (flat dashboard look): white top bar with search, blue 
   await page.getByRole("dialog").getByText("Yeni sinif").first().waitFor({ state: "visible", timeout: 10_000 });
   assert.equal(new URL(page.url()).searchParams.get("yarat"), null, "the address is cleaned after the dialog opened");
   // the dialog is a plain white sheet; the close button works
-  assert.equal(await page.locator(".ad-dialog").evaluate((e) => getComputedStyle(e).borderTopLeftRadius), "8px");
+  assert.equal(await page.locator(".ap-dialog").evaluate((e) => getComputedStyle(e).borderTopLeftRadius), "8px");
   await page.keyboard.press("Escape");
   assert.equal(await page.getByRole("dialog").count(), 0);
   assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
@@ -866,7 +869,7 @@ test("UI-30 admin accessibility basics: contrast, minimum text size, visible foc
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   // 1) the tabs carry the pending-work counts for assistive technology as well
   await page.waitForLoadState("networkidle").catch(() => {});
-  assert.ok(await page.locator("header.ad-header nav .sr-only", { hasText: /gözləyir/ }).count() >= 1, "tab counts are announced");
+  assert.ok(await page.locator("header.ap-header nav .sr-only", { hasText: /gözləyir/ }).count() >= 1, "tab counts are announced");
   // 2) contrast >= 4.5:1 for the colours used for small text on white
   await page.goto(BASE + "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});

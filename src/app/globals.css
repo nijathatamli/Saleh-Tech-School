@@ -587,7 +587,7 @@ html.cd-dark-nav header.fixed button[aria-label="Tema dəyiş"] { color: #cdd2e6
   .auth-bubble { background: #2a3350; }
 }
 @supports not (backdrop-filter: blur(1px)) { .auth-card { background: rgba(27, 34, 56, 0.94); } }
-.auth-card .ad-btn-app { background-image: linear-gradient(135deg, #ff8a2b, #e85d00); box-shadow: 0 16px 34px -14px rgba(255, 107, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.35) inset; }
+.auth-card .ap-btn-app { background-image: linear-gradient(135deg, #ff8a2b, #e85d00); box-shadow: 0 16px 34px -14px rgba(255, 107, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.35) inset; }
 
 /* ---- Glass toggle (light / dark switch in the navbar). Sizes are in em, so one font-size scales it. ---- */
 .gt { position: relative; flex: none; display: inline-block; width: 4.1em; height: 2.1em; font-size: 11px; border: 0; padding: 0; background: none; cursor: pointer; border-radius: 999px; -webkit-tap-highlight-color: transparent; }

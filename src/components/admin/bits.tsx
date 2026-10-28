@@ -13,7 +13,7 @@ export function ClassStatusBadge({ status }: { status: string }) {
   return <Badge variant={status === "ACTIVE" ? "success" : "default"}>{status === "ACTIVE" ? "Aktiv" : "Arxivdə"}</Badge>;
 }
 
-export const card = "ad-card"; // the look lives in admin.css (.ad-card): white card, 10px radius, hairline shadow; a card with a table is the grey panel the white rows sit on
+export const card = "ap-card"; // the look lives in admin.css (.ap-card): white card, 10px radius, hairline shadow; a card with a table is the grey panel the white rows sit on
 export type Tone = "blue" | "violet" | "lilac" | "mint" | "sand";
 const TONES: Tone[] = ["blue", "violet", "lilac", "mint", "sand"];
 export const toneAt = (i: number): Tone => TONES[i % TONES.length];
@@ -28,9 +28,9 @@ export function StatTile({ label, value, hint, tone = "blue", href, active }: { 
     </>
   );
   return href ? (
-    <Link href={href} className="ad-tile" data-tone={tone} data-active={active ? "true" : undefined}>{body}</Link>
+    <Link href={href} className="ap-tile" data-tone={tone} data-active={active ? "true" : undefined}>{body}</Link>
   ) : (
-    <div className="ad-tile" data-tone={tone}>{body}</div>
+    <div className="ap-tile" data-tone={tone}>{body}</div>
   );
 }
 
@@ -57,18 +57,18 @@ export function Pagination({ base, params, page, total, size }: { base: string; 
     return `${base}?${qs}`;
   };
   return (
-    <div className="ad-pager">
+    <div className="ap-pager">
       <span>{total} nəticə · səhifə {cur} / {pages}</span>
       {pages > 1 && (
         <nav aria-label="Səhifələr">
           {cur > 1 ? (
             <Link href={href(cur - 1)} aria-label="Əvvəlki" rel="prev"><ChevronLeft /></Link>
           ) : (
-            <span className="ad-pg" aria-disabled="true"><ChevronLeft aria-hidden="true" /></span>
+            <span className="ap-pg" aria-disabled="true"><ChevronLeft aria-hidden="true" /></span>
           )}
           {pageList(cur, pages).map((p, i) =>
             p === "…" ? (
-              <span key={`g${i}`} className="ad-pg" aria-hidden="true">…</span>
+              <span key={`g${i}`} className="ap-pg" aria-hidden="true">…</span>
             ) : (
               <Link key={p} href={href(p)} aria-current={p === cur ? "page" : undefined} aria-label={`Səhifə ${p}`}>{p}</Link>
             )
@@ -76,7 +76,7 @@ export function Pagination({ base, params, page, total, size }: { base: string; 
           {cur < pages ? (
             <Link href={href(cur + 1)} aria-label="Növbəti" rel="next"><ChevronRight /></Link>
           ) : (
-            <span className="ad-pg" aria-disabled="true"><ChevronRight aria-hidden="true" /></span>
+            <span className="ap-pg" aria-disabled="true"><ChevronRight aria-hidden="true" /></span>
           )}
         </nav>
       )}
