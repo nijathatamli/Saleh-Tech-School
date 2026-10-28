@@ -1,3 +1,4 @@
+import { StatTile, toneAt } from "@/components/admin/bits";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { getScholarshipAdminData } from "@/lib/scholarship/admin";
 import { SCHOLARSHIP_NAME } from "@/lib/scholarship/config";
@@ -21,18 +22,15 @@ export default async function AdminScholarshipPage() {
     <div>
       <AdminTopbar title={`${SCHOLARSHIP_NAME} — təqaüd imtahanı`} />
 
-      <div className="space-y-8 p-6 md:p-10">
+      <div className="space-y-8 ad-content">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { l: "Qeydiyyatdan keçən", v: students.length },
             { l: "İmtahanı bitirən", v: done.length },
             { l: "İşlənməmiş kodlar", v: unused.length },
             { l: "Təqaüd verilən", v: done.length },
-          ].map((c) => (
-            <div key={c.l} className="rounded-2xl border border-navy-100 bg-white p-5 shadow-sm shadow-navy-900/[0.03]">
-              <p className="text-xs font-bold uppercase tracking-widest text-navy-400">{c.l}</p>
-              <p className="mt-2 break-words text-2xl font-extrabold sm:text-3xl">{c.v}</p>
-            </div>
+          ].map((c, i) => (
+            <StatTile key={c.l} label={c.l} value={c.v} tone={toneAt(i)} />
           ))}
         </div>
 

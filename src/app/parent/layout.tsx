@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NotificationToaster } from "@/components/app/notification-toaster";
 // The approved parent portal UI (parent-dashboard.html) — its fonts, icon
 // font, base styles and generated hover/focus rules — scoped under .pp-root.
 import "@/features/parent-dashboard/styles/fonts.css";
@@ -12,5 +13,10 @@ export const metadata: Metadata = { title: "Valideyn portalı", robots: { index:
 // Access control lives in middleware.ts (session + PARENT role) and the page
 // itself re-checks the session before loading data.
 export default function ParentLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <NotificationToaster />
+    </>
+  );
 }

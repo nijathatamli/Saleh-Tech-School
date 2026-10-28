@@ -34,13 +34,24 @@ export function ParentPanelPreview() {
         </div>
 
         <div className="relative z-10 w-full md:w-1/2">
-          <div className="rotate-2 rounded-2xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-sm">
+          {/* liquid glass: orbs behind the frosted frame are churned by an SVG turbulence / displacement filter (refraction without touching the screenshot) */}
+          <svg width="0" height="0" aria-hidden="true" focusable="false" className="absolute">
+            <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="3" result="n">
+                <animate attributeName="baseFrequency" dur="18s" values="0.008 0.012;0.012 0.008;0.008 0.012" repeatCount="indefinite" />
+              </feTurbulence>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </svg>
+          <span aria-hidden="true" className="glass-orb -left-6 top-4 h-44 w-44 bg-primary" />
+          <span aria-hidden="true" className="glass-orb -right-4 bottom-0 h-52 w-52 bg-teal-400/80" />
+          <div className="glass glass-smoke glass-sweep relative rotate-2 rounded-2xl p-4">
             <Image
               src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_90e64f8db3_29b9a6071ab67562.png"
               alt="Valideyn Paneli: şagirdin qiymətləri, davamiyyəti və inkişafı mobil ekranda"
               width={600}
               height={600}
-              className="w-full rounded-xl shadow-lg"
+              className="relative w-full rounded-xl shadow-lg"
             />
           </div>
         </div>

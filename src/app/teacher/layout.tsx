@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NotificationToaster } from "@/components/app/notification-toaster";
 // The approved teacher dashboard UI (teacher-dashboard.html) — the shared fonts
 // and icon faces from the parent/student folders, plus this design's own base
 // styles and generated hover rules — scoped under .td-root.
@@ -14,5 +15,10 @@ export const metadata: Metadata = { title: "Müəllim paneli", robots: { index: 
 // Access control lives in middleware.ts (session + TEACHER role) and the page
 // itself re-checks the session before loading data.
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <NotificationToaster />
+    </>
+  );
 }

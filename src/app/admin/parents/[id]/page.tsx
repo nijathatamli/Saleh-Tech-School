@@ -21,7 +21,7 @@ export default async function AdminParentPage({ params }: { params: { id: string
   return (
     <div>
       <AdminTopbar title={p.name} subtitle="Valideyn profili" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <Link href="/admin/parents" className="text-sm font-bold text-electric-600 hover:underline">← Bütün valideynlər</Link>
         <div className={`${card} flex flex-wrap items-center justify-between gap-4 p-6`}>
           <div className="space-y-1 text-sm">

@@ -55,7 +55,7 @@ export function PillLinks({ items, label }: { items: PillItem[]; label: string }
           aria-current={l.active ? "page" : undefined}
           onMouseEnter={enter}
           onFocus={enter}
-          className={`pill-nav-link relative z-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-primary/60 ${l.className ?? "text-grey-500 hover:text-secondary dark:text-zinc-400 dark:hover:text-white"} ${l.active ? "!text-secondary dark:!text-white" : ""}`}
+          className={`pill-nav-link relative z-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-primary/60 ${l.className ?? "text-grey-500 hover:text-secondary dark:text-zinc-400 dark:hover:text-white"} ${l.active ? "!text-white" : ""}`}
         >
           {l.label}
         </Link>

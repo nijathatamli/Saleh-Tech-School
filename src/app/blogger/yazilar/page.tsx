@@ -19,7 +19,7 @@ export default async function OwnPostsPage({ searchParams }: { searchParams: { q
   return (
     <div>
       <BloggerTopbar title="Yazılarım" subtitle="Qaralamalar, planlanmış və dərc olunmuş məqalələr" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
             <input name="q" defaultValue={searchParams.q} placeholder="Başlıq və ya kateqoriya..." aria-label="Axtar" className="w-64 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />

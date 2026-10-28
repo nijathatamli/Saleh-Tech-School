@@ -1,6 +1,6 @@
 import { getReports } from "@/lib/admin/reports";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
-import { card, th, EmptyState } from "@/components/admin/bits";
+import { StatTile, toneAt, card, th, EmptyState } from "@/components/admin/bits";
 import { Button } from "@/components/ui/button";
 import { formatAzn } from "@/lib/utils";
 
@@ -8,9 +8,7 @@ import { adminGuard } from "@/lib/admin/guard";
 export const dynamic = "force-dynamic";
 const STAGE: Record<string, string> = { NEW: "Yeni", CONTACTED: "Əlaqə saxlanılıb", TRIAL_LESSON: "Sınaq dərsi", TRIAL_COMPLETED: "Sınaq bitib", INTERESTED: "Maraqlıdır", REGISTERED: "Tələbə yaradılıb", REJECTED: "Rədd edilib" };
 
-const Stat = ({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) => (
-  <div className={`${card} p-5`}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{label}</p><p className="mt-2 text-2xl font-extrabold text-navy-900">{value}</p>{hint && <p className="mt-1 text-xs text-navy-400">{hint}</p>}</div>
-);
+const Stat = ({ label, value, hint }: { label: string; value: React.ReactNode; hint?: string }) => <StatTile label={label} value={value} hint={hint} tone={toneAt(label.length)} />;
 
 export default async function AdminReportsPage({ searchParams }: { searchParams: { from?: string; to?: string } }) {
   await adminGuard();
@@ -19,7 +17,7 @@ export default async function AdminReportsPage({ searchParams }: { searchParams:
   return (
     <div>
       <AdminTopbar title="Hesabatlar" subtitle={`${r.range.from} — ${r.range.to}`} />
-      <div className="space-y-10 p-6 md:p-10">
+      <div className="space-y-10 ad-content">
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           <input type="date" name="from" defaultValue={r.range.from} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Başlanğıc" />
           <input type="date" name="to" defaultValue={r.range.to} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Son" />

@@ -56,7 +56,7 @@ export function ShareButtons({ url, title }: { url: string; title: string }) {
     { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
     { label: "X", href: `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(title)}` },
   ];
-  const btn = "inline-flex items-center gap-2 rounded-full border border-grey-200 px-4 py-2 text-xs font-semibold transition-colors hover:border-primary hover:text-primary dark:border-zinc-700";
+  const btn = "glass-chip inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:text-primary dark:text-white";
   return (
     <div className="flex flex-wrap gap-2" role="group" aria-label="Paylaş">
       {links.map((l) => (

@@ -32,7 +32,7 @@ export function CourseCatalog({ courses }: { courses: Course[] }) {
             className={`shrink-0 rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider transition-all ${
               active === c.key
                 ? "bg-primary text-white shadow-md"
-                : "bg-grey-100 text-grey-500 hover:bg-grey-200 dark:bg-zinc-800 dark:text-zinc-400"
+                : "glass-chip text-secondary hover:bg-white/80 dark:text-zinc-200"
             }`}
           >
             {c.label}
@@ -45,7 +45,7 @@ export function CourseCatalog({ courses }: { courses: Course[] }) {
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
           {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard key={course.id} course={course} glass />
           ))}
         </div>
       )}

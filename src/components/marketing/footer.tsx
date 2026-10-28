@@ -9,8 +9,12 @@ import { SOCIAL } from "@/lib/social";
 export async function Footer() {
   const contact = await getPublicContact();
   return (
-    <footer className="border-t border-grey-100 bg-white px-6 py-20 dark:border-zinc-800 dark:bg-black md:px-20">
-      <div className="mx-auto grid max-w-7xl gap-12 pb-12 md:grid-cols-3">
+    <footer className="relative isolate overflow-hidden border-t border-grey-100 bg-white px-6 py-20 dark:border-zinc-800 dark:bg-black md:px-20">
+      {/* coloured shapes behind the frosted panels */}
+      <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-10 -z-10 h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-1/3 -z-10 h-96 w-96 rounded-full bg-blue-400/25 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute bottom-0 left-1/3 -z-10 h-72 w-72 rounded-full bg-teal-400/20 blur-3xl" />
+      <div className="glass relative mx-auto grid max-w-7xl gap-12 rounded-3xl p-8 text-secondary dark:text-white md:grid-cols-3 md:p-12">
         <div className="space-y-6">
           <Link href="/" className="flex items-center">
             <Logo size={20} />
@@ -36,20 +40,20 @@ export async function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl justify-center px-2 pb-16 pt-14">
+      <div className="mx-auto flex max-w-7xl justify-center px-2 pb-14 pt-16">
         <FooterDock email={contact.email || undefined} {...SOCIAL} />
       </div>
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-grey-100 pt-10 text-xs text-grey-500 dark:border-zinc-800 dark:text-zinc-500 md:flex-row">
+      <div className="glass relative mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 rounded-3xl px-6 py-5 text-xs text-grey-800/80 dark:text-zinc-300 md:flex-row">
         <p>© 2026 Saleh Tech School. Bütün hüquqlar qorunur.</p>
         <a
           href="https://tezsayt.dev"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded-full border border-grey-100 bg-grey-50 py-2 pl-5 pr-5 text-xs normal-case tracking-normal transition-colors hover:border-primary dark:border-zinc-800 dark:bg-zinc-900/60"
+          className="tz-pill glass glass-lift glass-sweep group relative flex items-center gap-3 rounded-full py-2 pl-5 pr-5 text-xs normal-case tracking-normal text-secondary dark:text-white"
           aria-label="Bu sayt tezsayt.dev tərəfindən yaradılıb"
         >
           <span>Bu sayt</span>
-          <span className="rounded-full bg-white px-4 py-1.5 shadow-sm ring-1 ring-grey-100 dark:ring-0">
+          <span className="tz-logo rounded-full bg-white px-4 py-1.5 shadow-sm ring-1 ring-grey-100 dark:ring-0">
             <Image src="/images/tezsayt-logo.png" alt="tezsayt.dev" width={384} height={61} className="h-5 w-auto" />
           </span>
           <span>tərəfindən yaradılıb</span>

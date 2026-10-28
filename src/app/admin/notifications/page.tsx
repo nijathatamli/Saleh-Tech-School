@@ -32,7 +32,7 @@ export default async function AdminNotificationsPage({ searchParams }: { searchP
   return (
     <div>
       <AdminTopbar title="Bildirişlər" subtitle={`${unread} oxunmamış`} />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
             <select name="event" defaultValue={searchParams.event ?? ""} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Növ"><option value="">Bütün növlər</option>{Object.entries(EVENT_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select>

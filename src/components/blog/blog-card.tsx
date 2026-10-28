@@ -52,14 +52,14 @@ export function BlogCard({ post, priority = false }: { post: Card; priority?: bo
       <Link href={`/bloq/${post.slug}`} className="block" tabIndex={-1} aria-hidden>
         <Cover src={post.coverUrl} alt="" priority={priority} />
       </Link>
-      <div className="flex flex-1 flex-col gap-3 p-6">
+      <div className="glass glass-lift glass-sweep relative -mt-14 mx-3 mb-3 flex flex-1 flex-col gap-3 rounded-2xl p-5 text-secondary dark:text-white">
         <CategoryChip label={post.category} className="self-start" />
         <h3 className="font-display text-lg leading-snug">
           <Link href={`/bloq/${post.slug}`} className="transition-colors hover:text-primary">
             {post.title}
           </Link>
         </h3>
-        <p className="line-clamp-3 text-sm leading-relaxed text-grey-500 dark:text-zinc-400">{post.excerpt}</p>
+        <p className="line-clamp-3 text-sm leading-relaxed text-grey-800/80 dark:text-zinc-300">{post.excerpt}</p>
         <PostMeta post={post} className="mt-auto pt-3" />
       </div>
     </article>
@@ -68,11 +68,11 @@ export function BlogCard({ post, priority = false }: { post: Card; priority?: bo
 
 export function FeaturedCard({ post }: { post: Card }) {
   return (
-    <article className="group grid overflow-hidden rounded-[2rem] border border-grey-100 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 md:grid-cols-2">
+    <article className="group relative grid overflow-hidden rounded-[2rem] border border-grey-100 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 md:grid-cols-2">
       <Link href={`/bloq/${post.slug}`} className="block" tabIndex={-1} aria-hidden>
         <Cover src={post.coverUrl} alt="" priority className="h-full md:aspect-auto md:min-h-[22rem]" />
       </Link>
-      <div className="flex flex-col justify-center gap-4 p-8 md:p-12">
+      <div className="glass glass-strong relative m-3 flex flex-col justify-center gap-4 rounded-3xl p-8 text-secondary dark:text-white md:-ml-16 md:my-8 md:mr-8 md:p-10">
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white">Seçilmiş yazı</span>
           <CategoryChip label={post.category} />
@@ -82,7 +82,7 @@ export function FeaturedCard({ post }: { post: Card }) {
             {post.title}
           </Link>
         </h2>
-        <p className="leading-relaxed text-grey-500 dark:text-zinc-400">{post.excerpt}</p>
+        <p className="leading-relaxed text-grey-800/80 dark:text-zinc-300">{post.excerpt}</p>
         <PostMeta post={post} />
       </div>
     </article>

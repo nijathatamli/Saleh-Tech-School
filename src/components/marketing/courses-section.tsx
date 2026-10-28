@@ -49,7 +49,7 @@ export function CoursesSection() {
             key={c.title}
             className="course-card group cursor-pointer overflow-hidden rounded-3xl border border-grey-100 bg-white transition-all dark:border-zinc-800 dark:bg-zinc-900"
           >
-            <div className="relative h-64 overflow-hidden">
+            <div className="relative h-72 overflow-hidden">
               <Image
                 src={c.image}
                 alt={c.alt}
@@ -63,10 +63,10 @@ export function CoursesSection() {
                 </div>
               )}
             </div>
-            <div className="space-y-4 p-8">
+            <div className="glass glass-lift glass-sweep relative -mt-24 mx-3 mb-3 space-y-4 rounded-2xl p-6 text-secondary dark:text-white">
               <h3 className="font-display text-xl transition-colors group-hover:text-primary">{c.title}</h3>
-              <p className="line-clamp-3 text-sm leading-relaxed text-grey-500 dark:text-zinc-400">{c.desc}</p>
-              <div className="flex items-center justify-between border-t border-grey-50 pt-4 dark:border-zinc-800">
+              <p className="line-clamp-3 text-sm leading-relaxed text-grey-800/80 dark:text-zinc-300">{c.desc}</p>
+              <div className="flex items-center justify-between border-t border-white/50 pt-4 dark:border-white/15">
                 <span className="text-xs font-bold text-secondary dark:text-white">{c.duration}</span>
                 <span className="text-primary">
                   <ArrowRight className="h-4 w-4" />

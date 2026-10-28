@@ -34,14 +34,19 @@ const levelLabel: Record<string, string> = {
   ADVANCED: "Qabaqcıl",
 };
 
-export function CourseCard({ course }: { course: Course }) {
+/** `glass`: the frosted-glass look of the /kurslar catalogue (needs coloured shapes behind it, which that page provides) */
+export function CourseCard({ course, glass = false }: { course: Course; glass?: boolean }) {
   const meta = iconMap[course.category] ?? iconMap.programming;
   const Icon = meta.icon;
 
   return (
     <Link
       href={`/kurslar/${course.slug}`}
-      className="group flex flex-col rounded-3xl border border-grey-100 bg-white p-8 transition-all hover:-translate-y-1.5 hover:shadow-xl hover:shadow-secondary/5 dark:border-zinc-800 dark:bg-zinc-900"
+      className={
+        glass
+          ? "glass glass-lift glass-sweep group relative flex flex-col rounded-3xl p-8 text-secondary dark:text-white"
+          : "group flex flex-col rounded-3xl border border-grey-100 bg-white p-8 transition-all hover:-translate-y-1.5 hover:shadow-xl hover:shadow-secondary/5 dark:border-zinc-800 dark:bg-zinc-900"
+      }
     >
       <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${meta.color} text-white shadow-lg`}>
         <Icon className="h-6 w-6" />
@@ -49,16 +54,16 @@ export function CourseCard({ course }: { course: Course }) {
       <h3 className="mt-6 font-display text-lg leading-snug group-hover:text-primary transition-colors">
         {course.name}
       </h3>
-      <p className="mt-2 text-sm text-grey-500 dark:text-zinc-400">{course.shortDesc}</p>
+      <p className={`mt-2 text-sm ${glass ? "text-grey-800/80 dark:text-zinc-300" : "text-grey-500 dark:text-zinc-400"}`}>{course.shortDesc}</p>
 
       <div className="mt-5 flex flex-wrap gap-2">
-        <Badge variant="default" className="dark:bg-zinc-800 dark:text-white">
+        <Badge variant="default" className={glass ? "glass-chip border-0 text-secondary dark:text-white" : "dark:bg-zinc-800 dark:text-white"}>
           {course.minAge}-{course.maxAge} yaş
         </Badge>
         <Badge variant="primary">{levelLabel[course.level]}</Badge>
       </div>
 
-      <div className="mt-6 flex items-center justify-between border-t border-grey-50 pt-4 dark:border-zinc-800">
+      <div className={`mt-6 flex items-center justify-between border-t pt-4 ${glass ? "border-white/60 dark:border-white/15" : "border-grey-50 dark:border-zinc-800"}`}>
         <span className="text-xs font-bold text-secondary dark:text-white">{course.durationMonths} ay</span>
         <span className="flex items-center gap-1 text-xs font-bold text-primary">
           Ətraflı bax

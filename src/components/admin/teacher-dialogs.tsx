@@ -1,5 +1,6 @@
 "use client";
 
+import { useOpenFromQuery } from "@/components/admin/use-open-from-query";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,7 @@ function TeacherForm({ initial, onDone }: { initial?: T; onDone: () => void }) {
 
 export function CreateTeacherDialog() {
   const [open, setOpen] = useState(false);
+  useOpenFromQuery("muellim", setOpen);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild><Button variant="app">Yeni müəllim yarat</Button></DialogTrigger>

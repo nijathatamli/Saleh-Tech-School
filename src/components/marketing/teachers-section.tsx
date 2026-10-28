@@ -56,11 +56,11 @@ export async function TeachersSection() {
               fill
               className="object-cover grayscale contrast-125 transition-all duration-500 group-hover:grayscale-0"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 space-y-1 p-6">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+            <div className="glass glass-smoke glass-lift absolute inset-x-3 bottom-3 space-y-1 rounded-2xl p-4">
               <h3 className="teacher-name font-display text-lg text-white">{t.user.name}</h3>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-teal-400">{t.position}</p>
-              {t.experienceYears > 0 && <p className="text-xs text-grey-200/70">{t.experienceYears} illik təcrübə</p>}
+              <p className="text-[10px] font-bold uppercase tracking-widest text-teal-300">{t.position}</p>
+              {t.experienceYears > 0 && <p className="text-xs text-white/75">{t.experienceYears} illik təcrübə</p>}
             </div>
           </Link>
         ))}

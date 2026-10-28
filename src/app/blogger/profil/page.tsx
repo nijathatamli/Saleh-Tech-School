@@ -9,7 +9,7 @@ export default async function BloggerProfilePage() {
   return (
     <div>
       <BloggerTopbar title="Profil" subtitle="Məqalələrin altında görünən müəllif məlumatları" />
-      <div className="p-6 md:p-10">
+      <div className="ad-content">
         <ProfileForm initial={{ name: author.user.name, email: author.user.email, avatarUrl: author.user.avatarUrl, position: author.position, bio: author.bio }} />
       </div>
     </div>

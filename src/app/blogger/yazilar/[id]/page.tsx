@@ -13,7 +13,7 @@ export default async function EditPostPage({ params }: { params: { id: string } 
   return (
     <div>
       <BloggerTopbar title="Yazını redaktə et" subtitle={p.title} />
-      <div className="p-6 md:p-10">
+      <div className="ad-content">
         <PostEditor
           initial={{
             id: p.id, slug: p.slug, title: p.title, excerpt: p.excerpt, content: p.content, coverUrl: p.coverUrl, coverAlt: p.coverAlt, category: p.category, tags: p.tags,

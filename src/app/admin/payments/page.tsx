@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StatTile } from "@/components/admin/bits";
 import { listPayments } from "@/lib/admin/payments";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { PaymentActions } from "@/components/admin/payment-actions";
@@ -19,13 +20,10 @@ export default async function AdminPaymentsPage({ searchParams }: { searchParams
   return (
     <div>
       <AdminTopbar title="Ödənişlər" subtitle="Dərs əsaslı ödəniş dövrləri" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4">
-          {[["DUE", "Ödəniş vaxtıdır"], ["OVERDUE", "Gecikmiş"], ["PAID", "Ödənilib"], ["CANCELLED", "Ləğv edilib"]].map(([k, l]) => (
-            <Link key={k} href={`/admin/payments?status=${k}`} className={`${card} p-4 transition-colors sm:p-5 hover:border-electric-500 ${status === k ? "border-electric-500" : ""}`}>
-              <p className="text-xs font-bold uppercase tracking-widest text-navy-400">{l}</p>
-              <p className="mt-2 break-words text-2xl font-extrabold sm:text-3xl text-navy-900">{data.counts[k] ?? 0}</p>
-            </Link>
+          {[["DUE", "Ödəniş vaxtıdır"], ["OVERDUE", "Gecikmiş"], ["PAID", "Ödənilib"], ["CANCELLED", "Ləğv edilib"]].map(([k, l], i) => (
+            <StatTile key={k} href={`/admin/payments?status=${k}`} label={l} value={data.counts[k] ?? 0} tone={(["sand", "lilac", "mint", "blue"] as const)[i]} active={status === k} />
           ))}
         </div>
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">

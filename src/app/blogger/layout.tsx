@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AdminHeader } from "@/components/admin/admin-header";
 import { AdminChrome } from "@/components/admin/admin-chrome";
 import { PageTransition } from "@/components/app/page-transition";
 import { bloggerNav } from "@/lib/nav";
-// the blog panel wears the admin panel's design system (same stylesheet, same glass sidebar)
+// the blog panel wears the admin panel's design system (same stylesheet, same top bar with tabs)
 import "@/features/parent-dashboard/styles/fonts.css";
 import "@/components/admin/admin.css";
 
@@ -16,23 +16,26 @@ export default async function BloggerLayout({ children }: { children: React.Reac
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "BLOGGER") redirect("/giris");
 
+  const tabs = bloggerNav.map((n) => ({ href: n.href, label: n.label }));
   return (
     <div className="ad-root">
       <AdminChrome />
-      <div className="ad-glow-a" aria-hidden="true" />
-      <div className="ad-glow-b" aria-hidden="true" />
-      <div className="ad-glow-c" aria-hidden="true" />
-      <AdminSidebar
-        items={bloggerNav}
-        user={{ name: session.user.name ?? "Müəllif", role: "Bloq müəllifi" }}
-        home="/blogger"
-        groups={[["/blogger"], ["/blogger/profil"]]}
-        ariaLabel="Bloq paneli naviqasiyası"
-        logoLabel="Saleh Tech School — bloq paneli"
+      <AdminHeader
+        tabs={tabs}
+        badges={{}}
+        user={{ name: session.user.name ?? "Müəllif", email: session.user.email ?? "" }}
+        shell={{
+          home: "/blogger",
+          ariaLabel: "Bloq paneli naviqasiyası",
+          logoLabel: "Saleh Tech School — bloq paneli",
+          settingsHref: "/blogger/profil",
+          createLabel: "Yeni yazı",
+          create: [{ label: "Yeni yazı", href: "/blogger/yazilar/yeni" }],
+        }}
       />
-      <div className="relative z-[1] min-w-0 md:ml-[270px]">
+      <main className="ad-main">
         <PageTransition>{children}</PageTransition>
-      </div>
+      </main>
     </div>
   );
 }

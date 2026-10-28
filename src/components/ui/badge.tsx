@@ -10,6 +10,7 @@ const badgeVariants = cva("ad-badge inline-flex items-center gap-1 rounded-full 
       success: "ad-badge-success bg-emerald-100 text-emerald-700",
       warning: "ad-badge-warning bg-amber-100 text-amber-700",
       danger: "ad-badge-danger bg-red-100 text-red-700",
+      violet: "ad-badge-violet bg-violet-500/10 text-violet-600",
       "app-electric": "bg-electric-500/10 text-electric-600",
       "app-violet": "bg-amber-500/10 text-amber-600",
       "app-cyan": "bg-teal-500/10 text-teal-600",

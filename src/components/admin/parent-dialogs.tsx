@@ -1,5 +1,6 @@
 "use client";
 
+import { useOpenFromQuery } from "@/components/admin/use-open-from-query";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ function ParentForm({ initial, onDone }: { initial?: { id: string; name: string;
 
 export function CreateParentDialog() {
   const [open, setOpen] = useState(false);
+  useOpenFromQuery("valideyn", setOpen);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild><Button variant="app">Yeni valideyn yarat</Button></DialogTrigger>

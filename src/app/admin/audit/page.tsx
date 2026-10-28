@@ -22,7 +22,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: {
   return (
     <div>
       <AdminTopbar title="Audit jurnalı" subtitle="Kim nəyi nə vaxt dəyişdi" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           <input name="action" defaultValue={searchParams.action} placeholder="Əməliyyat (məs. class., payment., lesson.)" className="w-72 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />
           <select name="entityType" defaultValue={searchParams.entityType ?? ""} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Obyekt">

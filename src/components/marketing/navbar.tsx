@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/app/logo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { PillLinks } from "./pill-nav";
@@ -29,6 +29,39 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname() ?? "";
   const inScholarship = pathname === SCHOLARSHIP_BASE || pathname.startsWith(`${SCHOLARSHIP_BASE}/`);
+
+  // On the landing page the lit link follows the scroll: Kurslar while the courses are on screen, then Valideyn Paneli, then Rəylər
+  // (and Ana Səhifə above them). The hash targets are the section ids already on the page.
+  const [spy, setSpy] = useState("");
+  useEffect(() => {
+    if (pathname !== "/") {
+      setSpy("");
+      return;
+    }
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      const line = window.innerHeight * 0.4;
+      let cur = "";
+      for (const id of ["courses", "parents", "testimonials"]) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= line) cur = id;
+      }
+      setSpy(cur);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
+    compute();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [pathname]);
+  const hashOf = (href: string) => (href.includes("#") ? href.split("#")[1] : "");
 
   if (inScholarship) {
     const isActive = (href: string) => (href === SCHOLARSHIP_BASE ? pathname === href : pathname.startsWith(href));
@@ -85,7 +118,7 @@ export function Navbar() {
           <PillLinks
             label="Əsas naviqasiya"
             items={[
-              ...links.map((l) => ({ href: l.href, label: l.label, active: l.href === "/" ? pathname === "/" : l.href === "/bloq" && (pathname === "/bloq" || pathname.startsWith("/bloq/")) })),
+              ...links.map((l) => ({ href: l.href, label: l.label, active: l.href === "/" ? pathname === "/" && spy === "" : l.href === "/bloq" ? pathname === "/bloq" || pathname.startsWith("/bloq/") : pathname === "/" && !!hashOf(l.href) && hashOf(l.href) === spy })),
               { href: SCHOLARSHIP_BASE, label: "Təqaüd Proqramı", className: "text-primary hover:text-primary" },
             ]}
           />

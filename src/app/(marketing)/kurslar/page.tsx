@@ -11,7 +11,12 @@ export default async function CoursesPage() {
   const courses = await getAllCourses();
 
   return (
-    <div className="px-6 py-20 md:px-20">
+    <div className="relative isolate overflow-hidden px-6 py-20 md:px-20">
+      {/* coloured shapes for the frosted cards to blur */}
+      <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-24 -z-10 h-96 w-96 rounded-full bg-primary/30 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-blue-400/30 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -left-10 bottom-1/4 -z-10 h-80 w-80 rounded-full bg-teal-400/25 blur-3xl" />
+      <div aria-hidden="true" className="pointer-events-none absolute -right-16 bottom-10 -z-10 h-96 w-96 rounded-full bg-violet-400/25 blur-3xl" />
       <JsonLd
         data={[
           breadcrumbLd([{ name: "Kurslar", path: SEO.courses.path }]),

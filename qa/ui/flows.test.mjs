@@ -54,7 +54,13 @@ test("UI-02 sign in with the keyboard only, then sign out: the session is really
     await page.keyboard.type(a.password);
     await Promise.all([page.waitForURL(new RegExp(`${a.home}(/|$|\\?)`), { timeout: 30_000 }), page.keyboard.press("Enter")]);
     await page.waitForLoadState("networkidle").catch(() => {});
-    await Promise.all([page.waitForURL(/\/giris|^\S+\/$/, { timeout: 20_000 }), page.getByRole("button", { name: "Çıxış" }).first().click()]);
+    await page.waitForTimeout(2500); // the router's own link prefetches (started by the sign-in refresh) finish before the session is ended
+    let out = page.getByRole("button", { name: "Çıxış" }).first();
+    if (role === "admin") { // the admin's sign-out lives in the account menu of the top bar
+      await page.getByRole("button", { name: "Hesab menyusu" }).click();
+      out = page.getByRole("menuitem", { name: /Çıxış/ });
+    }
+    await Promise.all([page.waitForURL(/\/giris|^\S+\/$/, { timeout: 20_000 }), out.click()]);
     await page.goto(BASE + a.home);
     assert.match(new URL(page.url()).pathname, /\/giris/, `${role}: protected page still reachable after sign-out`);
     await page.goBack().catch(() => {});
@@ -203,21 +209,22 @@ test("UI-10 admin creates a class through the dialog; it appears in the list and
   await ctx.close();
 });
 
-test("UI-11 the mobile admin menu opens and closes; navigation works at phone width", async () => {
+test("UI-11 admin on a phone: the tab row scrolls sideways (arrow appears), the current tab is kept in view, tapping a tab navigates; the page itself never scrolls sideways", async () => {
   const { ctx, page, errors } = await newPage("mobile");
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
-  const menu = page.getByRole("button", { name: "Menyu", exact: true });
-  assert.equal(await menu.getAttribute("aria-expanded"), "false", "closed menu button says so");
-  assert.equal(await page.locator("#app-mobile-sidebar a").first().isVisible(), false, "the closed drawer's links are not reachable (invisible)");
-  await menu.click();
-  await page.waitForTimeout(400);
-  assert.equal(await menu.getAttribute("aria-expanded"), "true", "open menu button says so");
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(500);
-  assert.equal(await menu.getAttribute("aria-expanded"), "false", "Escape closes the drawer");
-  await menu.click();
-  await page.locator("#app-mobile-sidebar").getByRole("link", { name: "Siniflər" }).click();
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const strip = page.locator("header.ad-header .ad-tabs");
+  const dims = await strip.evaluate((e) => ({ sw: e.scrollWidth, cw: e.clientWidth }));
+  assert.ok(dims.sw > dims.cw, "more tabs than fit: the row scrolls");
+  assert.equal(await page.locator(".ad-tab-arrow.r").getAttribute("data-show"), "true", "an arrow tells there is more on the right");
+  assert.equal(await page.locator("#app-mobile-sidebar").count(), 0, "no drawer any more");
+  const link = strip.getByRole("link", { name: "Siniflər" });
+  await link.scrollIntoViewIfNeeded();
+  await link.click();
   await page.waitForURL(/\/admin\/classes/);
+  await page.waitForTimeout(700);
+  const vis = await strip.locator('[aria-current="page"]').evaluate((e) => { const r = e.getBoundingClientRect(); const s = e.parentElement.getBoundingClientRect(); return r.left >= s.left - 1 && r.right <= s.right + 1; });
+  assert.ok(vis, "the current tab is in view");
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), true, "horizontal scroll on /admin/classes");
   assert.deepEqual(errors, []);
   await ctx.close();
@@ -308,13 +315,17 @@ test("UI-15 bell panel (teacher and student): opens, lists notices, 'mark all re
   }
 });
 
-test("UI-16 admin account menu: 'Ayarlar' opens the settings page, there is no dead 'Profil' entry, the bell leads to notifications", async () => {
+test("UI-16 admin header: the gear opens the settings page, the account menu has no dead 'Profil' entry and signs out, the bell leads to notifications", async () => {
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
   await page.getByRole("button", { name: "Hesab menyusu" }).click();
   assert.equal(await page.getByRole("menuitem", { name: /Profil/ }).count(), 0, "a 'Profil' item with no destination is back");
-  await page.getByRole("menuitem", { name: /Ayarlar/ }).click();
+  assert.equal(await page.getByRole("menuitem", { name: /Çıxış/ }).count(), 1, "sign-out is in the account menu");
+  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: /^Bildirişlər/ }).click();
+  await page.waitForURL(/\/admin\/notifications/, { timeout: 15_000 });
+  await page.getByRole("link", { name: "Tənzimləmələr" }).click();
   await page.waitForURL(/\/admin\/settings/, { timeout: 15_000 });
   assert.deepEqual(errors, []);
   await ctx.close();
@@ -790,41 +801,59 @@ test("UI-28 parent phone 'Ana' screen shows the same sections as the computer on
   assert.ok(phone.sw <= 390, "the phone Ana screen scrolls sideways");
 });
 
-test("UI-29 admin design: glass sidebar, pill hover glides between items and hides when the cursor leaves, the active capsule follows the page, all 16 items fit", async () => {
+test("UI-29 admin design (flat dashboard look): white top bar with search, blue action menu, gear, bell and account; text tabs with a sliding blue underline; white cards on a grey canvas", async () => {
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
-  const aside = page.locator("aside.ad-glass").first();
-  assert.match(await aside.evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter), /blur/, "the sidebar is liquid glass (backdrop blur)");
-  const links = page.locator("aside.ad-glass").first().locator("a.ad-navlink");
-  assert.equal(await links.count(), 16);
-  // every item is reachable without scrolling the list (900px high window)
-  const hidden = await links.evaluateAll((els) => els.filter((e) => { const r = e.getBoundingClientRect(); const box = e.closest("nav").getBoundingClientRect(); return r.bottom > box.bottom + 1; }).length);
-  assert.equal(hidden, 0, "a nav item is cut off at the bottom of the sidebar");
-  const hover = aside.locator(".ad-pill-hover");
-  assert.equal(await hover.getAttribute("data-on"), "false", "no capsule before the cursor is over the list");
-  const yOf = async (i) => links.nth(i).evaluate((e) => e.offsetTop);
-  const pillY = () => hover.evaluate((e) => new DOMMatrix(getComputedStyle(e).transform).m42);
-  await links.nth(2).hover();
-  await page.waitForTimeout(400);
-  assert.equal(await hover.getAttribute("data-on"), "true");
-  assert.equal(Math.round(await pillY()), await yOf(2), "the capsule sits behind the hovered item");
-  await links.nth(6).hover();
-  await page.waitForTimeout(450);
-  assert.equal(Math.round(await pillY()), await yOf(6), "the capsule glided to the next item");
-  assert.match(await hover.evaluate((e) => getComputedStyle(e).transitionProperty), /transform/, "it animates with transform");
-  await page.mouse.move(900, 500); // away from the sidebar
-  await page.waitForTimeout(400);
-  assert.equal(await hover.getAttribute("data-on"), "false", "the capsule fades out when the cursor leaves");
-  // the orange capsule marks the current page and moves with navigation
-  const activeY = () => aside.locator(".ad-pill-active").evaluate((e) => new DOMMatrix(getComputedStyle(e).transform).m42);
-  assert.equal(Math.round(await activeY()), await yOf(0), "Dashboard is the active item on /admin");
-  await links.nth(5).click();
+  const header = page.locator("header.ad-header");
+  assert.equal(await header.evaluate((e) => getComputedStyle(e).position), "sticky", "the bar stays on top while the page scrolls");
+  assert.equal(await header.evaluate((e) => getComputedStyle(e).backgroundColor), "rgb(255, 255, 255)");
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector(".ad-root")).backgroundColor), "rgb(243, 245, 249)", "cool grey canvas");
+  assert.match(await page.evaluate(() => getComputedStyle(document.querySelector(".ad-root")).fontFamily), /Plus Jakarta Sans/);
+  const cta = header.getByRole("button", { name: "Yarat" });
+  assert.equal(await cta.evaluate((e) => getComputedStyle(e).backgroundColor), "rgb(59, 130, 246)", "the action button is blue");
+  // tabs: 14 pages (settings = gear, notifications = bell), the current one is bold with the underline under it
+  const tabs = header.locator("nav a.ad-tab");
+  assert.equal(await tabs.count(), 14);
+  const ink = header.locator(".ad-tab-ink");
+  const inkX = () => ink.evaluate((e) => ({ x: new DOMMatrix(getComputedStyle(e).transform).m41, w: e.getBoundingClientRect().width }));
+  const geom = (i) => tabs.nth(i).evaluate((e) => ({ x: e.offsetLeft, w: e.offsetWidth }));
+  await page.waitForTimeout(700); // the underline grows into place on arrival
+  let g = await geom(0);
+  let k = await inkX();
+  assert.equal(Math.round(k.x), g.x, "the underline is under Dashboard");
+  assert.ok(Math.abs(k.w - g.w) <= 1);
+  assert.equal(await tabs.nth(0).getAttribute("aria-current"), "page");
+  assert.equal(await tabs.nth(0).evaluate((e) => getComputedStyle(e).fontWeight), "700");
+  await tabs.nth(5).click();
   await page.waitForURL(/\/admin\/classes/);
-  await page.waitForTimeout(600);
-  assert.equal(await links.nth(5).getAttribute("aria-current"), "page");
-  assert.equal(Math.round(await activeY()), await yOf(5), "the active capsule slid to Siniflər");
-  assert.deepEqual(errors, []);
+  await page.waitForTimeout(700);
+  g = await geom(5);
+  k = await inkX();
+  assert.equal(await tabs.nth(5).getAttribute("aria-current"), "page");
+  assert.equal(Math.round(k.x), g.x, "the underline slid to Siniflər");
+  assert.match(await ink.evaluate((e) => getComputedStyle(e).transitionProperty), /transform/, "it slides with transform");
+  // cards are flat white with a small radius (no glass)
+  await page.goto(BASE + "/admin");
+  await page.waitForLoadState("networkidle").catch(() => {});
+  const card = await page.locator(".ad-card").first().evaluate((e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, r: c.borderTopLeftRadius, bf: c.backdropFilter }; });
+  assert.equal(card.bg, "rgb(255, 255, 255)");
+  assert.equal(card.r, "10px");
+  assert.ok(!/blur/.test(card.bf), "flat, not frosted");
+  // the header search finds students; the action menu opens the create dialog of the chosen page
+  await header.getByRole("search").getByRole("searchbox").fill("Ali");
+  await page.keyboard.press("Enter");
+  await page.waitForURL(/\/admin\/students\?q=Ali/);
+  await cta.click();
+  await page.getByRole("menuitem", { name: "Yeni sinif" }).click();
+  await page.waitForURL(/\/admin\/classes/);
+  await page.getByRole("dialog").getByText("Yeni sinif").first().waitFor({ state: "visible", timeout: 10_000 });
+  assert.equal(new URL(page.url()).searchParams.get("yarat"), null, "the address is cleaned after the dialog opened");
+  // the dialog is a plain white sheet; the close button works
+  assert.equal(await page.locator(".ad-dialog").evaluate((e) => getComputedStyle(e).borderTopLeftRadius), "8px");
+  await page.keyboard.press("Escape");
+  assert.equal(await page.getByRole("dialog").count(), 0);
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
   await ctx.close();
 });
 
@@ -835,9 +864,9 @@ const rgbOf = (css) => css.match(/[\d.]+/g).slice(0, 3).map(Number);
 test("UI-30 admin accessibility basics: contrast, minimum text size, visible focus, 44px touch targets, grouped nav with counts, helpful empty states", async () => {
   const { ctx, page, errors } = await newPage();
   await signIn(page, ADMIN.email, ADMIN.password, "/admin");
-  // 1) grouped navigation: 6 groups -> 5 separators, all 16 pages still listed
+  // 1) the tabs carry the pending-work counts for assistive technology as well
   await page.waitForLoadState("networkidle").catch(() => {});
-  assert.equal(await page.locator("aside.ad-glass").first().locator(".ad-sep").count(), 5, "nav groups");
+  assert.ok(await page.locator("header.ad-header nav .sr-only", { hasText: /gözləyir/ }).count() >= 1, "tab counts are announced");
   // 2) contrast >= 4.5:1 for the colours used for small text on white
   await page.goto(BASE + "/admin");
   await page.waitForLoadState("networkidle").catch(() => {});
@@ -847,8 +876,8 @@ test("UI-30 admin accessibility basics: contrast, minimum text size, visible foc
     const label = document.querySelector("p.text-navy-400, .text-navy-400");
     return { link: link ? css(link, "color") : null, label: label ? css(label, "color") : null };
   });
-  const WHITE = [255, 255, 255], PAPER = [247, 247, 245];
-  if (colours.link) assert.ok(ratio(rgbOf(colours.link), WHITE) >= 4.5, `orange link text ${colours.link} has contrast ${ratio(rgbOf(colours.link), WHITE).toFixed(2)}`);
+  const WHITE = [255, 255, 255], PAPER = [243, 245, 249];
+  if (colours.link) assert.ok(ratio(rgbOf(colours.link), WHITE) >= 4.5, `blue link text ${colours.link} has contrast ${ratio(rgbOf(colours.link), WHITE).toFixed(2)}`);
   assert.ok(ratio(rgbOf(colours.label), PAPER) >= 4.5, `muted label ${colours.label} on the page background: ${ratio(rgbOf(colours.label), PAPER).toFixed(2)}`);
   await page.goto(BASE + "/admin/students");
   await page.waitForLoadState("networkidle").catch(() => {});
@@ -1056,7 +1085,7 @@ test("UI-33 blog author panel: write with the toolbar, preview, upload a cover, 
 
   // save as a draft first: the address becomes /blogger/yazilar/<id>; not on the site yet
   await page.getByRole("button", { name: "Qaralama kimi saxla" }).click();
-  await page.waitForURL(/\/blogger\/yazilar\/[a-z0-9]+$/, { timeout: 20_000 });
+  await page.waitForURL(/\/blogger\/yazilar\/(?!yeni$)[a-z0-9]+$/, { timeout: 20_000 }); // not the /yeni form itself: wait for the saved post's address
   const slug = `ui-bloq-yazisi-${t}`;
   const row = (await sql(`select status, category, tags, "readingMinutes" rm from "BlogPost" where slug=$1`, [slug]))[0];
   assert.equal(row.status, "DRAFT");
@@ -1397,6 +1426,19 @@ test("UI-37 footer glass dock: real links (home, blog, contact, e-mail), tooltip
   assert.equal(await page.locator("footer h4", { hasText: "Bizi İzləyin" }).count(), 0, "the old social column is replaced by the dock");
   const d = () => page.evaluate(() => document.querySelector('a[aria-label="Bloq"] [data-dock-morph] path').getAttribute("d"));
   const rest = await d(); // the blog icon's own shape, before anything was hovered
+  // the Tezsayt credit is a frosted pill that reacts to hover: lifts, edge glows, the logo capsule swells
+  const tz = page.locator("a.tz-pill");
+  const tzState = () => tz.evaluate((a) => ({ y: new DOMMatrix(getComputedStyle(a).transform).f, border: getComputedStyle(a).borderColor, logo: new DOMMatrix(getComputedStyle(a.querySelector(".tz-logo")).transform).a, blur: getComputedStyle(a).backdropFilter }));
+  const tz0 = await tzState();
+  await tz.scrollIntoViewIfNeeded();
+  await tz.hover();
+  await page.waitForTimeout(700);
+  const tz1 = await tzState();
+  assert.ok(tz1.y < tz0.y - 1.5, `the pill lifts on hover (${tz0.y} → ${tz1.y})`);
+  assert.ok(tz1.logo > tz0.logo + 0.04, `the logo capsule swells (${tz0.logo} → ${tz1.logo})`);
+  assert.notEqual(tz1.border, tz0.border, "the edge changes colour (glows)");
+  assert.match(tz1.blur, /blur\(24px\)/, "the frost deepens");
+  await page.mouse.move(5, 5);
   // hovering shows the label centred above the icon
   const blog = dock.locator('a[aria-label="Bloq"]');
   await blog.hover();
@@ -1438,4 +1480,343 @@ test("UI-37 footer glass dock: real links (home, blog, contact, e-mail), tooltip
     await Promise.all([pp.waitForURL(/\/bloq$/), pp.locator("nav.glass-dock a[aria-label='Bloq']").tap()]);
     await phone.close();
   }
+});
+
+test("UI-38 landing stats numbers roll like an odometer: every digit is a reel that spins with motion blur, lands on the right value, staggered left to right; reduced motion shows the numbers at once; accessible values are the real numbers", async () => {
+  const { ctx, page, errors } = await newPage();
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  const sec = page.locator("section", { has: page.locator(".odo") });
+  await page.waitForSelector(".odo-reel");
+  // armed at 0 until the section is on screen (nothing has spun yet)
+  const ty = () => sec.evaluate((s) => [...s.querySelectorAll(".odo-reel")].map((r) => { const m = new DOMMatrix(getComputedStyle(r).transform); return m.f; }));
+  const emFinal = () => sec.evaluate((s) => [...s.querySelectorAll(".odo-reel")].map((r) => -Number(getComputedStyle(r).getPropertyValue("--odo-end")) * 1.15 * parseFloat(getComputedStyle(r).fontSize)));
+  assert.ok((await ty()).every((v) => v === 0), "reels wait at 0 below the fold");
+  await sec.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(450);
+  const mid = await ty();
+  const final = await emFinal();
+  assert.ok(mid.some((v, i) => Math.abs(v - final[i]) > 5), "digits are mid-roll shortly after the section appears");
+  const blur = await sec.evaluate((s) => [...s.querySelectorAll(".odo-reel")].map((r) => getComputedStyle(r).filter));
+  assert.ok(blur.some((f) => /blur\((?!0px)/.test(f)), `motion blur while spinning (${blur[0]})`);
+  // staggered: the first digit lands before the last one
+  const delays = await sec.evaluate((s) => [...s.querySelectorAll(".odo-reel")].map((r) => parseInt(getComputedStyle(r).getPropertyValue("--odo-delay"))));
+  assert.ok(delays[0] < delays[delays.length - 1], "digits start one after another");
+  await page.waitForTimeout(4200);
+  const landed = await ty();
+  assert.ok(landed.every((v, i) => Math.abs(v - final[i]) < 1.5), `every reel landed on its digit (${landed.map((v) => Math.round(v))} vs ${final.map((v) => Math.round(v))})`);
+  // what a reader / search engine gets: the real numbers
+  assert.deepEqual(await sec.evaluate((s) => [...s.querySelectorAll("[aria-label]")].map((e) => e.getAttribute("aria-label"))), ["100+", "20+", "15+", "98%"]);
+  assert.equal(await sec.locator(".odo-label.is-rolling").count(), 4, "the four labels rose in after the digits landed");
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
+  await ctx.close();
+  // reduced motion: final numbers immediately, no spinning
+  const calm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: "reduce" });
+  const cp = await calm.newPage();
+  await cp.goto(BASE + "/", { waitUntil: "networkidle" });
+  const csec = cp.locator("section", { has: cp.locator(".odo") });
+  await csec.scrollIntoViewIfNeeded();
+  await cp.waitForTimeout(200);
+  const cty = await csec.evaluate((s) => [...s.querySelectorAll(".odo-reel")].map((r) => [new DOMMatrix(getComputedStyle(r).transform).f, -Number(getComputedStyle(r).getPropertyValue("--odo-end")) * 1.15 * parseFloat(getComputedStyle(r).fontSize)]));
+  assert.ok(cty.every(([a, b2]) => Math.abs(a - b2) < 1.5), "numbers are already final under reduced motion");
+  await calm.close();
+});
+
+test("UI-39 landing navbar follows the scroll: the lit link is Ana Səhifə at the top, Kurslar over the courses, Valideyn Paneli over the parents section, Rəylər over the reviews; the capsule is the exact orange of the Qeydiyyat button with a white label; opening /#courses lights Kurslar", async () => {
+  const { ctx, page, errors } = await newPage();
+  await page.goto(BASE + "/", { waitUntil: "networkidle" });
+  const nav = page.getByRole("navigation", { name: "Əsas naviqasiya" });
+  const current = async () => { await page.waitForTimeout(450); return nav.locator('[aria-current="page"]').allInnerTexts(); };
+  assert.deepEqual(await current(), ["Ana Səhifə"], "top of the page");
+  for (const [id, label] of [["courses", "Kurslar"], ["parents", "Valideyn Paneli"], ["testimonials", "Rəylər"]]) {
+    await page.evaluate((i) => { const el = document.getElementById(i); window.scrollTo(0, el.getBoundingClientRect().top + scrollY - 120); }, id);
+    assert.deepEqual(await current(), [label], `over #${id}`);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  assert.deepEqual(await current(), ["Ana Səhifə"], "back at the top");
+  // the capsule: orange glass, white label
+  const look = (e) => { const c = getComputedStyle(e); return { bg: c.backgroundColor, img: c.backgroundImage, border: c.borderTopWidth, shadow: c.boxShadow }; };
+  const cap = await nav.locator(".pill-nav-active").evaluate(look);
+  assert.equal(await nav.locator(".pill-nav-active").getAttribute("data-on"), "true");
+  const signUp = await page.locator("header a", { hasText: /Qeydiyyat/i }).first().evaluate(look);
+  assert.equal(cap.bg, signUp.bg, `the capsule is exactly the colour of the Qeydiyyat button (${cap.bg} vs ${signUp.bg})`);
+  assert.equal(cap.img, "none", "flat: no sheen or gradient over the colour");
+  assert.equal(signUp.img, "none");
+  const flat = (x) => x.replace(/rgba\(0, 0, 0, 0\) 0px 0px 0px 0px, /g, ""); // Tailwind prepends two transparent ring layers
+  assert.equal(flat(cap.shadow), flat(signUp.shadow), "the same shadow as the button");
+  assert.equal(await nav.locator('[aria-current="page"]').evaluate((e) => getComputedStyle(e).color), "rgb(255, 255, 255)", "white label on the orange capsule");
+  assert.deepEqual(errors.filter((e) => !/Failed to load resource/.test(e)), []);
+  // landing on a hash address
+  await page.goto(BASE + "/#courses", { waitUntil: "networkidle" });
+  await page.waitForTimeout(900);
+  assert.deepEqual(await nav.locator('[aria-current="page"]').allInnerTexts(), ["Kurslar"], "/#courses lights Kurslar");
+  // other pages are unchanged: the blog link is lit on /bloq
+  await page.goto(BASE + "/bloq", { waitUntil: "networkidle" });
+  assert.deepEqual(await nav.locator('[aria-current="page"]').allInnerTexts(), ["Bloq"]);
+  await ctx.close();
+});
+
+// ---- UI-40 / UI-41: notification banners in every panel and the sign-in page ------------------------------------------
+const userId = (email) => sql(`select id from "User" where lower(email)=lower($1)`, [email]).then((r) => r[0].id);
+const notify = (id, title, body = "QA body") =>
+  sql(`insert into "Notification"(id,"userId",title,body,type,read,"createdAt") values (gen_random_uuid()::text,$1,$2,$3,'info',false,now() at time zone 'utc')`, [id, title, body]);
+const SPY = () => {
+  // counts the notes the chime plays (every note is a few oscillators)
+  window.__osc = 0;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  const o = AC.prototype.createOscillator;
+  AC.prototype.createOscillator = function () { window.__osc++; return o.call(this); };
+};
+// records where the banner is on every animation frame from the moment it exists
+const WATCH = () => {
+  window.__path = [];
+  const tick = () => {
+    const b = document.querySelector(".nt-banner");
+    if (b) { const r = b.getBoundingClientRect(); window.__path.push({ l: r.left, r: r.right, t: r.top, b: r.bottom, o: +getComputedStyle(b).opacity }); }
+    if (window.__path.length < 90) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+};
+
+test("UI-40 new notifications slide in as a glass banner with a chime in every panel (admin, teacher, student, parent): from the edge, once, closable, mutable; phone from the top", async () => {
+  const people = { admin: ACCOUNTS.admin.email, teacher: w.teacherA.email, student: w.student1.email, parent: w.parent1.email };
+  const pw = { admin: ACCOUNTS.admin.password, teacher: w.pw, student: w.pw, parent: w.pw };
+  const home = { admin: "/admin", teacher: "/teacher", student: "/student", parent: "/parent" };
+  for (const role of Object.keys(people)) {
+    const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+    await ctx.addInitScript(SPY);
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(String(e).slice(0, 200)));
+    await page.goto(BASE + "/giris", { waitUntil: "domcontentloaded" });
+    await page.fill('input[type="email"]', people[role]);
+    await page.fill('input[type="password"]', pw[role]);
+    await Promise.all([page.waitForURL(new RegExp(`${home[role]}(/|$|\\?)`), { timeout: 30_000 }), page.click('button[type="submit"]')]);
+    await page.waitForLoadState("networkidle").catch(() => {});
+    await page.waitForTimeout(600); // the first poll has set the cursor
+    assert.equal(await page.locator(".nt-banner").count(), 0, `${role}: nothing is announced just for opening the page`);
+    await page.mouse.click(5, 5); // a touch of the page unlocks sound, as a real visitor's click would
+
+    const id = await userId(people[role]);
+    await page.evaluate(WATCH);
+    await notify(id, `QA banner ${role}`, "Salam, bu yoxlama bildirişidir.");
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    const banner = page.locator(".nt-banner", { hasText: `QA banner ${role}` });
+    await banner.waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(900);
+    const path = await page.evaluate(() => window.__path);
+    const vw = VIEWPORTS.desktop.width;
+    assert.ok(path[0].l > vw - 120, `${role}: the banner starts at the right edge, off screen (${path[0].l})`);
+    const end = path[path.length - 1];
+    assert.ok(end.r <= vw - 8 && end.l > vw - 460 && end.t >= 0 && end.t < 40, `${role}: it settles in the top-right corner (${JSON.stringify(end)})`);
+    assert.ok(end.o > 0.98);
+    assert.ok((await page.evaluate(() => window.__osc)) >= 3, `${role}: the chime played`);
+    const look = await banner.evaluate((e) => { const c = getComputedStyle(e); return { f: c.backdropFilter || c.webkitBackdropFilter, bg: c.backgroundImage }; });
+    assert.match(look.f, /blur/, `${role}: the banner is frosted glass`);
+    assert.match(await banner.innerText(), /Saleh Tech School[\s\S]*QA banner[\s\S]*bu yoxlama/i);
+    // not delivered twice
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await page.waitForTimeout(800);
+    assert.equal(await page.locator(".nt-banner", { hasText: `QA banner ${role}` }).count(), 1, `${role}: one banner for one notification`);
+    if (role === "admin") {
+      // the banner is a link to the notification page
+      await banner.locator(".nt-main").click();
+      await page.waitForURL(/\/admin\/notifications/, { timeout: 15_000 });
+    } else if (role === "teacher") {
+      // mute: the next one is silent; the choice is remembered; the close button removes the banner
+      await banner.getByRole("button", { name: /səsini söndür/ }).click();
+      assert.equal(await page.evaluate(() => localStorage.getItem("sts-notif-sound")), "off");
+      const before = await page.evaluate(() => window.__osc);
+      await notify(id, "QA second teacher");
+      await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+      await page.locator(".nt-banner", { hasText: "QA second teacher" }).waitFor({ state: "visible", timeout: 10_000 });
+      assert.equal(await page.evaluate(() => window.__osc), before, "muted: no chime");
+      await banner.getByRole("button", { name: "Bildirişi bağla" }).click();
+      await banner.waitFor({ state: "detached", timeout: 5_000 });
+    } else if (role === "student") {
+      // it leaves by itself after a few seconds
+      await banner.waitFor({ state: "detached", timeout: 12_000 });
+    }
+    assert.deepEqual(errors, [], `${role}: no page errors`);
+    await ctx.close();
+  }
+});
+
+test("UI-40b notification banner on a phone comes down from the top of the screen, centred; a reduced-motion visitor gets a fade only", async () => {
+  const id = await userId(w.parent1.email);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/giris", { waitUntil: "domcontentloaded" });
+  await page.fill('input[type="email"]', w.parent1.email);
+  await page.fill('input[type="password"]', w.pw);
+  await Promise.all([page.waitForURL(/\/parent/, { timeout: 30_000 }), page.click('button[type="submit"]')]);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await page.waitForTimeout(600);
+  await page.evaluate(WATCH);
+  await notify(id, "QA phone banner");
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await page.locator(".nt-banner", { hasText: "QA phone banner" }).waitFor({ state: "visible", timeout: 10_000 });
+  await page.waitForTimeout(900);
+  const path = await page.evaluate(() => window.__path);
+  assert.ok(path[0].b < 60, `it starts above the screen (bottom edge ${path[0].b})`);
+  const end = path[path.length - 1];
+  assert.ok(end.l >= 4 && end.r <= 386 && end.t >= 0 && end.t < 40, `it settles at the top and fits the width (${JSON.stringify(end)})`);
+  await ctx.close();
+
+  const rm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: "reduce" });
+  const p2 = await rm.newPage();
+  await p2.goto(BASE + "/giris", { waitUntil: "domcontentloaded" });
+  await p2.fill('input[type="email"]', w.parent1.email);
+  await p2.fill('input[type="password"]', w.pw);
+  await Promise.all([p2.waitForURL(/\/parent/, { timeout: 30_000 }), p2.click('button[type="submit"]')]);
+  await p2.waitForLoadState("networkidle").catch(() => {});
+  await p2.waitForTimeout(600);
+  await p2.evaluate(WATCH);
+  await notify(id, "QA calm banner");
+  await p2.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await p2.locator(".nt-banner", { hasText: "QA calm banner" }).waitFor({ state: "visible", timeout: 10_000 });
+  await p2.waitForTimeout(500);
+  const calm = await p2.evaluate(() => window.__path);
+  assert.ok(calm[0].r <= VIEWPORTS.desktop.width - 8, "reduced motion: it appears in place, it does not fly in");
+  await rm.close();
+});
+
+test("UI-41 sign-in page: frosted glass card over coloured light, the mascot looks away while the password is typed, winks on success, wonders after a mistake; eye button; phones fit; reduced motion is still", async () => {
+  const { ctx, page, errors } = await newPage();
+  await page.goto(BASE + "/giris", { waitUntil: "load" });
+  await page.waitForTimeout(1800);
+  const card = page.locator(".auth-card");
+  assert.match(await card.evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter), /blur/, "the card is frosted glass");
+  assert.ok((await page.locator(".auth-fox-img").first().boundingBox()).width > 200, "the mascot is there");
+  await page.locator(".auth-bubble", { hasText: /Salam/ }).waitFor({ state: "visible", timeout: 5_000 });
+  // password field: eyes close (frame 50), the bubble says so; leaving the field opens them again
+  await page.click("#password");
+  await page.waitForFunction(() => document.querySelector('.auth-fox-frame[data-on="true"]')?.getAttribute("src")?.includes("f050"), null, { timeout: 5_000 });
+  await page.locator(".auth-bubble", { hasText: /baxmıram/ }).waitFor({ state: "visible", timeout: 5_000 });
+  await page.click("#email");
+  await page.waitForFunction(() => !document.querySelector('.auth-fox-frame[data-on="true"]') && document.querySelector('.auth-fox-img[data-on="true"]'), null, { timeout: 5_000 });
+  await page.locator(".auth-bubble", { hasText: /Salam/ }).waitFor({ state: "visible", timeout: 5_000 });
+  // the eye button shows and hides the password
+  await page.fill("#password", "secret-pass");
+  const eye = page.getByRole("button", { name: "Şifrəni göstər" });
+  await eye.click();
+  assert.equal(await page.locator("#password").getAttribute("type"), "text");
+  await page.getByRole("button", { name: "Şifrəni gizlət" }).click();
+  assert.equal(await page.locator("#password").getAttribute("type"), "password");
+  // wrong password: message, mascot wonders
+  await page.fill("#email", ACCOUNTS.admin.email);
+  await page.fill("#password", "definitely-wrong");
+  await page.click('button[type="submit"]');
+  await page.getByRole("alert").waitFor({ state: "visible", timeout: 15_000 });
+  await page.locator(".auth-bubble", { hasText: /bir də yoxla/ }).waitFor({ state: "visible", timeout: 5_000 });
+  // right password: the mascot winks, the button says so, then the panel opens
+  await page.fill("#password", ACCOUNTS.admin.password);
+  await page.evaluate(() => {
+    window.__frames = new Set();
+    new MutationObserver(() => { const f = document.querySelector('.auth-fox-frame[data-on="true"]'); if (f) window.__frames.add(f.getAttribute("src")); }).observe(document.body, { attributes: true, subtree: true, attributeFilter: ["data-on"] });
+  });
+  await page.click('button[type="submit"]');
+  await page.waitForFunction(() => window.__frames.size >= 6, null, { timeout: 8_000 });
+  assert.match(await page.locator('button[type="submit"]').textContent(), /Daxil oldunuz/);
+  await page.waitForURL(/\/admin/, { timeout: 30_000 });
+  assert.deepEqual(errors, []);
+  await ctx.close();
+
+  // forgot-password page uses the same glass card
+  const f = await newPage();
+  await f.page.goto(BASE + "/sifre-unutdum", { waitUntil: "load" });
+  assert.match(await f.page.locator(".auth-card").evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter), /blur/);
+  await f.page.locator(".auth-bubble", { hasText: /Narahat olma/ }).waitFor({ state: "visible", timeout: 5_000 });
+  await f.ctx.close();
+
+  // phones: nothing scrolls sideways, the field text stays readable
+  for (const width of [320, 390]) {
+    const m = await browser.newContext({ viewport: { width, height: 800 }, isMobile: true, hasTouch: true });
+    const p = await m.newPage();
+    await p.goto(BASE + "/giris", { waitUntil: "load" });
+    await p.waitForTimeout(1500);
+    assert.ok((await p.evaluate(() => document.documentElement.scrollWidth)) <= width, `@${width}: no sideways scroll`);
+    const box = await p.locator(".auth-card").boundingBox();
+    assert.ok(box.x >= 0 && box.x + box.width <= width, `@${width}: the card fits`);
+    await m.close();
+  }
+
+  // reduced motion: only the still picture, no frames are loaded, everything is there at once
+  const rm = await browser.newContext({ viewport: VIEWPORTS.desktop, reducedMotion: "reduce" });
+  const rp = await rm.newPage();
+  await rp.goto(BASE + "/giris", { waitUntil: "load" });
+  await rp.waitForTimeout(500);
+  assert.equal(await rp.locator(".auth-fox-frame").count(), 0, "no animation frames with reduced motion");
+  assert.ok(await rp.locator("#email").isVisible());
+  await rm.close();
+});
+
+test("UI-42 glass theme toggle in the navbar: same place, bead rolls from the left (day) to the right (night) and back, the page theme and the saved choice follow, labels and icons cross-fade, aria-pressed tells the state; phones keep the header inside the screen", async () => {
+  const { ctx, page, errors } = await newPage();
+  await page.goto(BASE + "/", { waitUntil: "load" });
+  await page.waitForTimeout(800);
+  const t = page.getByRole("button", { name: "Tema dəyiş" }).first();
+  const dark = () => page.evaluate(() => document.documentElement.classList.contains("dark"));
+  const beadX = () => t.locator(".gt-bead").evaluate((e) => e.getBoundingClientRect().left - e.parentElement.getBoundingClientRect().left);
+  assert.equal(await dark(), false);
+  const dayX = await beadX();
+  assert.ok(dayX < 4, `day: the bead is at the left end (${dayX})`);
+  assert.equal(await t.getAttribute("aria-pressed"), "false");
+  assert.equal(await t.locator(".gt-fill-day").evaluate((e) => getComputedStyle(e).opacity), "1");
+  await t.click();
+  await page.waitForTimeout(900);
+  assert.equal(await dark(), true);
+  assert.equal(await page.evaluate(() => localStorage.getItem("theme")), "dark");
+  const box = await t.boundingBox();
+  const nightX = await beadX();
+  assert.ok(nightX > box.width - 56 + 2, `night: the bead is at the right end (${nightX} of ${box.width})`);
+  assert.equal(await t.getAttribute("aria-pressed"), "true");
+  assert.equal(await t.locator(".gt-fill-night").evaluate((e) => getComputedStyle(e).opacity), "1");
+  assert.equal(await t.locator(".gt-fill-day").evaluate((e) => getComputedStyle(e).opacity), "0");
+  assert.equal(await t.locator(".gt-icon-moon").evaluate((e) => getComputedStyle(e).opacity), "1");
+  assert.match(await t.locator(".gt-lens").evaluate((e) => getComputedStyle(e).backdropFilter || getComputedStyle(e).webkitBackdropFilter), /blur/, "the bead is glass");
+  await page.reload({ waitUntil: "load" });
+  assert.equal(await dark(), true, "the choice survives a reload");
+  await page.getByRole("button", { name: "Tema dəyiş" }).first().click();
+  await page.waitForTimeout(800);
+  assert.equal(await dark(), false, "and back to day");
+  assert.deepEqual(errors, []);
+  await ctx.close();
+});
+
+test("UI-40c notification sound with a browser that has not allowed audio yet: the banner says how to turn it on and the chime plays with the first tap", async () => {
+  const id = await userId(w.student1.email);
+  const ctx = await browser.newContext({ viewport: VIEWPORTS.desktop });
+  // a context that stays suspended until it is resumed inside a real tap, like a browser that blocks autoplay
+  await ctx.addInitScript(() => {
+    window.__osc = 0;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    let tapped = false;
+    addEventListener("pointerdown", () => { tapped = true; }, true);
+    const resume = AC.prototype.resume;
+    AC.prototype.resume = function () { return tapped ? resume.call(this) : Promise.resolve(); };
+    Object.defineProperty(AC.prototype, "state", { get() { return tapped ? "running" : "suspended"; }, configurable: true });
+    const o = AC.prototype.createOscillator;
+    AC.prototype.createOscillator = function () { window.__osc++; return o.call(this); };
+  });
+  const page = await ctx.newPage();
+  await page.goto(BASE + "/giris", { waitUntil: "domcontentloaded" });
+  await page.fill('input[type="email"]', w.student1.email);
+  await page.fill('input[type="password"]', w.pw);
+  await page.evaluate(() => { window.__tapped = false; });
+  // sign in with the keyboard: no pointer event happens on the page
+  await page.focus('input[type="password"]');
+  await Promise.all([page.waitForURL(/\/student/, { timeout: 30_000 }), page.keyboard.press("Enter")]);
+  await page.waitForLoadState("networkidle").catch(() => {});
+  await page.waitForTimeout(600);
+  await notify(id, "QA silent banner");
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  const banner = page.locator(".nt-banner", { hasText: "QA silent banner" });
+  await banner.waitFor({ state: "visible", timeout: 10_000 });
+  await banner.locator(".nt-hint").waitFor({ state: "visible", timeout: 3_000 });
+  assert.equal(await page.evaluate(() => window.__osc), 0, "nothing was played while audio was blocked");
+  await page.mouse.click(5, 5);
+  await page.waitForFunction(() => window.__osc >= 3, null, { timeout: 5_000 });
+  await banner.locator(".nt-hint").waitFor({ state: "detached", timeout: 3_000 });
+  await ctx.close();
 });

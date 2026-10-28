@@ -25,7 +25,7 @@ export default async function AdminStudentDetailPage({ params }: { params: { id:
   return (
     <div>
       <AdminTopbar title={s.name} subtitle={s.email ?? "giriş yoxdur"} />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <Link href="/admin/students" className="text-xs font-bold text-electric-600 hover:underline">← Bütün tələbələr</Link>
         <div className={`${card} p-6`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

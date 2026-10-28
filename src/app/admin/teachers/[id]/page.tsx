@@ -20,7 +20,7 @@ export default async function AdminTeacherDetailPage({ params }: { params: { id:
   return (
     <div>
       <AdminTopbar title={t.name} subtitle={`${t.position} · ${t.email}`} />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <Link href="/admin/teachers" className="text-xs font-bold text-electric-600 hover:underline">← Bütün müəllimlər</Link>
         <div className={`${card} flex flex-wrap items-center justify-between gap-4 p-6`}>
           <div><div className="flex items-center gap-3"><h2 className="font-display text-xl text-navy-900">{t.name}</h2><Badge variant={t.active ? "success" : "default"}>{t.active ? "Aktiv" : "Deaktiv"}</Badge></div><p className="mt-1 text-sm text-navy-600">{t.phone ?? "telefon yoxdur"} · {t.experienceYears} il təcrübə</p><div className="mt-2 flex flex-wrap gap-2">{t.specializations.map((s) => <Badge key={s} variant="app-electric">{s}</Badge>)}</div></div>

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { listAttendance } from "@/lib/admin/attendance";
 import { resolveRange } from "@/lib/admin/reports";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
-import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
+import { Pagination, StatTile, toneAt, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +25,7 @@ export default async function AdminAttendancePage({ searchParams }: { searchPara
   return (
     <div>
       <AdminTopbar title="Davamiyyət" subtitle="Bütün siniflər üzrə qeydlər (müəllim qeyd edir, admin yoxlayır)" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
           <input type="date" name="from" defaultValue={range.fromDay} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Başlanğıc" />
           <input type="date" name="to" defaultValue={range.toDay} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Son" />
@@ -34,7 +34,7 @@ export default async function AdminAttendancePage({ searchParams }: { searchPara
           <Button type="submit" variant="app-outline" size="sm">Göstər</Button>
         </form>
         <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-5">
-          {[["Qeyd", data.total], ["İştirak", t.PRESENT ?? 0], ["Gecikib", t.LATE ?? 0], ["Qayıb", t.ABSENT ?? 0], ["Davamiyyət", `${rate}%`]].map(([l, v]) => <div key={String(l)} className={`${card} p-4`}><p className="text-xs font-bold uppercase tracking-widest text-navy-400">{l}</p><p className="mt-1 text-2xl font-extrabold text-navy-900">{v}</p></div>)}
+          {[["Qeyd", data.total], ["İştirak", t.PRESENT ?? 0], ["Gecikib", t.LATE ?? 0], ["Qayıb", t.ABSENT ?? 0], ["Davamiyyət", `${rate}%`]].map(([l, v], i) => <StatTile key={String(l)} label={String(l)} value={v} tone={toneAt(i)} />)}
         </div>
         <div className={card}>
           <div className="table-scroll overflow-x-auto">

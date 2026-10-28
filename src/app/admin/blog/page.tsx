@@ -21,7 +21,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: { 
   return (
     <div>
       <AdminTopbar title="Bloq" subtitle="Müəlliflər, yazılar və saytda görünüş" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <section className={card} aria-labelledby="blog-authors">
           <div className="flex flex-wrap items-center justify-between gap-3 p-5 pb-3">
             <h2 id="blog-authors" className="font-display text-lg text-navy-900">Bloq müəllifləri</h2>

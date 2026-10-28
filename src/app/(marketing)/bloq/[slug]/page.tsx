@@ -80,22 +80,22 @@ export default async function BlogPostPage({ params }: Props) {
           <CategoryChip label={post.category} />
           <h1 className="font-display text-3xl leading-tight md:text-5xl">{post.title}</h1>
           {post.excerpt && <p className="text-lg leading-relaxed text-grey-500 dark:text-zinc-400">{post.excerpt}</p>}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 border-y border-grey-100 py-4 text-sm text-grey-500 dark:border-zinc-800 dark:text-zinc-400">
+        </header>
+
+        <figure className="relative mx-auto mt-10 max-w-5xl overflow-hidden rounded-[2rem]">
+          <Cover src={post.coverUrl} alt={post.coverAlt} priority className="!aspect-[16/9]" />
+          <figcaption className="glass glass-smoke absolute inset-x-4 bottom-4 flex flex-wrap items-center gap-x-5 gap-y-3 rounded-2xl px-5 py-4 text-sm text-white">
             <span className="flex items-center gap-3">
               <Avatar src={post.author.user.avatarUrl} name={post.author.user.name} size={40} />
               <span>
-                <span className="block font-bold text-secondary dark:text-white">{post.author.user.name}</span>
-                <span className="block text-xs">{post.author.position}</span>
+                <span className="block font-bold">{post.author.user.name}</span>
+                <span className="block text-xs text-white/75">{post.author.position}</span>
               </span>
             </span>
-            {post.publishedAt && <time dateTime={post.publishedAt.toISOString()}>{formatBlogDate(post.publishedAt)}</time>}
-            <span className="flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden /> {post.readingMinutes} dəq oxu</span>
-            {post.views > 0 && <span className="flex items-center gap-1"><Eye className="h-4 w-4" aria-hidden /> {post.views} oxunma</span>}
-          </div>
-        </header>
-
-        <figure className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-[2rem]">
-          <Cover src={post.coverUrl} alt={post.coverAlt} priority className="!aspect-[16/9]" />
+            {post.publishedAt && <time dateTime={post.publishedAt.toISOString()} className="text-white/85">{formatBlogDate(post.publishedAt)}</time>}
+            <span className="flex items-center gap-1 text-white/85"><Clock className="h-4 w-4" aria-hidden /> {post.readingMinutes} dəq oxu</span>
+            {post.views > 0 && <span className="flex items-center gap-1 text-white/85"><Eye className="h-4 w-4" aria-hidden /> {post.views} oxunma</span>}
+          </figcaption>
         </figure>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-12 lg:grid-cols-[minmax(0,1fr)_16rem]">
@@ -117,7 +117,7 @@ export default async function BlogPostPage({ params }: Props) {
               <ShareButtons url={url} title={post.title} />
             </section>
 
-            <aside aria-label="Müəllif haqqında" className="mt-10 flex gap-5 rounded-3xl bg-grey-50 p-6 dark:bg-zinc-900">
+            <aside aria-label="Müəllif haqqında" className="glass relative mt-10 flex gap-5 rounded-3xl p-6 text-secondary dark:text-white">
               <Avatar src={post.author.user.avatarUrl} name={post.author.user.name} size={64} className="shrink-0" />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Müəllif</p>
@@ -131,7 +131,7 @@ export default async function BlogPostPage({ params }: Props) {
           <aside className="hidden lg:block" aria-label="Məqalənin məzmunu">
             <div className="sticky top-28 space-y-6">
               {headings.length > 0 && (
-                <nav aria-label="Məzmun" className="rounded-3xl border border-grey-100 p-5 dark:border-zinc-800">
+                <nav aria-label="Məzmun" className="glass relative rounded-3xl p-5 text-secondary dark:text-white">
                   <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-grey-500 dark:text-zinc-400">Bu məqalədə</p>
                   <ol className="space-y-2 text-sm">
                     {headings.map((h) => (

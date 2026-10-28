@@ -48,7 +48,7 @@ export default async function AdminSchedulePage({ searchParams }: { searchParams
   return (
     <div>
       <AdminTopbar title="Cədvəl" subtitle="Dərslər, müəllimlər və otaqlar" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
             <input type="date" name="from" defaultValue={from} className="rounded-xl border border-navy-100 bg-white px-3 py-2.5 text-sm" aria-label="Başlanğıc" />

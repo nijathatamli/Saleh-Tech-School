@@ -25,7 +25,7 @@ export default async function BloggerDashboard() {
   return (
     <div>
       <BloggerTopbar title={`Salam, ${first}`} subtitle="Yazılarınızın vəziyyəti və oxunma statistikası" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="grid flex-1 grid-cols-2 gap-3 lg:grid-cols-4">
             <Stat label="Dərc olunub" value={s.published} href="/blogger/yazilar?status=PUBLISHED" />

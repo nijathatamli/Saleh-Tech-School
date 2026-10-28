@@ -1,5 +1,6 @@
 "use client";
 
+import { useOpenFromQuery } from "@/components/admin/use-open-from-query";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ export type CourseOption = { id: string; name: string; price: number };
 export function CreateClassDialog({ courses }: { courses: CourseOption[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  useOpenFromQuery("sinif", setOpen);
   const [name, setName] = useState("");
   const [courseId, setCourseId] = useState("");
   const [schedule, setSchedule] = useState("");

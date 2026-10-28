@@ -112,3 +112,43 @@ export async function getDashboard() {
     teacherLoad: loads.map((t) => ({ id: t.id, name: t.name, lessonsWeek: n(t.lessons), students: n(t.students) })),
   };
 }
+
+/** Last seven school days (Baku time) of the numbers the dashboard draws as charts and sparklines, plus the
+ *  week-over-week / month-over-month comparisons shown on its tiles. Grouped in the database. */
+export async function getDashboardSeries() {
+  const fmt = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Baku" });
+  const wd = new Intl.DateTimeFormat("az-AZ", { weekday: "short", timeZone: "Asia/Baku" });
+  const now = new Date();
+  const keys = Array.from({ length: 7 }, (_, i) => fmt.format(new Date(now.getTime() - (6 - i) * 86_400_000)));
+  const start = fromBakuLocal(`${keys[0]}T00:00`);
+  const weekAgo = new Date(now.getTime() - 7 * 86_400_000);
+  const twoWeeksAgo = new Date(now.getTime() - 14 * 86_400_000);
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const prevMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  const baku = (col: string) => `((${col} AT TIME ZONE 'UTC') AT TIME ZONE 'Asia/Baku')`;
+  type Row = { d: string; a: bigint | number | null; c: bigint | number };
+  const [paid, apps, absent, invoices, studentsNew, appsPrev, prevRevenue] = await Promise.all([
+    prisma.$queryRawUnsafe<Row[]>(`SELECT to_char(${baku('"paidAt"')}, 'YYYY-MM-DD') d, sum("amount") a, count(*) c FROM "Payment" WHERE "status" = 'PAID' AND "paidAt" >= $1 GROUP BY 1`, start),
+    prisma.$queryRawUnsafe<Row[]>(`SELECT to_char(${baku('"createdAt"')}, 'YYYY-MM-DD') d, 0 a, count(*) c FROM "TrialBooking" WHERE "createdAt" >= $1 GROUP BY 1`, start),
+    prisma.$queryRawUnsafe<Row[]>(`SELECT to_char(${baku('"date"')}, 'YYYY-MM-DD') d, 0 a, count(*) c FROM "Attendance" WHERE "status" IN ('ABSENT','EXCUSED') AND "date" >= $1 GROUP BY 1`, start),
+    prisma.$queryRawUnsafe<Row[]>(`SELECT to_char(${baku('"createdAt"')}, 'YYYY-MM-DD') d, 0 a, count(*) c FROM "Payment" WHERE "cycle" IS NOT NULL AND "createdAt" >= $1 GROUP BY 1`, start),
+    prisma.studentProfile.count({ where: { createdAt: { gte: weekAgo } } }),
+    prisma.trialBooking.count({ where: { createdAt: { gte: twoWeeksAgo, lt: weekAgo } } }),
+    prisma.payment.aggregate({ where: { status: "PAID", paidAt: { gte: prevMonthStart, lt: monthStart } }, _sum: { amount: true } }),
+  ]);
+  const pick = (rows: Row[], key: string) => rows.find((r) => r.d === key);
+  const days = keys.map((key, i) => {
+    const noon = new Date(fromBakuLocal(`${key}T12:00`));
+    return {
+      key,
+      label: wd.format(noon).replace(/\./g, "").replace(/^(.)(.*)$/u, (_, a: string, b: string) => a + b.toLowerCase()),
+      revenue: n(pick(paid, key)?.a),
+      paidCount: n(pick(paid, key)?.c),
+      applications: n(pick(apps, key)?.c),
+      absences: n(pick(absent, key)?.c),
+      invoices: n(pick(invoices, key)?.c),
+      today: i === 6,
+    };
+  });
+  return { days, studentsNew7d: studentsNew, applicationsPrev7d: appsPrev, prevMonthRevenue: prevRevenue._sum.amount ?? 0 };
+}

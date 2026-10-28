@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NotificationToaster } from "@/components/app/notification-toaster";
 // The approved student dashboard UI (student-dashboard.html) — the shared
 // fonts and icon font from the parent portal, plus this design's own regular
 // icon face, base styles and generated hover rules — scoped under .sd-root.
@@ -14,5 +15,10 @@ export const metadata: Metadata = { title: "Tələbə paneli", robots: { index: 
 // Access control lives in middleware.ts (session + STUDENT role) and the page
 // itself re-checks the session before loading data.
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      {children}
+      <NotificationToaster />
+    </>
+  );
 }

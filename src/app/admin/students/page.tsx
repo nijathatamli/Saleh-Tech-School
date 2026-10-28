@@ -5,6 +5,7 @@ import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { CreateStudentDialog } from "@/components/admin/student-dialog";
 import { Pagination, card, fmtDate, th, EmptyState } from "@/components/admin/bits";
 import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import { adminGuard } from "@/lib/admin/guard";
@@ -25,7 +26,7 @@ export default async function AdminStudentsPage({ searchParams }: { searchParams
   return (
     <div>
       <AdminTopbar title="Tələbələr" subtitle="Hesablar, siniflər və axtarış" />
-      <div className="space-y-6 p-6 md:p-10">
+      <div className="space-y-6 ad-content">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <form method="GET" className="flex flex-wrap items-end gap-3" role="search">
             <input name="q" defaultValue={searchParams.q} placeholder="Ad, soyad, FIN, e-poçt və ya tələbə ID..." className="w-72 rounded-xl border border-navy-100 bg-white px-4 py-2.5 text-sm" />
@@ -46,7 +47,7 @@ export default async function AdminStudentsPage({ searchParams }: { searchParams
                 {data.items.length === 0 && <tr><td colSpan={6} className="px-4 py-4"><EmptyState text="Tələbə tapılmadı." hint="Axtarışı və ya filtrləri dəyişməyi sınayın." /></td></tr>}
                 {data.items.map((s) => (
                   <tr key={s.id} className="border-b border-navy-50 last:border-0 hover:bg-navy-50/50">
-                    <td className="px-4 py-3"><Link href={`/admin/students/${s.id}`} className="font-bold text-navy-900 hover:text-electric-600">{s.name}</Link><p className="text-xs text-navy-400">{s.grade ? `${s.grade}-ci sinif · ` : ""}{s.email ?? "giriş yoxdur"}</p></td>
+                    <td className="px-4 py-3"><div className="flex items-center gap-3"><Avatar name={s.name} size={34} /><div className="min-w-0"><Link href={`/admin/students/${s.id}`} className="font-bold text-navy-900 hover:text-electric-600">{s.name}</Link><p className="text-xs text-navy-400">{s.grade ? `${s.grade}-ci sinif · ` : ""}{s.email ?? "giriş yoxdur"}</p></div></div></td>
                     <td className="px-4 py-3 font-mono text-xs">{s.fin ?? "—"}</td>
                     <td className="px-4 py-3 text-navy-600">{s.parentName}</td>
                     <td className="px-4 py-3 text-navy-600">{s.classNames.length ? s.classNames.join(", ") : "—"}</td>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useOpenFromQuery } from "@/components/admin/use-open-from-query";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ const err = (m?: string) => (m ? <p role="alert" className="mt-1.5 text-xs font-
 export function CreateStudentDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  useOpenFromQuery("telebe", setOpen);
   const [f, setF] = useState({ firstName: "", lastName: "", email: "", password: "", birthDate: "", grade: "", fin: "" });
   const [active, setActive] = useState(true);
   const [parentMode, setParentMode] = useState<"existing" | "new">("existing");
