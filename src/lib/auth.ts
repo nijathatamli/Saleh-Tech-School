@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { adminPath } from "@/lib/admin-path";
 import { ipFromHeader, loginBlockedFor, loginFailed, loginKeys, loginSucceeded } from "@/lib/rate-limit";
 
 // Compared against when the account does not exist, so "unknown e-mail" costs as much time as "wrong password".
@@ -26,6 +27,7 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        gate: { label: "Gate", type: "text" }, // the path the form was opened at: admins may only sign in at /<ADMIN_PATH>
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -38,7 +40,9 @@ export const authOptions: AuthOptions = {
         const user = await prisma.user.findUnique({ where: { email } });
         // deactivated accounts cannot sign in
         const valid = await bcrypt.compare(credentials.password, user && user.active ? user.passwordHash : DUMMY_HASH);
-        if (!user || !user.active || !valid) {
+        const gate = adminPath();
+        const wrongDoor = user?.role === "ADMIN" && gate !== null && credentials.gate !== gate;
+        if (!user || !user.active || !valid || wrongDoor) {
           loginFailed(keys);
           return null;
         }

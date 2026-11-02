@@ -40,7 +40,7 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const res = await signIn("credentials", { email, password, redirect: false });
+    const res = await signIn("credentials", { email, password, gate: window.location.pathname.slice(1), redirect: false });
     setLoading(false);
 
     if (res?.error) {
