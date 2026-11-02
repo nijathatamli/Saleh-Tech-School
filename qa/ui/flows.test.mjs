@@ -62,7 +62,7 @@ test("UI-02 sign in with the keyboard only, then sign out: the session is really
     }
     await Promise.all([page.waitForURL(/\/giris|^\S+\/$/, { timeout: 20_000 }), out.click()]);
     await page.goto(BASE + a.home);
-    assert.match(new URL(page.url()).pathname, /\/giris/, `${role}: protected page still reachable after sign-out`);
+    assert.ok((await page.content()).includes("Ups, axtardığınız"), `${role}: protected page still reachable after sign-out`); // panels answer 404 to the signed-out
     await page.goBack().catch(() => {});
     await page.waitForTimeout(300);
     assert.ok(!(await page.content()).includes("Çıxış") || /\/giris/.test(page.url()), `${role}: back button shows the panel again`);

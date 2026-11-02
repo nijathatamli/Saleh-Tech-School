@@ -64,12 +64,12 @@ test("BLOG-02 role isolation: a blogger reaches only the blog panel, and nobody 
     assert.equal((await c.get("/api/blogger/posts")).status, 403, u.email);
     assert.equal((await c.post("/api/blogger/posts", input())).status, 403);
     const pg = await c.page("/blogger");
-    assert.ok(pg.status >= 300 && pg.status < 400 && /giris/.test(pg.location ?? ""), `/blogger for ${u.email} → ${pg.status} ${pg.location}`);
+    assert.equal(pg.status, 404, `/blogger for ${u.email} → ${pg.status} ${pg.location}`);
   }
   const anonPage = await anon.page("/blogger");
-  assert.ok(anonPage.status >= 300 && anonPage.status < 400, "anonymous is redirected away from the panel");
+  assert.equal(anonPage.status, 404, "anonymous gets a 404 for the panel");
   const adm = await A.page("/admin");
-  assert.ok(adm.status >= 300 && adm.status < 400 && /giris/.test(adm.location ?? ""), "blogger is sent away from /admin");
+  assert.equal(adm.status, 404, "blogger gets a 404 for /admin");
   const ok = await A.page("/blogger");
   assert.equal(ok.status, 200);
   assert.match(ok.html, /Bloq paneli|Yeni yazı/);

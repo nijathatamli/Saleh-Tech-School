@@ -16,11 +16,11 @@ const under = (pathname: string, prefix: string) => pathname === prefix || pathn
 const notFound = (req: NextRequest) => NextResponse.rewrite(new URL("/__yoxdur", req.url));
 
 export async function middleware(req: NextRequest) {
-  const { pathname, search } = req.nextUrl;
+  const { pathname } = req.nextUrl;
   const secret = adminPath();
 
   // The admin panel's front door: the sign-in page at /<ADMIN_PATH>; an admin who is already in goes straight to the panel.
-  // With ADMIN_PATH set, /admin and /api/admin answer 404 to everyone else, so the panel does not show it exists.
+  // With ADMIN_PATH set, /api/admin also answers 404 to everyone else.
   if (secret && pathname === `/${secret}`) {
     const token = await getToken({ req });
     if (token && !token.revoked && token.role === "ADMIN") return NextResponse.redirect(new URL("/admin", req.url));
@@ -37,15 +37,10 @@ export async function middleware(req: NextRequest) {
   const prefix = Object.keys(roleForPrefix).find((p) => under(pathname, p));
   if (!prefix) return NextResponse.next();
 
+  // A panel is only there for its own role: everyone else gets the plain 404, not a sign-in page that tells them it exists.
   const token = await getToken({ req });
   if (token && !token.revoked && token.role === roleForPrefix[prefix]) return NextResponse.next();
-  if (prefix === "/admin" && secret) return notFound(req);
-  if (!token || token.revoked) {
-    const login = new URL("/giris", req.url);
-    login.searchParams.set("callbackUrl", pathname + search);
-    return NextResponse.redirect(login);
-  }
-  return NextResponse.redirect(new URL("/giris", req.url));
+  return notFound(req);
 }
 
 export const config = {
